@@ -24,7 +24,7 @@ def test_dashboard_is_seeded_data(client):
     response = client.get("/api/v1/dashboard")
     assert response.status_code == 200
     data = response.json()
-    assert len(data["workers"]) == 8
+    assert len(data["workers"]) == 12
     assert len(data["projects"]) == 3
     assert data["staffing_gaps"] == 1
     assert data["demo"] is True
@@ -126,10 +126,10 @@ def test_disruption_is_explicit_and_persistent(client, db):
     response = client.post("/api/v1/assignments/assignment-maya/disrupt")
     assert response.status_code == 200
     assert response.json()["staffing_gaps"] == before + 1
-    assert db.get(Assignment, "assignment-maya").status == "disrupted"
+    assert db.get(Assignment, "assignment-maya").status == "confirmed"
     assert db.scalar(select(WorkerAbsence.worker_id)) == "maya"
     assert client.post("/api/v1/assignments/assignment-maya/disrupt").status_code == 409
-    assert db.scalar(select(AuditEvent.action)) == "assignment.disrupted_and_absence_recorded"
+    assert db.scalar(select(AuditEvent.action)) == "worker.absence_recorded"
 
 
 def test_recovery_finds_contractor_respects_private_busy(db):
@@ -170,7 +170,7 @@ def test_no_double_booking_cross_project(db):
 def test_certification_expiry_blocks_unqualified_workers(db):
     remove_maya(db)
     for cert in db.scalars(
-        select(Certification).where(Certification.worker_id.in_(["sofia", "ethan"]))
+        select(Certification).where(Certification.worker_id.in_(["sofia", "ethan", "jack"]))
     ):
         cert.expires_at = at(9, 7)
     db.flush()
@@ -181,7 +181,7 @@ def test_certification_expiry_blocks_unqualified_workers(db):
 
 def test_skills_required(db):
     remove_maya(db)
-    db.execute(delete(Skill).where(Skill.worker_id.in_(["sofia", "ethan"])))
+    db.execute(delete(Skill).where(Skill.worker_id.in_(["sofia", "ethan", "jack"])))
     db.flush()
     assert run(db).solver_status == "INFEASIBLE"
 
@@ -189,7 +189,9 @@ def test_skills_required(db):
 def test_worker_availability_enforced(db):
     remove_maya(db)
     db.execute(
-        delete(AvailabilityWindow).where(AvailabilityWindow.worker_id.in_(["sofia", "ethan"]))
+        delete(AvailabilityWindow).where(
+            AvailabilityWindow.worker_id.in_(["sofia", "ethan", "jack"])
+        )
     )
     db.flush()
     assert run(db).solver_status == "INFEASIBLE"
@@ -248,10 +250,12 @@ def run_with_limit(db, limit):
     return solve(db, db.get(Project, "eastside"), db.get(Membership, "demo-manager"), limit)
 
 
-def test_partial_crews_not_silently_ignored(db):
+def test_partial_crews_are_filled_without_moving_fixed_members(db):
     db.get(Task, "rough-in").crew_size = 2
     db.flush()
-    assert run(db).solver_status == "INVALID_INPUT"
+    draft = run(db)
+    assert draft.solver_status in {"OPTIMAL", "FEASIBLE"}
+    assert any(p["task_id"] == "rough-in" and p["worker_id"] != "maya" for p in draft.proposals)
 
 
 def test_fingerprint_changes_when_inputs_change(db):
@@ -291,4 +295,4 @@ def test_busy_non_hour_aligned_blocks_intersected_slot(db):
     d = run(db)
     p = next(p for p in d.proposals if p["task_id"] == "rough-in")
     if p["worker_id"] == "sofia":
-        assert utc(datetime.fromisoformat(p["starts_at"])) >= at(9, 13)
+        assert utc(datetime.fromisoformat(p["starts_at"])) >= at(9, 12) + timedelta(minutes=30)

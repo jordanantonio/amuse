@@ -1,110 +1,105 @@
 # SHIFT architecture
 
-## Repository assessment (2026-11-06)
-Origin is https://github.com/jordanantonio/amuse.git. Local main and origin/main
-were both f59048b, the initial commit, with only README.md and LICENSE. A read-only
-remote-ref inspection found only main. No application, dependencies, CI, existing
-AGENTS.md, or branch policy was present. Work begins on codex/shift-foundation;
-main is unchanged and nothing is pushed. System PATH initially lacked Node/npm;
-Python 3.12 and uv were available. Use documented standard toolchains below.
+## Current implementation
+Next.js App Router/TypeScript/Tailwind/Lucide UI → same-origin `/api/v1` proxy →
+FastAPI/Pydantic → SQLAlchemy/Alembic → SQLite local or PostgreSQL/Supabase.
+Google OR-Tools CP-SAT is the only feasibility/optimization engine. No LLM is used.
 
-## Components
-```mermaid
-flowchart LR
-  UI[Next.js App Router] -->|same-origin /api proxy| API[FastAPI]
-  API --> DB[(SQLAlchemy: SQLite local / PostgreSQL)]
-  API --> Solver[OR-Tools CP-SAT]
-  Auth[Supabase Auth: next milestone] -. JWT .-> API
-  DB -. production policies .-> RLS[Supabase RLS + exclusion constraints]
-```
-Next.js uses TypeScript, Tailwind, Lucide icons, and accessible composable UI
-primitives. The dashboard fetches FastAPI data, with refresh after writes and
-periodic polling. Next rewrites /api/v1/* to the backend; no browser secret keys.
-FastAPI validates requests and returns typed Pydantic responses/OpenAPI. SQLAlchemy
-2 models work with SQLite for local setup and PostgreSQL for Supabase. Alembic
-owns schema migrations; seed code is a separate idempotent development operation.
+The repository originally contained only README/LICENSE at f59048b. Foundation
+commit 3239334 established the stack. Adaptive extends that implementation rather
+than rebuilding its database or modifying Claude's separate worktree.
 
-## Model boundaries
-| Entity | Purpose |
-| --- | --- |
-| Organization, Membership | Tenant and role scope; future auth subject binding |
-| Worker, Skill, Certification | Searchable professional profile and qualifications |
-| AvailabilityWindow | Worker-published available slots |
-| PrivateCommitment | Private blocker; serialize only start/end when appropriate |
-| Project, Task, TaskDependency | Deadlines, duration, capacity, skill demand, DAG |
-| Assignment | Confirmed work and historical disruptions; never draft proposals |
-| JobPosting, Application | Company demand and worker-initiated applications |
-| ScheduleDraft | Immutable input fingerprint, solver result, proposed placements |
-| Invitation | Explicit offer lifecycle before confirmed assignment |
-| AuditEvent | Actor, action, entity, timestamp; no private calendar payloads |
+## Frontend
+`adaptive-workspace.tsx` coordinates operational dashboard, projects, marketplace,
+Adaptive and inbox views; `team-calendar.tsx`, `proposal-comparison.tsx`,
+`data-editor.tsx`, `auth-gate.tsx` and owned UI primitives are separate components.
+`calendar-time.ts` handles full local-date keys, timezone conversion, interval
+clipping and subtraction. Query parameters persist view/project/proposal selection
+and support sharing/reload/back navigation. Refresh follows writes plus a 15-second
+poll; loaded-data age is visible. Calendar state explicitly distinguishes confirmed,
+proposed and awaiting acceptance. The superseded read-only workspace was retired.
 
-All instants are timezone-aware at API boundaries, stored in UTC. UI displays
-America/Edmonton. Intervals are half-open [start, end). Integer CAD cents avoid
-float money; solver uses hourly discrete slots in the first demo. Non-aligned
-commitments block every slot they intersect. Qualifications must remain valid
-through the end of the assignment. SQLite lacks production exclusion constraints;
-PostgreSQL acceptance must add transactional locking and range exclusion indexes.
+Public Supabase client configuration enables password sign-in/session refresh.
+API calls attach the access token; no service-role or database credentials reach
+browser code. The local persona harness remains available only in demo mode.
+Next uses supported Webpack dev/build because the execution host restricts
+Turbopack's CSS subprocess port binding.
 
-## Authorization and privacy
-Foundation local mode uses a conspicuous demo-persona header and explicitly
-requires loopback/local deployment. This is a role-policy testing harness, not
-login. API checks tenant and role; worker endpoints return own schedule. Managers
-get published availability, relevant workforce profiles, and opaque busy windows.
-Private titles/reasons are never serialized into dashboard responses.
-Production is fail-closed until Supabase JWT verification, membership mapping,
-RLS, and acceptance transaction tests are implemented. Never ship a public demo
-identity override or put a service-role key in browser code. Runtime DB credentials
-must be server-only. RLS migrations and authenticated APIs are a later gate, not
-implied by PostgreSQL compatibility.
+## Database and API contracts
+Core tables: organizations, memberships, workers, skills, dated certifications,
+published availability, private commitments, worksites, projects, tasks,
+dependencies, assignments, job postings, applications, legacy drafts/invitations,
+worker absences and audit events.
+Adaptive tables: scheduling policies, weather forecasts, recovery proposals,
+worker confirmations, slot reservations, approval decisions, scheduling events,
+and persisted risk reviews. Legacy draft/invitation tables remain compatible;
+Adaptive confirmations/reservations are the new recovery invitation lifecycle.
 
-## Solver contract
-Input: organization/project scope, fixed confirmed assignments across projects,
-workers and dated skills/certifications, published availability, private busy
-intervals, task duration/dependencies/crew size, site capacity, deadlines, budget.
-An LLM is not in this path. CP-SAT optional intervals represent eligible worker,
-task, and start combinations. Exactly required crew placements per unstaffed task;
-shared task start; NoOverlap per worker including fixed commitments; cumulative
-site capacity; precedence; project deadline; labour budget. Minimize illustrative
-planned labour cents and start times. No speed/savings claims are precomputed.
-Existing confirmed assignments are fixed; the disruption action must be explicit.
-Return OPTIMAL/FEASIBLE with proposals, INFEASIBLE with candidate eligibility and
-resource/deadline blockers, or UNKNOWN with a timeout explanation. Diagnostics are
-prechecks and model constraints, not an alleged minimal unsatisfiable core.
-Partial fixed crews, multi-day shifts, breaks, travel, and legal overtime rules
-require dedicated modeling; unsupported inputs must be reported, never ignored.
+Requests are explicit Pydantic schemas in inputs.py. Proposal/forecast/dashboard
+responses have typed schemas; `packages/contracts/openapi.json` is generated from
+FastAPI. Frontend contracts are in `lib/types.ts` and `lib/adaptive-types.ts`.
+All API instants are timezone-aware, normalized to UTC; workspace presentation is
+America/Edmonton. Intervals are half-open [start,end). Money is integer CAD cents.
 
-## Foundation API (v1)
-- GET /health, /personas (local demo only)
-- GET /dashboard — role-scoped projects, workforce/own profile, assignments, jobs
-- POST /projects/{id}/draft — manager/admin only; CP-SAT draft persisted separately
-- POST /assignments/{id}/disrupt — manager/admin, explicit confirmed→disrupted
-- GET /drafts — scoped persisted proposals; never confirmed work
-- POST /demo/reset — demo admin only; fixture reset, never production
-Later contracts: profile/availability/project/task/job CRUD; applications;
-POST /drafts/{id}/approve; invitations accept/decline; revision/ETag conflict (409).
-Export OpenAPI via scripts/export_openapi.py. Frontend types mirror response models.
+## Authorization
+Demo headers are a local role-policy harness, not login. In authenticated mode the
+API ignores those headers, verifies Supabase asymmetric JWT signatures through
+JWKS and checks issuer, audience, expiry, issued-at and subject. Roles and tenant
+scope come from server database memberships, never user-editable JWT metadata.
+No configured provider or missing/invalid tokens fails closed. Operator tooling
+maps existing Supabase Auth users to memberships; account onboarding is not an
+unrestricted self-assignment of company privileges.
+
+Workers can update only their own profile/availability/applications/confirmations.
+Managers can change only assigned projects; administrators have tenant scope.
+Private calendar titles/reasons never enter dashboard or proposal responses.
+Workers see only their own proposed slots, not another worker's original plan.
+
+PostgreSQL migrations enable RLS and revoke direct anon/authenticated/PUBLIC table
+access. This is an **API-exclusive database boundary**, not browser-side PostgREST
+CRUD. The trusted API database role owns/bypasses those policies. Keep its connection
+secret. RLS intentionally remains enabled on guard-migration downgrade.
+
+## Atomic recovery
+See ADAPTIVE.md for the detailed state machine. All scheduling mutations acquire
+a tenant write boundary: SQLite BEGIN IMMEDIATE or PostgreSQL transaction advisory
+lock. All writers must retain this convention. Approval/acceptance/publication
+compare a canonical scheduling-input fingerprint and rerun CP-SAT with the exact
+stored placements forced. Accepted slots are reserved under the same lock.
+Publication checks all confirmations and atomically cancels only superseded work,
+inserts confirmed assignments, releases reservations and records history.
+PostgreSQL additionally uses btree_gist range exclusion constraints to reject
+confirmed-worker overlap and reservation overlap within their respective tables.
+Cross-table capacity/rest consistency is enforced by the locked validation service.
+
+Supabase service-role clients or database owners can bypass RLS; do not expose
+these credentials or use direct client-side scheduling writes. Read replicas cannot
+be used for validation. Application API is the supported scheduling writer.
+
+## Solver and weather
+Half-hour, non-preemptive optional intervals, shared crew starts, dependencies,
+capacity, fixed commitments, qualified availability, private busy windows, rest,
+daily hours, task/setup/contingency buffers, weather and hard labour budgets.
+Each objective is solved separately. Fixed work, including the freeze window,
+remains protected unless a detected disruption and its dependency closure are
+included in an explicitly approved project recovery. See ADAPTIVE.md for limitations.
+
+A replaceable WeatherProvider returns source/timestamp-labeled forecasts. The
+local provider is deterministic and simulated. Thresholds belong to tasks, not a
+generic construction rule. Manual reviews persist risk evidence; a CLI supports
+operator-configured cron. No unattended scheduler is installed by default.
+
+## Verification boundary
+Local SQLite, signed JWT policy tests, browser workflows and a production web build
+are verified. A disposable PostgreSQL CI job covers migrations, RLS rejection,
+overlap exclusions and concurrent acceptance/publication. Consult TESTING.md for
+its actual execution status. No hosted Supabase account, live-weather provider,
+or public deployment is assumed. Equipment, material delays, legal overtime rules,
+preemptive/split tasks and resilience benchmarking remain outside this release.
 
 ## References
-- [Next.js installation](https://nextjs.org/docs/app/getting-started/installation)
-- [OR-Tools employee scheduling](https://developers.google.com/optimization/scheduling/employee_scheduling)
-- [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security)
-- [Supabase Auth](https://supabase.com/docs/guides/auth)
-
-## Foundation implementation notes
-
-The frontend calendar and project cards are separate components; workspace.tsx
-coordinates persona/view state and mutations. UI primitives are locally owned
-shadcn-style components (CVA, clsx, tailwind-merge), not a claim that every shadcn
-component is installed. Both dev and build select Webpack because Turbopack's CSS
-subprocess is restricted in the current executor. Lockfiles pin tested resolutions.
-
-`worker_absences` stores explicitly manager-recorded unavailability independently
-of private commitments. The demo disruption action clearly scopes absence to the
-project week, retains the disrupted assignment, and writes an audit event. It does
-not cancel other confirmed work: if another commitment conflicts with the recorded
-absence, the solver reports infeasibility rather than silently moving that work.
-
-The initial absence and draft endpoints are synchronous local-demo operations.
-They do not claim the production transactional reservation or optimistic-concurrency
-guarantees required for approval/acceptance. Add these before exposing assignment
-creation. The input fingerprint is persisted now for that follow-up lifecycle.
+- [Next.js authentication](https://nextjs.org/docs/app/guides/authentication)
+- [Supabase signing keys/JWKS](https://supabase.com/docs/guides/auth/signing-keys)
+- [Supabase JWT verification](https://supabase.com/docs/guides/auth/jwts)
+- [PostgreSQL range exclusions](https://www.postgresql.org/docs/current/rangetypes.html)
+- [OR-Tools scheduling](https://developers.google.com/optimization/scheduling/employee_scheduling)

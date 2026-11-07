@@ -73,3 +73,14 @@ an explicit fictional-demo indicator. No decorative buttons with no behavior.
 ## Initial scope
 This branch is the documentation and runnable foundation, not the completed MVP.
 See the implementation plan for shipped work and remaining acceptance criteria.
+
+## SHIFT Adaptive implementation (2026-11-07)
+The current product includes weather-aware recovery, manager decisions, worker
+confirmations, reservations and publication. Read docs/ADAPTIVE.md before touching
+this lifecycle. Never bypass the tenant transaction lock or exact-plan validation
+at approval/acceptance/publication. PostgreSQL RLS is API-exclusive; do not grant
+direct client access to private tables. Supabase JWT roles come from database
+memberships, not client-editable token metadata. Keep demo and authenticated modes
+explicitly separate. Retain immutable original assignments and decision history.
+Calendar comparisons use full dates and half-open intervals; free time subtracts
+all busy and confirmed windows, including multi-day blocks.

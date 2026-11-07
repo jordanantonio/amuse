@@ -54,7 +54,7 @@ known gaps; reviewable diff. Report any unrun tests explicitly.
 
 ## Foundation handoff (2026-11-06)
 
-Implemented on `codex/shift-foundation`, uncommitted and unpushed:
+Foundation snapshot implemented on `codex/shift-foundation` (commit 3239334, pushed):
 - All requested permanent product, architecture, implementation, and Claude docs.
 - Next.js/TypeScript/Tailwind dashboard and FastAPI/SQLAlchemy monorepo.
 - Alembic relational models, local fixture, OpenAPI export, lockfiles and CI checks.
@@ -75,3 +75,38 @@ Concrete next-task ownership seams:
 
 M0 is ready for foundation review; M1–M4 remain open. Do not describe the product
 as MVP complete until approval and contractor acceptance work end to end.
+
+## Active Adaptive implementation — 2026-11-07
+Owner: Codex, branch `codex/shift-adaptive`. Scope: all API/model/contract changes,
+calendar, workspace and new Adaptive views in this checkout. Claude's existing
+`claude/ui-polish` worktree is not modified. Do not concurrently edit these files.
+Milestones: (1) versioned recovery/acceptance/publish transactions; (2) weather,
+buffers and separately optimized alternatives; (3) editing, auth and operational
+calendar/worker views; (4) integrated tests, docs, commit and feature-branch push.
+
+
+## Adaptive handoff — 2026-11-07
+Implemented on `codex/shift-adaptive`:
+- Exact absences preserve confirmed work; targeted risk/dependency recovery.
+- Three CP-SAT objectives, half-hour slots, partial crews, task/setup/contingency
+  buffers, project work hours, rest/daily-hour policies and task-specific weather.
+- Persistent proposal comparison, approval/revision/rejection, worker confirmations,
+  accepted reservations, exact-plan revalidation and atomic publication.
+- Tenant write serialization, PostgreSQL exclusion/RLS migrations, Supabase JWT
+  verification and browser sign-in support (live credentials not supplied).
+- Editable project/task/profile/availability/job flows; applications, withdrawal,
+  validated offers; operational overview, date-aware calendar, actual free windows,
+  overlays/legend/drawer, mobile worker workspace and shareable URLs.
+- Deterministic simulated weather, rolling manual reviews and optional cron CLI.
+- Expanded negative/concurrency tests and CI jobs. See TESTING.md for actual results.
+
+Remaining deployment setup: provision Supabase/PostgreSQL credentials and initial
+memberships; verify hosted sign-in; configure scheduler only if desired; deployment
+review. Remaining product extensions: material/equipment models, jurisdictional
+labour/overtime rules, split tasks, delegated crew/company roles, resilience analysis.
+No production or performance benchmark is claimed without evidence.
+
+Updated ownership seams: recovery.py/locking.py/adaptive_routes.py are the lifecycle;
+solver.py/weather.py are constraint/risk services. UI uses adaptive-workspace.tsx,
+team-calendar.tsx, proposal-comparison.tsx, data-editor.tsx, auth-gate.tsx. The old
+read-only workspace.tsx is retired. Coordinate these contracts before parallel edits.

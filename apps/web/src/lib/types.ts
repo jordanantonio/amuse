@@ -24,6 +24,7 @@ export type Task = {
   required_certifications: string[];
   work_mode: string;
   confirmed_count: number;
+  predecessor_ids: string[];
 };
 export type Project = {
   id: string;

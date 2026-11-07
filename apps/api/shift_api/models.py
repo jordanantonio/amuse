@@ -240,3 +240,100 @@ class WorkerAbsence(Base):
     starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     recorded_by: Mapped[str] = mapped_column(ForeignKey("memberships.id"))
+
+
+class SchedulingPolicy(Base):
+    __tablename__ = "scheduling_policies"
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), primary_key=True)
+    task_buffer_percent: Mapped[int] = mapped_column(Integer, default=0)
+    transition_minutes: Mapped[int] = mapped_column(Integer, default=0)
+    contingency_minutes: Mapped[int] = mapped_column(Integer, default=0)
+    freeze_hours: Mapped[int] = mapped_column(Integer, default=48)
+    day_start_hour: Mapped[int] = mapped_column(Integer, default=8)
+    day_end_hour: Mapped[int] = mapped_column(Integer, default=17)
+    minimum_rest_hours: Mapped[int] = mapped_column(Integer, default=11)
+    max_daily_hours: Mapped[int] = mapped_column(Integer, default=9)
+    timezone: Mapped[str] = mapped_column(String(80), default="America/Edmonton")
+    task_weather_rules: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
+class WeatherForecast(Base):
+    __tablename__ = "weather_forecasts"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    rain_probability: Mapped[int] = mapped_column(Integer)
+    precipitation_mm: Mapped[int] = mapped_column(Integer)
+    wind_kph: Mapped[int] = mapped_column(Integer)
+    temperature_c: Mapped[int] = mapped_column(Integer)
+    source: Mapped[str] = mapped_column(String(100))
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    simulated: Mapped[bool] = mapped_column(default=True)
+
+
+class RecoveryProposal(Base):
+    __tablename__ = "recovery_proposals"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    draft_id: Mapped[str] = mapped_column(ForeignKey("schedule_drafts.id"))
+    created_by: Mapped[str] = mapped_column(ForeignKey("memberships.id"))
+    original_fingerprint: Mapped[str] = mapped_column(String(64))
+    original_schedule: Mapped[list] = mapped_column(JSON)
+    proposed_schedule: Mapped[list] = mapped_column(JSON)
+    replaces_assignment_ids: Mapped[list] = mapped_column(JSON)
+    objective: Mapped[str] = mapped_column(String(40))
+    reason: Mapped[str] = mapped_column(String(2000))
+    status: Mapped[str] = mapped_column(String(40), default="pending_approval")
+    metrics: Mapped[dict] = mapped_column(JSON, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class WorkerConfirmation(Base):
+    __tablename__ = "worker_confirmations"
+    __table_args__ = (UniqueConstraint("proposal_id", "worker_id"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    proposal_id: Mapped[str] = mapped_column(ForeignKey("recovery_proposals.id"), index=True)
+    worker_id: Mapped[str] = mapped_column(ForeignKey("workers.id"))
+    status: Mapped[str] = mapped_column(String(30), default="pending")
+    responded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class SlotReservation(Base):
+    __tablename__ = "slot_reservations"
+    __table_args__ = (CheckConstraint("ends_at > starts_at"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    proposal_id: Mapped[str] = mapped_column(ForeignKey("recovery_proposals.id"), index=True)
+    worker_id: Mapped[str] = mapped_column(ForeignKey("workers.id"), index=True)
+    task_id: Mapped[str] = mapped_column(ForeignKey("tasks.id"))
+    starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class ApprovalDecision(Base):
+    __tablename__ = "approval_decisions"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    proposal_id: Mapped[str] = mapped_column(ForeignKey("recovery_proposals.id"), index=True)
+    actor_id: Mapped[str] = mapped_column(ForeignKey("memberships.id"))
+    decision: Mapped[str] = mapped_column(String(40))
+    comment: Mapped[str] = mapped_column(String(2000), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class SchedulingEvent(Base):
+    __tablename__ = "scheduling_events"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    kind: Mapped[str] = mapped_column(String(50))
+    description: Mapped[str] = mapped_column(String(1000))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class RiskReview(Base):
+    __tablename__ = "risk_reviews"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    report: Mapped[dict] = mapped_column(JSON)
