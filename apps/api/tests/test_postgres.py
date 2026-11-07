@@ -98,7 +98,9 @@ def test_postgres_concurrent_acceptance_and_publication(pg):
             responses = list(pool.map(accept, [a, b]))
         assert sorted(r.status_code for r in responses) == [200, 409]
         winner = next(r.json() for r in responses if r.status_code == 200)
-        for w in winner["confirmations"]:
+        # Worker responses intentionally redact other workers' confirmations.
+        manager_view = c.get(f"/api/v1/proposals/{winner['id']}").json()
+        for w in manager_view["confirmations"]:
             if w["status"] == "pending":
                 assert (
                     c.post(
