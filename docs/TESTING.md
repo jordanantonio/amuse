@@ -72,3 +72,14 @@ a configured hosted environment uses JWTs and ignores demo persona headers.
 PostgreSQL CI and hosted Supabase verification are distinct: passing a disposable
 PostgreSQL test does not verify a real Supabase project. No legal-compliance,
 performance, resilience or savings benchmark is asserted.
+
+## Verified hosted CI evidence
+
+[GitHub Actions run 42412789167](https://github.com/jordanantonio/amuse/actions/runs/42412789167)
+completed successfully for source commit `99b1299` on 2026-11-07. All four jobs
+(`api`, `web`, `browser`, `postgres`) passed. This includes the three real PostgreSQL
+integration cases, not just migration configuration. The initial PostgreSQL test
+incorrectly expected a worker-scoped response to contain other workers' confirmations;
+the corrected test obtains the authorized manager view before completing acceptance.
+No privacy restriction was relaxed. Hosted Supabase credentials/sign-in remain a
+separate, unverified deployment setup step.
