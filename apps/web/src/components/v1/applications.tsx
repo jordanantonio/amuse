@@ -16,6 +16,7 @@ import { market } from '@/lib/market';
 import type { ApplicationStatus, ApplicationView } from '@/lib/market-types';
 import { dollars, range } from '@/lib/format';
 import { StatusChip, type Tone } from './ui';
+import { CompanyBadge, PersonAvatar } from './avatar';
 
 const STATUS: Record<ApplicationStatus, { tone: Tone; label: string; icon: typeof Clock3 }> = {
   applied: { tone: 'muted', label: 'Applied', icon: Clock3 },
@@ -122,6 +123,7 @@ export function MyApplicationRow({
   const p = a.posting;
   return (
     <li className="work-row">
+      <CompanyBadge name={p.org.name} industry={p.org.industry} size={44} />
       <div className="work-row-main">
         <Link href={`/postings/${p.id}`} className="work-row-title">
           {p.title}
@@ -169,6 +171,11 @@ export function ApplicantRow({
   };
   return (
     <li className="applicant-row">
+      {a.applicant.kind === 'worker' ? (
+        <PersonAvatar id={a.applicant.id} name={a.applicant.name} size={52} />
+      ) : (
+        <CompanyBadge name={a.applicant.name} industry={a.applicant.industry} size={52} />
+      )}
       <div className="applicant-main">
         <div className="applicant-name">
           <strong>{a.applicant.name}</strong>

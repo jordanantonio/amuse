@@ -255,7 +255,9 @@ export function PostingForm({
             </label>
           </div>
           <fieldset className="req-field">
-            <legend>{form.posting_type === 'agency' ? 'Company credentials' : 'Certifications'}</legend>
+            <legend>
+              {form.posting_type === 'agency' ? 'Company credentials' : 'Certifications'}
+            </legend>
             <small>
               Required certifications decide who can apply. Nice-to-haves only improve ranking.
             </small>

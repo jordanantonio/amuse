@@ -170,6 +170,7 @@ def card(db, p: Posting, org: Organization, ev: Evaluation, **extra) -> dict:
             "name": org.name,
             "kind": org.kind,
             "verified": org.verification_status == "verified",
+            "industry": org.industry,
         },
         "city": p.city,
         "start_date": p.start_date,

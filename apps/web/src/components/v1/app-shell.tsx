@@ -14,8 +14,8 @@ import {
 } from 'lucide-react';
 import { market } from '@/lib/market';
 import type { Notifications, Notification } from '@/lib/market-types';
-import { initials } from '@/lib/format';
 import { useSession } from './session';
+import { CompanyBadge, PersonAvatar } from './avatar';
 
 const TABS = [
   { href: '/home', label: 'Home', icon: House },
@@ -124,7 +124,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     {notes.items.map((n) => (
                       <li key={n.id} className={n.read_at ? '' : 'unread'}>
                         <Link href="/work" onClick={() => setBellOpen(false)}>
-                          {describe(n)}
+                          <NoteFace n={n} />
+                          <span>{describe(n)}</span>
                         </Link>
                       </li>
                     ))}
@@ -145,9 +146,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               buttonClass="account-button"
               button={
                 <>
-                  <span className="account-avatar" aria-hidden="true">
-                    {initials(name)}
-                  </span>
+                  {me.organization ? (
+                    <CompanyBadge
+                      name={me.organization.name}
+                      industry={me.organization.industry}
+                      size={34}
+                    />
+                  ) : (
+                    <PersonAvatar id={me.user.id} name={me.user.full_name} size={34} />
+                  )}
                   <span className="account-name">{name}</span>
                   <ChevronDown size={16} aria-hidden="true" />
                 </>
@@ -188,6 +195,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </nav>
     </div>
   );
+}
+
+/** Who a notification is about: the applicant for businesses, the company for workers. */
+function NoteFace({ n }: { n: Notification }) {
+  const p = n.payload;
+  const aboutApplicant = [
+    'application.received',
+    'offer.accepted',
+    'offer.declined',
+    'application.withdrawn',
+  ].includes(n.type);
+  if (aboutApplicant && p.applicant) return <PersonAvatar name={String(p.applicant)} size={32} />;
+  return <CompanyBadge name={String(p.org || 'Shift')} size={32} />;
 }
 
 function NavLink({

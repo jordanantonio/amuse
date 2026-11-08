@@ -323,6 +323,7 @@ class OrgRef(BaseModel):
     name: str
     kind: str
     verified: bool
+    industry: str | None = None
 
 
 class MatchItem(BaseModel):
@@ -388,6 +389,7 @@ class ApplicantSummary(BaseModel):
     city: str
     distance_km: int | None = None
     verified: bool | None = None
+    industry: str | None = None
 
 
 class EngagementSummary(BaseModel):
@@ -532,6 +534,8 @@ class ScheduleItem(BaseModel):
     posting_id: str | None = None
     engagement_id: str | None = None
     status: str | None = None
+    person_id: str | None = None
+    industry: str | None = None
 
 
 class ScheduleView(BaseModel):

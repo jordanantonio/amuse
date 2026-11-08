@@ -8,6 +8,7 @@ import type { ScheduleItem, ScheduleView } from '@/lib/market-types';
 import { day, range, todayIso } from '@/lib/format';
 import { useSession } from '@/components/v1/session';
 import { EmptyState, ErrorNote, Modal, Skeleton } from '@/components/v1/ui';
+import { CompanyBadge, PersonAvatar } from '@/components/v1/avatar';
 
 const DAY = 86400000;
 const toUtc = (iso: string) => Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10));
@@ -213,7 +214,8 @@ export default function SchedulePage() {
                         onClick={() => open(i)}
                         title={`${i.title}${i.subtitle ? ` · ${i.subtitle}` : ''}`}
                       >
-                        {i.title}
+                        <ItemFace item={i} size={18} />
+                        <span>{i.title}</span>
                       </button>
                     ))}
                     {items.length > shown.length && (
@@ -253,10 +255,11 @@ export default function SchedulePage() {
           {upcoming.map((i) => (
             <li key={i.id}>
               <button className={`agenda-item ${i.kind}`} onClick={() => open(i)}>
-                <i
-                  className={`swatch ${i.kind === 'manual' ? 'unavailable' : 'booked'}`}
-                  aria-hidden="true"
-                />
+                {i.kind === 'manual' ? (
+                  <i className="swatch unavailable" aria-hidden="true" />
+                ) : (
+                  <ItemFace item={i} size={36} />
+                )}
                 <span>
                   <strong>{i.title}</strong>
                   {range(i.start_date, i.end_date)}
@@ -302,6 +305,13 @@ export default function SchedulePage() {
       )}
     </>
   );
+}
+
+/** Business view shows the booked worker; worker view shows the company. */
+function ItemFace({ item, size }: { item: ScheduleItem; size: number }) {
+  if (item.kind === 'manual') return null;
+  if (item.person_id) return <PersonAvatar id={item.person_id} name={item.subtitle} size={size} />;
+  return <CompanyBadge name={item.subtitle} industry={item.industry} size={size} />;
 }
 
 function BlockDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () => Promise<void> }) {

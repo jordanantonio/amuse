@@ -12,8 +12,8 @@ export default function DevReset() {
       <div className="v1-notice">
         <h1>Reset the demo</h1>
         <p className="v1-lede">
-          Restores every fictional account, posting, application and certification to the starting state.
-          New demo accounts are removed.
+          Restores every fictional account, posting, application and certification to the starting
+          state. New demo accounts are removed.
         </p>
         {error && (
           <p className="v1-inline-error" role="alert">

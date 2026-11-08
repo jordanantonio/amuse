@@ -2293,3 +2293,373 @@ label.toggle input {
     padding: 40px 16px;
   }
 }
+
+/* =====================================================================
+ * V2 shell theme (SHELL-1, SHELL-2): blueprint blue app, light cards.
+ * Swap the app background with one variable: --app-bg (deep | vivid).
+ * ===================================================================== */
+.v1-shell {
+  --app-bg: var(--bp-deep);
+  --r-panel: 14px;
+  --r-control: 12px;
+  --shadow: 0 10px 28px rgb(0 8 20 / 0.22);
+  /* Tokens for content sitting directly on the blue */
+  --text: #ffffff;
+  --text-2: #d6e4f3;
+  --text-3: #b2c7df;
+  --line: rgb(255 255 255 / 0.16);
+  --line-strong: rgb(255 255 255 / 0.32);
+  --raised: rgb(255 255 255 / 0.1);
+  --surface: #f5f8fc;
+  background: var(--app-bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+.theme-vivid {
+  --app-bg: var(--bp-vivid);
+}
+
+/* Light card surfaces: dark, softened ink on a near-white card (AA everywhere). */
+.v1-shell
+  :is(
+    .contract-card,
+    .today-item,
+    .filters,
+    .v1-empty,
+    .wallet-card,
+    .history-list,
+    .completeness,
+    .talent-list,
+    .eligibility,
+    .work-row,
+    .applicant-row,
+    .offer-card,
+    .agenda-item,
+    .cal-grid,
+    .popover-panel,
+    .v1-dialog,
+    .apply-sheet,
+    .why-sheet,
+    .light-card
+  ) {
+  --surface: #f5f8fc;
+  --raised: #e7eef7;
+  --ink: #ffffff;
+  --text: #001d3d;
+  --text-2: #3d5a7a;
+  --text-3: #52708f;
+  --line: #dde6f0;
+  --line-strong: #b7c9dd;
+  --gold: #8a5a00;
+  --accent-soft: #fff0bf;
+  --ok: #0f6b45;
+  --ok-soft: #dff2e8;
+  --danger: #b3261e;
+  --danger-soft: #fbe3e1;
+  color: var(--text);
+}
+.v1-shell
+  :is(
+    .contract-card,
+    .today-item,
+    .filters,
+    .wallet-card,
+    .history-list,
+    .completeness,
+    .talent-list,
+    .eligibility,
+    .work-row,
+    .applicant-row,
+    .offer-card,
+    .agenda-item,
+    .cal-grid,
+    .light-card
+  ) {
+  border: 0;
+  border-radius: var(--r-panel);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.v1-shell :is(.contract-card, .work-row, .applicant-row, .offer-card, .wallet-card) {
+  padding: 22px 24px;
+}
+.v1-shell .v1-empty {
+  border: 0;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.v1-shell
+  :is(.filters, .v1-dialog, .popover-panel, .apply-sheet, .why-sheet)
+  :is(input, select, textarea) {
+  background: #ffffff;
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+.v1-shell .v1-dialog {
+  border: 0;
+  background: var(--surface);
+  box-shadow: 0 24px 60px rgb(0 8 20 / 0.4);
+}
+.v1-shell .v1-dialog .editor-heading,
+.v1-shell .v1-dialog .editor-actions {
+  border-color: var(--line);
+}
+.v1-shell .popover-panel {
+  border: 0;
+  background: var(--surface);
+  box-shadow: 0 18px 44px rgb(0 8 20 / 0.32);
+}
+.v1-shell :is(.button, input, select, textarea) {
+  border-radius: var(--r-control);
+}
+.v1-shell .button-outline {
+  border-color: var(--line-strong);
+}
+.v1-shell
+  :is(.contract-card, .work-row, .applicant-row, .offer-card, .light-card)
+  .button-outline:hover {
+  border-color: #003c76;
+  color: #003c76;
+}
+.v1-shell .button-outline:hover {
+  border-color: var(--gold);
+}
+.v1-shell :is(.text-button):hover {
+  color: var(--gold);
+}
+
+/* Chrome: sidebar a shade deeper than the app, header blends into the blue. */
+.v1-shell .v1-sidebar {
+  background: color-mix(in oklab, var(--app-bg) 72%, #000814);
+  border-right: 0;
+}
+.v1-shell .v1-header {
+  background: color-mix(in oklab, var(--app-bg) 88%, transparent);
+  border-bottom: 1px solid var(--line);
+}
+.v1-shell .v1-tab.active {
+  background: rgb(255 255 255 / 0.12);
+}
+.v1-shell .v1-tabbar {
+  background: color-mix(in oklab, var(--app-bg) 72%, #000814);
+  border-top: 0;
+}
+.v1-shell .account-button {
+  border-color: var(--line);
+}
+.v1-shell .account-avatar,
+.v1-shell .account-button .person-avatar {
+  width: 34px;
+  height: 34px;
+}
+.v1-shell .v1-tabs {
+  border-bottom-color: var(--line);
+}
+
+/* Fewer lines inside cards */
+.v1-shell .history-list li + li,
+.v1-shell .talent-row + .talent-row {
+  border-top-color: var(--line);
+}
+.v1-shell .cal-row + .cal-row,
+.v1-shell .cal-cell {
+  border-color: var(--line);
+}
+.v1-shell .cal-cell.outside {
+  background: var(--raised);
+}
+.v1-shell .cal-item.engagement {
+  color: var(--accent-ink);
+}
+.v1-shell .elig-row.pending :is(svg, strong) {
+  color: var(--gold);
+}
+.v1-shell .unlock-hint {
+  background: rgb(255 214 10 / 0.12);
+}
+
+/* HOME-1: "new since yesterday" as a bright card at the top of Home. */
+.v1-shell .new-since {
+  margin: 0 0 18px;
+  padding: 18px 22px;
+  border: 0;
+  border-radius: var(--r-panel);
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: var(--shadow);
+}
+.v1-shell .new-since h2 {
+  color: var(--accent-ink);
+}
+.v1-shell .new-since a span {
+  color: #3d3000;
+}
+.v1-shell .new-since a:hover strong {
+  color: #001d3d;
+  text-decoration: underline;
+}
+
+/* ASSET-5: faces and logo badges inside rows and cards */
+.contract-card {
+  position: relative;
+}
+.contract-card-badge {
+  position: absolute;
+  top: 22px;
+  right: 24px;
+}
+.contract-card .contract-card-head {
+  padding-right: 64px;
+}
+.with-face {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.with-face > .person-avatar,
+.with-face > .company-badge {
+  margin-top: 2px;
+}
+.notifications li a {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+}
+.agenda-item .person-avatar,
+.agenda-item .company-badge {
+  margin-top: 0;
+}
+.cal-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cal-item .person-avatar,
+.cal-item .company-badge {
+  flex-shrink: 0;
+}
+
+/* ---------- /dev/theme preview ---------- */
+.theme-preview {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-size: 16px;
+}
+.theme-preview h1 {
+  margin-bottom: 8px;
+}
+.theme-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  margin: 24px 0;
+}
+.theme-option h2 {
+  margin: 14px 0 4px;
+}
+.theme-option code {
+  font-size: 15px;
+  color: var(--text-2);
+}
+.theme-mock {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  min-height: 300px;
+  border-radius: 14px;
+  overflow: hidden;
+  color: #fff;
+}
+.theme-mock-nav {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 16px 10px;
+  background: rgb(0 8 20 / 0.28);
+  font-size: 14px;
+}
+.theme-mock-nav strong span {
+  color: var(--accent);
+}
+.theme-mock-nav span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  color: #d6e4f3;
+}
+.theme-mock-nav span.on {
+  background: rgb(255 255 255 / 0.12);
+  color: #fff;
+}
+.theme-mock-body {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 18px;
+}
+.theme-mock-title {
+  font-family: var(--font-head);
+  font-size: 22px;
+  font-weight: 600;
+}
+.theme-mock-bright {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.theme-mock-card {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 14px;
+  background: #f5f8fc;
+  color: #001d3d;
+  box-shadow: 0 10px 28px rgb(0 8 20 / 0.22);
+}
+.theme-mock-card > span:not(.chip) {
+  color: #3d5a7a;
+}
+.theme-mock-card .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+.theme-mock-card .chip.ok {
+  background: #dff2e8;
+  color: #0f6b45;
+}
+.theme-mock-card .chip.warn {
+  background: #fff0bf;
+  color: #8a5a00;
+}
+.theme-mock-card button {
+  margin-top: 6px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+/* Form controls inside the app shell are always light with ink text. */
+.v1-shell :is(input, select, textarea) {
+  background: #ffffff;
+  border-color: #b7c9dd;
+  color: #001d3d;
+}
+.v1-shell :is(input, select, textarea)::placeholder {
+  color: #52708f;
+}
+.v1-shell :is(label, legend) {
+  color: inherit;
+}

@@ -130,7 +130,7 @@ export type PostingCard = {
   title: string;
   trade: string;
   posting_type: 'individual' | 'agency';
-  org: { id: string; name: string; kind: string; verified: boolean };
+  org: { id: string; name: string; kind: string; verified: boolean; industry?: string | null };
   city: string;
   start_date: string;
   end_date: string;
@@ -166,6 +166,7 @@ export type ApplicantSummary = {
   city: string;
   distance_km?: number | null;
   verified?: boolean | null;
+  industry?: string | null;
 };
 
 export type EngagementSummary = {
@@ -285,6 +286,8 @@ export type ScheduleItem = {
   posting_id?: string | null;
   engagement_id?: string | null;
   status?: string | null;
+  person_id?: string | null;
+  industry?: string | null;
 };
 
 export type ScheduleView = {

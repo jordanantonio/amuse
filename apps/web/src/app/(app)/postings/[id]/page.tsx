@@ -10,6 +10,7 @@ import { ContractFacts, EligibilityBox, OrgLine, Pay, WhyPopover } from '@/compo
 import { ApplicationStatusBlock } from '@/components/v1/applications';
 import { AcceptOffer, EngagementActions } from '@/components/v1/accept';
 import { ErrorNote, Skeleton, StatusChip } from '@/components/v1/ui';
+import { CompanyBadge } from '@/components/v1/avatar';
 
 export default function PostingPage() {
   const { id } = useParams<{ id: string }>();
@@ -47,7 +48,8 @@ export default function PostingPage() {
         {data.is_owner ? 'Back to Work' : 'Back to Home'}
       </Link>
       <header className="posting-head">
-        <div>
+        <CompanyBadge name={p.org.name} industry={p.org.industry} size={56} />
+        <div className="posting-head-main">
           <h1>{p.title}</h1>
           <div className="contract-card-head">
             <OrgLine card={p} />

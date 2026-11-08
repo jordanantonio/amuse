@@ -15,6 +15,7 @@ import {
 import { AcceptOffer, EngagementActions } from '@/components/v1/accept';
 import { PostingForm } from '@/components/v1/posting-form';
 import { EmptyState, ErrorNote, Skeleton, StatusChip } from '@/components/v1/ui';
+import { CompanyBadge, PersonAvatar } from '@/components/v1/avatar';
 
 export default function WorkPage() {
   return (
@@ -156,11 +157,14 @@ function OfferRow({
   const p = a.posting;
   return (
     <li className="offer-card">
-      <div className="offer-head">
-        <Link href={`/postings/${p.id}`} className="work-row-title">
-          {p.title}
-        </Link>
-        <p className="wallet-meta">{p.org.name}</p>
+      <div className="offer-head with-face">
+        <CompanyBadge name={p.org.name} industry={p.org.industry} size={48} />
+        <div>
+          <Link href={`/postings/${p.id}`} className="work-row-title">
+            {p.title}
+          </Link>
+          <p className="wallet-meta">{p.org.name}</p>
+        </div>
       </div>
       <dl className="offer-terms">
         <div>
@@ -270,7 +274,8 @@ function BusinessWork() {
                 </button>
               }
             >
-              Post a contract and workers who hold the right certifications will see it on their Home.
+              Post a contract and workers who hold the right certifications will see it on their
+              Home.
             </EmptyState>
           )}
           <ul className="work-list">
@@ -462,6 +467,7 @@ function EngagementList({ items, empty }: { items: OrgWork['active']; empty: str
     <ul className="work-list">
       {items.map((e) => (
         <li key={e.engagement.id} className="work-row">
+          <PersonAvatar id={e.applicant.id} name={e.applicant.name} size={44} />
           <div className="work-row-main">
             <Link href={`/postings/${e.posting_id}`} className="work-row-title">
               {e.posting_title}

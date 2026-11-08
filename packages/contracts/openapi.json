@@ -127,6 +127,17 @@
             "title": "Id",
             "type": "string"
           },
+          "industry": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Industry"
+          },
           "kind": {
             "enum": [
               "worker",
@@ -2200,6 +2211,17 @@
             "title": "Id",
             "type": "string"
           },
+          "industry": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Industry"
+          },
           "kind": {
             "title": "Kind",
             "type": "string"
@@ -3234,6 +3256,17 @@
             "title": "Id",
             "type": "string"
           },
+          "industry": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Industry"
+          },
           "kind": {
             "enum": [
               "engagement",
@@ -3241,6 +3274,17 @@
             ],
             "title": "Kind",
             "type": "string"
+          },
+          "person_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person Id"
           },
           "posting_id": {
             "anyOf": [

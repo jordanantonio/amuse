@@ -7,6 +7,7 @@ import { day, dollars, initials } from '@/lib/format';
 import { useSession } from '@/components/v1/session';
 import { CredentialWallet } from '@/components/v1/wallet';
 import { EmptyState, ErrorNote, Modal, Skeleton, StatusChip } from '@/components/v1/ui';
+import { CompanyBadge, PersonAvatar } from '@/components/v1/avatar';
 
 export default function ProfilePage() {
   const { me } = useSession();
@@ -46,9 +47,7 @@ function WorkerProfilePage() {
   return (
     <>
       <section className="profile-hero">
-        <span className="profile-avatar-lg" aria-hidden="true">
-          {user.avatar_url ? <img src={user.avatar_url} alt="" /> : initials(user.full_name)}
-        </span>
+        <PersonAvatar id={user.id} name={user.full_name} size={88} ring />
         <div className="profile-hero-text">
           <h1>{user.full_name}</h1>
           <p className="profile-headline">
@@ -533,9 +532,7 @@ function CompanyProfilePage() {
   return (
     <>
       <section className="profile-hero">
-        <span className="profile-avatar-lg square" aria-hidden="true">
-          {initials(org.name)}
-        </span>
+        <CompanyBadge name={org.name} industry={org.industry} size={80} />
         <div className="profile-hero-text">
           <h1>{org.name}</h1>
           <p className="profile-headline">

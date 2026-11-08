@@ -16,6 +16,7 @@ import { day, dollars, range } from '@/lib/format';
 import { useSession } from '@/components/v1/session';
 import { ContractCard } from '@/components/v1/contract';
 import { EmptyState, ErrorNote, Modal, Skeleton } from '@/components/v1/ui';
+import { CompanyBadge, PersonAvatar } from '@/components/v1/avatar';
 
 export default function HomePage() {
   const { me } = useSession();
@@ -127,7 +128,6 @@ function WorkerHome() {
   return (
     <>
       <Greeting />
-      <TodayStrip home={home} />
       {feed && !filtered && feed.new_count > 0 && (
         <section className="new-since" aria-labelledby="new-title">
           <h2 id="new-title">
@@ -148,6 +148,7 @@ function WorkerHome() {
           </ul>
         </section>
       )}
+      <TodayStrip home={home} />
       <section className="v1-section" aria-labelledby="foryou-title">
         <div className="v1-section-head">
           <h2 id="foryou-title">For you</h2>
@@ -418,14 +419,17 @@ function BusinessHome() {
         <ul className="talent-list">
           {talent?.map((t) => (
             <li key={t.id} className="talent-row">
-              <div>
-                <strong>{t.name}</strong>
-                <p>{t.headline}</p>
-                <p className="wallet-meta">
-                  <MapPin size={15} aria-hidden="true" />
-                  {t.city}
-                  {t.distance_km != null ? `, ${t.distance_km} km away` : ''}
-                </p>
+              <div className="with-face">
+                <PersonAvatar id={t.id} name={t.name} size={52} />
+                <div>
+                  <strong>{t.name}</strong>
+                  <p>{t.headline}</p>
+                  <p className="wallet-meta">
+                    <MapPin size={15} aria-hidden="true" />
+                    {t.city}
+                    {t.distance_km != null ? `, ${t.distance_km} km away` : ''}
+                  </p>
+                </div>
               </div>
               <div className="talent-side">
                 <span className="status-chip ok">

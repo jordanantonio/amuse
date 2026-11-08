@@ -37,9 +37,7 @@ export function CredentialWallet({
   return (
     <section className="v1-section" aria-labelledby={`wallet-${scope}`}>
       <div className="v1-section-head">
-        <h2 id={`wallet-${scope}`}>
-          {scope === 'me' ? 'Certifications' : 'Company credentials'}
-        </h2>
+        <h2 id={`wallet-${scope}`}>{scope === 'me' ? 'Certifications' : 'Company credentials'}</h2>
         <button
           className="button button-outline"
           onClick={() => {

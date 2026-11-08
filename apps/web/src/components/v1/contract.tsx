@@ -11,6 +11,7 @@ import {
   TriangleAlert,
   Users,
 } from 'lucide-react';
+import { CompanyBadge } from './avatar';
 import type { MatchItem, PostingCard } from '@/lib/market-types';
 import { dollars, duration, payUnit, range } from '@/lib/format';
 
@@ -110,6 +111,9 @@ export function ContractCard({
 }) {
   return (
     <article className={`contract-card ${card.eligible ? '' : 'ineligible'}`}>
+      <span className="contract-card-badge">
+        <CompanyBadge name={card.org.name} industry={card.org.industry} size={48} />
+      </span>
       <div className="contract-card-head">
         <h3>
           <Link href={`/postings/${card.id}`}>{card.title}</Link>
@@ -186,7 +190,9 @@ export function EligibilityBox({ items, reasons }: { items: MatchItem[]; reasons
   return (
     <section className="eligibility" aria-labelledby="eligibility-title">
       <h2 id="eligibility-title">Your certifications for this contract</h2>
-      {!required.length && <p className="v1-lede">This contract doesn’t require any certifications.</p>}
+      {!required.length && (
+        <p className="v1-lede">This contract doesn’t require any certifications.</p>
+      )}
       <ul>
         {required.map((i) => (
           <EligibilityRow key={i.credential_type_id} item={i} />
