@@ -446,6 +446,79 @@ def seed_postings(db: Session, today: date) -> None:
                 ))
 
 
+H = 60  # minutes per hour
+DAYS = range(0, 5)  # Mon-Fri
+# Weekly availability windows: uid -> [(weekdays, start minute, end minute)]
+WORKER_HOURS = {
+    "u-amelia": [(DAYS, 6 * H, 18 * H), ([5], 6 * H, 14 * H)],
+    "u-ilya": [(DAYS, 6 * H, 18 * H)],
+    "u-isla": [(DAYS, 7 * H, 17 * H)],
+    "u-noah": [(range(0, 4), 20 * H, 31 * H)],  # nights, 8 PM-7 AM
+    "u-sofia": [(DAYS, 8 * H, 17 * H)],
+    "u-lucas": [(DAYS, 7 * H, 16 * H)],
+    "u-liam": [(range(0, 7), 5 * H, 15 * H)],  # not on the crew: the marketplace backup
+    "u-maya": [(DAYS, 8 * H, 17 * H)],
+    "u-ella": [(DAYS, 8 * H, 17 * H)],
+}
+CREW = {"prairie-harvest": ["u-amelia", "u-ilya", "u-isla", "u-noah", "u-sofia", "u-lucas"]}
+# (weekdays, label, start, end, needed, preferred cert, required certs)
+SLOT_PLAN = [
+    (DAYS, "Packaging line", 8 * H, 12 * H, 2, "forklift", []),
+    (DAYS, "Packaging line", 12 * H + 30, 16 * H + 30, 2, None, []),
+    (range(0, 4), "Sanitation", 22 * H, 30 * H, 1, None, ["whmis"]),
+    ([0, 2, 4, 5], "Loading dock", 6 * H, 14 * H, 1, None, ["forklift"]),
+    ([6], "Cold storage restock", 6 * H, 14 * H, 1, None, ["forklift"]),
+]
+# Pre-filled spots this week: (weekday, label, start, uid)
+PREFILLED = [
+    (0, "Packaging line", 8 * H, "u-amelia"),
+    (0, "Packaging line", 8 * H, "u-sofia"),
+    (0, "Packaging line", 12 * H + 30, "u-isla"),
+    (0, "Packaging line", 12 * H + 30, "u-ilya"),
+    (1, "Packaging line", 8 * H, "u-ilya"),
+    (0, "Sanitation", 22 * H, "u-noah"),
+]
+
+
+def seed_crew(db: Session, today: date) -> None:
+    from .market_models import CrewAssignment, CrewMember, CrewRules, CrewSlot, WorkerHours
+
+    for uid, windows in WORKER_HOURS.items():
+        for weekdays, start, end in windows:
+            for wd in weekdays:
+                db.add(WorkerHours(user_id=uid, weekday=wd, start_minute=start, end_minute=end))
+    for oid, members in CREW.items():
+        db.add(CrewRules(org_id=oid, max_consecutive_days=5, min_rest_hours=10, max_weekly_hours=40))
+        for uid in members:
+            db.add(CrewMember(org_id=oid, user_id=uid))
+    monday = today - timedelta(days=today.weekday())
+    created: dict[tuple, str] = {}
+    for week in (0, 1):
+        for weekdays, label, start, end, needed, preferred, required in SLOT_PLAN:
+            for wd in weekdays:
+                slot = CrewSlot(
+                    org_id="prairie-harvest",
+                    day=monday + timedelta(days=7 * week + wd),
+                    start_minute=start,
+                    end_minute=end,
+                    label=label,
+                    needed=needed,
+                    preferred_cert=preferred,
+                    required_certs=required,
+                )
+                db.add(slot)
+                db.flush()
+                if week == 0:
+                    created[(wd, label, start)] = slot.id
+    seen: dict[str, int] = {}
+    for wd, label, start, uid in PREFILLED:
+        sid = created[(wd, label, start)]
+        if seen.get(sid, 0) >= 2:
+            continue
+        seen[sid] = seen.get(sid, 0) + 1
+        db.add(CrewAssignment(slot_id=sid, user_id=uid, status="assigned"))
+
+
 def seed_catalog(db: Session) -> None:
     from .catalog import CREDENTIAL_TYPES
     from .market_models import CredentialType
@@ -569,6 +642,8 @@ def seed_market(db: Session) -> None:
     seed_wallets(db, today)
     db.flush()
     seed_postings(db, today)
+    db.flush()
+    seed_crew(db, today)
     db.commit()
 
 

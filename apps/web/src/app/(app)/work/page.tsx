@@ -232,16 +232,8 @@ function BusinessWork() {
       <div className="page-head-row">
         <h1 className="page-title">Work</h1>
         <div className="actions">
-          {me.planner_persona && (
-            <Link
-              className="text-button"
-              href="/planner"
-              onClick={() => {
-                try {
-                  localStorage.setItem('shift-persona', me.planner_persona!);
-                } catch {}
-              }}
-            >
+          {me.mode === 'business' && (
+            <Link className="text-button" href="/crew">
               <Workflow size={18} aria-hidden="true" /> Crew planner
             </Link>
           )}

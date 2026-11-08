@@ -66,12 +66,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return () => clearInterval(id);
   }, [load, pathname]);
   const name = me.organization?.name || me.user.full_name;
-  const openPlanner = () => {
-    // The crew planner uses its own demo persona; hand it this business's manager.
-    try {
-      if (me.planner_persona) localStorage.setItem('shift-persona', me.planner_persona);
-    } catch {}
-  };
   return (
     <div className="v1-shell">
       <a className="skip-link" href="#main">
@@ -165,8 +159,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   {me.user.full_name}
                   <small>{me.user.email}</small>
                 </p>
-                {me.planner_persona && (
-                  <Link href="/planner" onClick={openPlanner} className="menu-item">
+                {me.mode === 'business' && (
+                  <Link href="/crew" className="menu-item" onClick={() => setMenuOpen(false)}>
                     <Workflow size={18} aria-hidden="true" />
                     Crew planner
                   </Link>

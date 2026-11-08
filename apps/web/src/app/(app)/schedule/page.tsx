@@ -104,16 +104,8 @@ export default function SchedulePage() {
       <div className="page-head-row">
         <h1 className="page-title">Schedule</h1>
         <div className="actions">
-          {me.mode === 'business' && me.planner_persona && (
-            <Link
-              className="text-button"
-              href="/planner"
-              onClick={() => {
-                try {
-                  localStorage.setItem('shift-persona', me.planner_persona!);
-                } catch {}
-              }}
-            >
+          {me.mode === 'business' && (
+            <Link className="text-button" href="/crew">
               <Workflow size={18} aria-hidden="true" /> Crew planner
             </Link>
           )}

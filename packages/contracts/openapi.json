@@ -22,20 +22,6 @@
         "title": "AbsenceInput",
         "type": "object"
       },
-      "AcceptInput": {
-        "properties": {
-          "withdraw_ids": {
-            "items": {
-              "type": "string"
-            },
-            "maxItems": 50,
-            "title": "Withdraw Ids",
-            "type": "array"
-          }
-        },
-        "title": "AcceptInput",
-        "type": "object"
-      },
       "AcceptPreview": {
         "properties": {
           "conflicts": {
@@ -322,6 +308,19 @@
         "title": "ApprovalView",
         "type": "object"
       },
+      "AssignInput": {
+        "properties": {
+          "user_id": {
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id"
+        ],
+        "title": "AssignInput",
+        "type": "object"
+      },
       "AssignmentView": {
         "properties": {
           "color": {
@@ -393,6 +392,32 @@
         "title": "AssignmentView",
         "type": "object"
       },
+      "AutofillResult": {
+        "properties": {
+          "proposed": {
+            "title": "Proposed",
+            "type": "integer"
+          },
+          "solver_status": {
+            "title": "Solver Status",
+            "type": "string"
+          },
+          "unfilled_slot_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Unfilled Slot Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "proposed",
+          "unfilled_slot_ids",
+          "solver_status"
+        ],
+        "title": "AutofillResult",
+        "type": "object"
+      },
       "AvailabilityInput": {
         "additionalProperties": false,
         "properties": {
@@ -409,6 +434,44 @@
           "windows"
         ],
         "title": "AvailabilityInput",
+        "type": "object"
+      },
+      "Bar": {
+        "properties": {
+          "booked": {
+            "items": {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "title": "Booked",
+            "type": "array"
+          },
+          "free": {
+            "items": {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "title": "Free",
+            "type": "array"
+          },
+          "slot": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Slot",
+            "type": "array"
+          }
+        },
+        "required": [
+          "free",
+          "booked",
+          "slot"
+        ],
+        "title": "Bar",
         "type": "object"
       },
       "BlockInput": {
@@ -463,6 +526,34 @@
         "title": "BlockedPlan",
         "type": "object"
       },
+      "BreakdownRow": {
+        "properties": {
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "points": {
+            "title": "Points",
+            "type": "integer"
+          },
+          "strength": {
+            "title": "Strength",
+            "type": "number"
+          }
+        },
+        "required": [
+          "kind",
+          "label",
+          "points",
+          "strength"
+        ],
+        "title": "BreakdownRow",
+        "type": "object"
+      },
       "CalendarResult": {
         "properties": {
           "count": {
@@ -512,6 +603,121 @@
           "status"
         ],
         "title": "CalendarResult",
+        "type": "object"
+      },
+      "CandidateCert": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "state",
+          "kind"
+        ],
+        "title": "CandidateCert",
+        "type": "object"
+      },
+      "CandidateView": {
+        "properties": {
+          "bar": {
+            "$ref": "#/components/schemas/Bar"
+          },
+          "blockers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Blockers",
+            "type": "array"
+          },
+          "breakdown": {
+            "items": {
+              "$ref": "#/components/schemas/BreakdownRow"
+            },
+            "title": "Breakdown",
+            "type": "array"
+          },
+          "certs": {
+            "items": {
+              "$ref": "#/components/schemas/CandidateCert"
+            },
+            "title": "Certs",
+            "type": "array"
+          },
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "on_crew": {
+            "title": "On Crew",
+            "type": "boolean"
+          },
+          "score": {
+            "title": "Score",
+            "type": "integer"
+          },
+          "user_id": {
+            "title": "User Id",
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "user_id",
+          "name",
+          "headline",
+          "on_crew",
+          "certs",
+          "score",
+          "breakdown",
+          "warnings",
+          "blockers",
+          "bar"
+        ],
+        "title": "CandidateView",
+        "type": "object"
+      },
+      "CertRef": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "CertRef",
         "type": "object"
       },
       "Certificate": {
@@ -3234,6 +3440,35 @@
         "title": "RequirementInput",
         "type": "object"
       },
+      "RulesView": {
+        "properties": {
+          "max_consecutive_days": {
+            "maximum": 14.0,
+            "minimum": 1.0,
+            "title": "Max Consecutive Days",
+            "type": "integer"
+          },
+          "max_weekly_hours": {
+            "maximum": 84.0,
+            "minimum": 1.0,
+            "title": "Max Weekly Hours",
+            "type": "integer"
+          },
+          "min_rest_hours": {
+            "maximum": 24.0,
+            "minimum": 0.0,
+            "title": "Min Rest Hours",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "max_consecutive_days",
+          "min_rest_hours",
+          "max_weekly_hours"
+        ],
+        "title": "RulesView",
+        "type": "object"
+      },
       "ScheduleItem": {
         "properties": {
           "end_date": {
@@ -3442,6 +3677,104 @@
           "points"
         ],
         "title": "ScorePart",
+        "type": "object"
+      },
+      "SlotView": {
+        "properties": {
+          "day": {
+            "format": "date",
+            "title": "Day",
+            "type": "string"
+          },
+          "end_minute": {
+            "title": "End Minute",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "needed": {
+            "title": "Needed",
+            "type": "integer"
+          },
+          "preferred_cert": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CertRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "required_certs": {
+            "items": {
+              "$ref": "#/components/schemas/CertRef"
+            },
+            "title": "Required Certs",
+            "type": "array"
+          },
+          "spots": {
+            "items": {
+              "$ref": "#/components/schemas/SpotView"
+            },
+            "title": "Spots",
+            "type": "array"
+          },
+          "start_minute": {
+            "title": "Start Minute",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "day",
+          "start_minute",
+          "end_minute",
+          "label",
+          "needed",
+          "preferred_cert",
+          "required_certs",
+          "spots"
+        ],
+        "title": "SlotView",
+        "type": "object"
+      },
+      "SpotView": {
+        "properties": {
+          "assignment_id": {
+            "title": "Assignment Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "assigned",
+              "proposed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "user_id": {
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "assignment_id",
+          "user_id",
+          "name",
+          "status"
+        ],
+        "title": "SpotView",
         "type": "object"
       },
       "TalentCard": {
@@ -3735,6 +4068,42 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "WeekView": {
+        "properties": {
+          "crew_size": {
+            "title": "Crew Size",
+            "type": "integer"
+          },
+          "proposed": {
+            "title": "Proposed",
+            "type": "integer"
+          },
+          "rules": {
+            "$ref": "#/components/schemas/RulesView"
+          },
+          "slots": {
+            "items": {
+              "$ref": "#/components/schemas/SlotView"
+            },
+            "title": "Slots",
+            "type": "array"
+          },
+          "start": {
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "slots",
+          "rules",
+          "crew_size",
+          "proposed"
+        ],
+        "title": "WeekView",
         "type": "object"
       },
       "Window": {
@@ -4126,6 +4495,28 @@
         "title": "WorkerView",
         "type": "object"
       },
+      "shift_api__crew_routes__AcceptInput": {
+        "properties": {
+          "assignment_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 200,
+            "title": "Assignment Ids",
+            "type": "array"
+          },
+          "start": {
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start"
+        ],
+        "title": "AcceptInput",
+        "type": "object"
+      },
       "shift_api__inputs__ProfileInput": {
         "additionalProperties": false,
         "properties": {
@@ -4187,6 +4578,20 @@
           "work_modes"
         ],
         "title": "ProfileInput",
+        "type": "object"
+      },
+      "shift_api__market_schemas__AcceptInput": {
+        "properties": {
+          "withdraw_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50,
+            "title": "Withdraw Ids",
+            "type": "array"
+          }
+        },
+        "title": "AcceptInput",
         "type": "object"
       },
       "shift_api__market_schemas__ProfileInput": {
@@ -5566,7 +5971,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AcceptInput"
+                "$ref": "#/components/schemas/shift_api__market_schemas__AcceptInput"
               }
             }
           },
@@ -6166,6 +6571,524 @@
         "summary": "Document Link",
         "tags": [
           "market"
+        ]
+      }
+    },
+    "/api/v1/market/crew/assignments/{assignment_id}": {
+      "delete": {
+        "operationId": "unassign_api_v1_market_crew_assignments__assignment_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "assignment_id",
+            "required": true,
+            "schema": {
+              "title": "Assignment Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlotView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unassign",
+        "tags": [
+          "crew"
+        ]
+      }
+    },
+    "/api/v1/market/crew/autofill": {
+      "post": {
+        "operationId": "run_autofill_api_v1_market_crew_autofill_post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutofillResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Run Autofill",
+        "tags": [
+          "crew"
+        ]
+      }
+    },
+    "/api/v1/market/crew/proposals/accept": {
+      "post": {
+        "operationId": "accept_proposals_api_v1_market_crew_proposals_accept_post",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/shift_api__crew_routes__AcceptInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeekView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Accept Proposals",
+        "tags": [
+          "crew"
+        ]
+      }
+    },
+    "/api/v1/market/crew/proposals/clear": {
+      "post": {
+        "operationId": "clear_week_proposals_api_v1_market_crew_proposals_clear_post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeekView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Clear Week Proposals",
+        "tags": [
+          "crew"
+        ]
+      }
+    },
+    "/api/v1/market/crew/rules": {
+      "put": {
+        "operationId": "update_rules_api_v1_market_crew_rules_put",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RulesView"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RulesView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Rules",
+        "tags": [
+          "crew"
+        ]
+      }
+    },
+    "/api/v1/market/crew/slots/{slot_id}/assign": {
+      "post": {
+        "operationId": "assign_api_v1_market_crew_slots__slot_id__assign_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slot_id",
+            "required": true,
+            "schema": {
+              "title": "Slot Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlotView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Assign",
+        "tags": [
+          "crew"
+        ]
+      }
+    },
+    "/api/v1/market/crew/slots/{slot_id}/candidates": {
+      "get": {
+        "operationId": "candidates_api_v1_market_crew_slots__slot_id__candidates_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slot_id",
+            "required": true,
+            "schema": {
+              "title": "Slot Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "scope",
+            "required": false,
+            "schema": {
+              "default": "crew",
+              "enum": [
+                "crew",
+                "market"
+              ],
+              "title": "Scope",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CandidateView"
+                  },
+                  "title": "Response Candidates Api V1 Market Crew Slots  Slot Id  Candidates Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Candidates",
+        "tags": [
+          "crew"
+        ]
+      }
+    },
+    "/api/v1/market/crew/week": {
+      "get": {
+        "operationId": "get_week_api_v1_market_crew_week_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeekView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Week",
+        "tags": [
+          "crew"
         ]
       }
     },
