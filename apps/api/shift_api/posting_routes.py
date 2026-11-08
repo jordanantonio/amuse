@@ -18,12 +18,12 @@ from .flow import (
     transition,
     worker_work,
 )
+from .engagements import sync_completions
 from .market_common import audit, require_org, require_worker, user_org
 from .market_models import (
     ContractApplication,
     Credential,
     CredentialType,
-    Engagement,
     Posting,
     PostingRequirement,
     User,
@@ -270,18 +270,21 @@ def application_action(application_id: str, payload: ActionInput, db: Database, 
 def my_work(db: Database, user: CurrentUser):
     if user.default_mode not in {"worker", "agency"}:
         raise HTTPException(403, "Use the business Work view")
+    sync_completions(db)
     return worker_work(db, user)
 
 
 @router.get("/org/work", response_model=OrgWorkView)
 def org_work(db: Database, user: CurrentUser):
     org = require_org(db, user)
+    sync_completions(db)
     return {"postings": org_postings(db, org), **org_engagements(db, org)}
 
 
 @router.get("/home", response_model=HomeView)
 def home(db: Database, user: CurrentUser):
     today = date.today()
+    sync_completions(db)
     if user.default_mode == "worker":
         work = worker_work(db, user)
         upcoming = sorted(work["active"], key=lambda v: v["engagement"]["start_date"])
@@ -373,5 +376,3 @@ def dev_reset(db: Database):
         raise HTTPException(409, str(error)) from None
     return {"reset": True, "at": datetime.now(timezone.utc)}
 
-
-__all__ = ["router", "dev", "Engagement"]

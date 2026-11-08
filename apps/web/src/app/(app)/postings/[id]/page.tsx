@@ -8,6 +8,7 @@ import type { PostingDetail } from '@/lib/market-types';
 import { useSession } from '@/components/v1/session';
 import { ContractFacts, EligibilityBox, OrgLine, Pay, WhyPopover } from '@/components/v1/contract';
 import { ApplicationStatusBlock } from '@/components/v1/applications';
+import { AcceptOffer, EngagementActions } from '@/components/v1/accept';
 import { ErrorNote, Skeleton, StatusChip } from '@/components/v1/ui';
 
 export default function PostingPage() {
@@ -95,7 +96,14 @@ export default function PostingPage() {
           </Link>
         )}
         {mine && mine.status !== 'withdrawn' && (
-          <ApplicationStatusBlock application={mine} onChange={load} />
+          <ApplicationStatusBlock
+            application={mine}
+            onChange={load}
+            acceptSlot={<AcceptOffer application={mine} onAccepted={load} />}
+          />
+        )}
+        {mine?.status === 'accepted' && mine.engagement?.status === 'active' && (
+          <EngagementActions application={mine} onChange={load} />
         )}
         {canApply && (
           <form

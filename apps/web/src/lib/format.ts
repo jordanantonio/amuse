@@ -16,6 +16,7 @@ export function range(start: string, end: string) {
   const a = parseDay(start);
   const b = parseDay(end);
   const thisYear = new Date().getFullYear();
+  if (start.slice(0, 10) === end.slice(0, 10)) return day(start);
   if (a.y === b.y && a.y === thisYear) return `${day(start, false)} – ${day(end, false)}`;
   if (a.y === b.y) return `${day(start, false)} – ${day(end, true)}`;
   return `${day(start, true)} – ${day(end, true)}`;

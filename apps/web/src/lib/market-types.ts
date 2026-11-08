@@ -260,6 +260,39 @@ export type TalentCard = {
   tickets: number;
 };
 
+export type AcceptPreview = {
+  is_exclusive: boolean;
+  conflicts: { engagement_id: string; title: string; message: string }[];
+  ticket_problems: string[];
+  overlapping: ApplicationView[];
+  manual_overlaps: { id: string; start_date: string; end_date: string; note: string }[];
+};
+
+export type CalendarResult = {
+  status: 'added' | 'needs_auth' | 'unavailable';
+  url?: string | null;
+  count?: number | null;
+  message?: string | null;
+};
+
+export type ScheduleItem = {
+  id: string;
+  kind: 'engagement' | 'manual';
+  start_date: string;
+  end_date: string;
+  title: string;
+  subtitle: string;
+  posting_id?: string | null;
+  engagement_id?: string | null;
+  status?: string | null;
+};
+
+export type ScheduleView = {
+  items: ScheduleItem[];
+  calendar_enabled: boolean;
+  calendar_connected: boolean;
+};
+
 export type DemoAccount = {
   id: string;
   full_name: string;

@@ -490,6 +490,68 @@ class TalentCard(BaseModel):
     tickets: int
 
 
+class AcceptInput(BaseModel):
+    withdraw_ids: list[str] = Field(default_factory=list, max_length=50)
+
+
+class ConflictItem(BaseModel):
+    engagement_id: str
+    title: str
+    message: str
+
+
+class ManualOverlap(BaseModel):
+    id: str
+    start_date: date
+    end_date: date
+    note: str
+
+
+class AcceptPreview(BaseModel):
+    is_exclusive: bool
+    conflicts: list[ConflictItem]
+    ticket_problems: list[str]
+    overlapping: list[ApplicationView]
+    manual_overlaps: list[ManualOverlap]
+
+
+class CalendarResult(BaseModel):
+    status: Literal["added", "needs_auth", "unavailable"]
+    url: str | None = None
+    count: int | None = None
+    message: str | None = None
+
+
+class ScheduleItem(BaseModel):
+    id: str
+    kind: Literal["engagement", "manual"]
+    start_date: date
+    end_date: date
+    title: str
+    subtitle: str
+    posting_id: str | None = None
+    engagement_id: str | None = None
+    status: str | None = None
+
+
+class ScheduleView(BaseModel):
+    items: list[ScheduleItem]
+    calendar_enabled: bool
+    calendar_connected: bool
+
+
+class BlockInput(BaseModel):
+    start_date: date
+    end_date: date
+    note: str = Field("", max_length=200)
+
+    @model_validator(mode="after")
+    def ordered(self):
+        if self.end_date < self.start_date:
+            raise ValueError("The end date must be on or after the start date")
+        return self
+
+
 class City(BaseModel):
     name: str
     lat: float

@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 from .auth import Database
 from .catalog import CITIES, INDUSTRIES, SCHEDULE_PATTERNS, TRADES, coordinates
 from .market_common import unique_handle, user_org
-from .market_models import OrgMember, User, WorkerProfile
+from .market_models import ConnectedAccount, OrgMember, User, WorkerProfile
 from .market_schemas import City, MeView, Meta, OnboardingInput, OrgView, UserView, WorkerProfileView
 from .models import Organization
 from .session import CurrentUser
@@ -15,13 +15,7 @@ router = APIRouter(prefix="/api/v1/market", tags=["market"])
 def me_view(db, user: User) -> MeView:
     profile = db.get(WorkerProfile, user.id)
     org = user_org(db, user)
-    connected = False
-    try:
-        from .market_models import ConnectedAccount
-
-        connected = bool(db.get(ConnectedAccount, (user.id, "google_calendar")))
-    except ImportError:
-        pass
+    connected = bool(db.get(ConnectedAccount, (user.id, "google_calendar")))
     return MeView(
         user=UserView.model_validate(user),
         mode=user.default_mode,

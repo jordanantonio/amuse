@@ -84,3 +84,11 @@ memberships, not client-editable token metadata. Keep demo and authenticated mod
 explicitly separate. Retain immutable original assignments and decision history.
 Calendar comparisons use full dates and half-open intervals; free time subtracts
 all busy and confirmed windows, including multi-day blocks.
+
+## Shift V1 marketplace (2026-11-08)
+Product decision: the V1 contractor marketplace (credential wallet, For You feed,
+offers, schedule lock + Google Calendar) is now the main product; SHIFT Adaptive
+remains a business-side crew planner at /planner. Read docs/V1.md before changing it.
+Availability blocks are the source of truth for bookings; Google Calendar only mirrors
+them. Never show a site address before an offer, never serve credential documents
+except through short-lived signed links, and keep ranking weights in feed_config.py.

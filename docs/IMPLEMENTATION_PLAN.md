@@ -110,3 +110,10 @@ Updated ownership seams: recovery.py/locking.py/adaptive_routes.py are the lifec
 solver.py/weather.py are constraint/risk services. UI uses adaptive-workspace.tsx,
 team-calendar.tsx, proposal-comparison.tsx, data-editor.tsx, auth-gate.tsx. The old
 read-only workspace.tsx is retired. Coordinate these contracts before parallel edits.
+
+## Shift V1 marketplace — 2026-11-08
+Branch `claude/shift-v1` (from `codex/shift-adaptive`). P0 phases 1–4 of
+Shift_v1_Requirements.md shipped: Google/demo sign-in + onboarding; four-tab shell,
+profiles and credential wallets; postings, For You feed and applications; accept with
+conflict check, availability blocks, Google Calendar and .ics, Schedule tab. Status per
+requirement and open P1/P2 items: docs/V1.md. The crew planner moved to /planner.

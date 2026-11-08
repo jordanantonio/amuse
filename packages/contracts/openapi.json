@@ -22,6 +22,65 @@
         "title": "AbsenceInput",
         "type": "object"
       },
+      "AcceptInput": {
+        "properties": {
+          "withdraw_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50,
+            "title": "Withdraw Ids",
+            "type": "array"
+          }
+        },
+        "title": "AcceptInput",
+        "type": "object"
+      },
+      "AcceptPreview": {
+        "properties": {
+          "conflicts": {
+            "items": {
+              "$ref": "#/components/schemas/ConflictItem"
+            },
+            "title": "Conflicts",
+            "type": "array"
+          },
+          "is_exclusive": {
+            "title": "Is Exclusive",
+            "type": "boolean"
+          },
+          "manual_overlaps": {
+            "items": {
+              "$ref": "#/components/schemas/ManualOverlap"
+            },
+            "title": "Manual Overlaps",
+            "type": "array"
+          },
+          "overlapping": {
+            "items": {
+              "$ref": "#/components/schemas/ApplicationView"
+            },
+            "title": "Overlapping",
+            "type": "array"
+          },
+          "ticket_problems": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Ticket Problems",
+            "type": "array"
+          }
+        },
+        "required": [
+          "is_exclusive",
+          "conflicts",
+          "ticket_problems",
+          "overlapping",
+          "manual_overlaps"
+        ],
+        "title": "AcceptPreview",
+        "type": "object"
+      },
       "ActionInput": {
         "properties": {
           "action": {
@@ -341,6 +400,32 @@
         "title": "AvailabilityInput",
         "type": "object"
       },
+      "BlockInput": {
+        "properties": {
+          "end_date": {
+            "format": "date",
+            "title": "End Date",
+            "type": "string"
+          },
+          "note": {
+            "default": "",
+            "maxLength": 200,
+            "title": "Note",
+            "type": "string"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start_date",
+          "end_date"
+        ],
+        "title": "BlockInput",
+        "type": "object"
+      },
       "BlockedPlan": {
         "properties": {
           "blockers": {
@@ -365,6 +450,57 @@
           "objective"
         ],
         "title": "BlockedPlan",
+        "type": "object"
+      },
+      "CalendarResult": {
+        "properties": {
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "status": {
+            "enum": [
+              "added",
+              "needs_auth",
+              "unavailable"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "CalendarResult",
         "type": "object"
       },
       "Certificate": {
@@ -530,6 +666,29 @@
           "status"
         ],
         "title": "ConfirmationView",
+        "type": "object"
+      },
+      "ConflictItem": {
+        "properties": {
+          "engagement_id": {
+            "title": "Engagement Id",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "engagement_id",
+          "title",
+          "message"
+        ],
+        "title": "ConflictItem",
         "type": "object"
       },
       "CredentialInput": {
@@ -1422,6 +1581,36 @@
           "status"
         ],
         "title": "JobView",
+        "type": "object"
+      },
+      "ManualOverlap": {
+        "properties": {
+          "end_date": {
+            "format": "date",
+            "title": "End Date",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "start_date",
+          "end_date",
+          "note"
+        ],
+        "title": "ManualOverlap",
         "type": "object"
       },
       "Match": {
@@ -3023,6 +3212,83 @@
         "title": "RequirementInput",
         "type": "object"
       },
+      "ScheduleItem": {
+        "properties": {
+          "end_date": {
+            "format": "date",
+            "title": "End Date",
+            "type": "string"
+          },
+          "engagement_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engagement Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "engagement",
+              "manual"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "posting_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Posting Id"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "subtitle": {
+            "title": "Subtitle",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "start_date",
+          "end_date",
+          "title",
+          "subtitle"
+        ],
+        "title": "ScheduleItem",
+        "type": "object"
+      },
       "ScheduleSlot": {
         "properties": {
           "cost_cents": {
@@ -3088,6 +3354,32 @@
           "cost_cents"
         ],
         "title": "ScheduleSlot",
+        "type": "object"
+      },
+      "ScheduleView": {
+        "properties": {
+          "calendar_connected": {
+            "title": "Calendar Connected",
+            "type": "boolean"
+          },
+          "calendar_enabled": {
+            "title": "Calendar Enabled",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ScheduleItem"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items",
+          "calendar_enabled",
+          "calendar_connected"
+        ],
+        "title": "ScheduleView",
         "type": "object"
       },
       "ScorePart": {
@@ -4375,6 +4667,86 @@
         ]
       }
     },
+    "/api/v1/auth/google/calendar/start": {
+      "get": {
+        "description": "Incremental consent for calendar.events only, at the moment it is useful (CONN-1).",
+        "operationId": "calendar_start_api_v1_auth_google_calendar_start_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "next",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Next"
+            }
+          },
+          {
+            "in": "query",
+            "name": "engagement",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Engagement"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Calendar Start",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/v1/auth/google/callback": {
       "get": {
         "operationId": "google_callback_api_v1_auth_google_callback_get",
@@ -5116,6 +5488,132 @@
         ]
       }
     },
+    "/api/v1/market/applications/{application_id}/accept": {
+      "post": {
+        "operationId": "accept_api_v1_market_applications__application_id__accept_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "application_id",
+            "required": true,
+            "schema": {
+              "title": "Application Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Accept",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/applications/{application_id}/accept-preview": {
+      "get": {
+        "operationId": "accept_preview_api_v1_market_applications__application_id__accept_preview_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "application_id",
+            "required": true,
+            "schema": {
+              "title": "Application Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptPreview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Accept Preview",
+        "tags": [
+          "market"
+        ]
+      }
+    },
     "/api/v1/market/applications/{application_id}/action": {
       "post": {
         "operationId": "application_action_api_v1_market_applications__application_id__action_post",
@@ -5179,6 +5677,119 @@
           }
         },
         "summary": "Application Action",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/availability": {
+      "post": {
+        "operationId": "add_block_api_v1_market_availability_post",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlockInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Block",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/availability/{block_id}": {
+      "delete": {
+        "operationId": "delete_block_api_v1_market_availability__block_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "block_id",
+            "required": true,
+            "schema": {
+              "title": "Block Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Block",
         "tags": [
           "market"
         ]
@@ -5509,6 +6120,178 @@
           }
         },
         "summary": "Document Link",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/engagements/{engagement_id}/calendar.ics": {
+      "get": {
+        "operationId": "download_ics_api_v1_market_engagements__engagement_id__calendar_ics_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "engagement_id",
+            "required": true,
+            "schema": {
+              "title": "Engagement Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Download Ics",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/engagements/{engagement_id}/cancel": {
+      "post": {
+        "operationId": "cancel_engagement_api_v1_market_engagements__engagement_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "engagement_id",
+            "required": true,
+            "schema": {
+              "title": "Engagement Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancel Engagement",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/engagements/{engagement_id}/google": {
+      "post": {
+        "operationId": "add_to_google_api_v1_market_engagements__engagement_id__google_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "engagement_id",
+            "required": true,
+            "schema": {
+              "title": "Engagement Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add To Google",
         "tags": [
           "market"
         ]
@@ -6613,6 +7396,75 @@
           }
         },
         "summary": "Close Posting",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/schedule": {
+      "get": {
+        "operationId": "schedule_api_v1_market_schedule_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "Start",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "end",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "End",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Schedule",
         "tags": [
           "market"
         ]

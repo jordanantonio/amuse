@@ -32,7 +32,9 @@ Terminal 2:
 npm run dev
 ```
 
-Open **http://127.0.0.1:3000**. API documentation: http://127.0.0.1:8000/docs.
+Open **http://127.0.0.1:3000** for the Shift V1 marketplace (sign in with a
+fictional demo account; see `docs/V1.md`) or **/planner** for the SHIFT Adaptive crew
+planner. Reset the V1 demo at **/dev/reset**. API documentation: http://127.0.0.1:8000/docs.
 Both launchers bind to loopback. Stop with Ctrl+C. SQLite persists to ignored
 `shift.sqlite`; startup applies Alembic migrations and idempotently upgrades the
 fictional Northline fixture. It does not reset existing work.

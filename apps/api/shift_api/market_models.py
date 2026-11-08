@@ -257,6 +257,20 @@ class AvailabilityBlock(Base):
     note: Mapped[str] = mapped_column(String(200), default="")
 
 
+class ConnectedAccount(Base):
+    """An external account linked after sign-in, e.g. Google Calendar (CONN-1).
+
+    The refresh token is Fernet-encrypted with SHIFT_TOKEN_ENCRYPTION_KEY.
+    """
+
+    __tablename__ = "connected_accounts"
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    provider: Mapped[str] = mapped_column(String(40), primary_key=True)
+    scopes: Mapped[str] = mapped_column(String(500), default="")
+    refresh_token_encrypted: Mapped[str] = mapped_column(String(2000))
+    connected_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class OrgMember(Base):
     __tablename__ = "org_members"
     org_id: Mapped[str] = mapped_column(ForeignKey("organizations.id"), primary_key=True)
