@@ -42,8 +42,9 @@ The root `.env` is optional (see `.env.example`). To change the Next proxy, set
 `API_INTERNAL_URL` in the web process environment or `apps/web/.env.local`.
 The fictional fixture is the week **November 9–13, 2026, America/Edmonton**, so it
 remains repeatable regardless of today's date. It persists in ignored `shift.sqlite`.
-There is no production login yet: the clearly labeled persona selector is a local
-role-policy demo. **Do not expose this foundation publicly.**
+The local persona selector is a role-policy demo, not login. **Do not expose local
+demo mode publicly.** Hosted email/password identity and PostgreSQL setup are
+documented in [Hosted setup](docs/HOSTED_SETUP.md); they require explicit configuration.
 
 ## Try the foundation
 
@@ -72,9 +73,12 @@ npm run build
 npm run test:e2e
 ```
 
+Hosted login UI checks (mocked Supabase responses): `npm run test:auth`.
+
 Browser tests use Playwright; install a browser with `npx playwright install chromium`
 or set `PLAYWRIGHT_CHROME_PATH` to an existing Chrome executable. They launch an
-isolated API fixture in `.tmp/` and a Next server; keep ports 8000/3000 free.
+isolated API fixture in `.tmp/` and a Next server on ports 8002/3002.
+Login UI tests use port 3001. Both suites use separate Next build directories.
 See [docs/TESTING.md](docs/TESTING.md) for actual results and limitations.
 
 To export an updated API contract:
@@ -87,7 +91,7 @@ For manual database administration (demo only):
 
 ```sh
 uv run alembic upgrade head
-PYTHONPATH=apps/api uv run python -m shift_api.seed
+SHIFT_ENVIRONMENT=local SHIFT_DEMO_MODE=true PYTHONPATH=apps/api uv run python -m shift_api.seed
 ```
 
 ## Structure and collaboration
@@ -106,7 +110,7 @@ The original MIT license is retained.
 
 ## Next milestones
 
-Supabase authentication/JWT and RLS; production PostgreSQL concurrency constraints;
+Configure and verify Supabase identity for your hosted environment;
 profile, availability, project, and job editing; applications; versioned schedule
 approval; invitations and atomic acceptance; full Gantt; complete recovery demo.
 No LLM decides feasibility. No optimization performance claims are fabricated.

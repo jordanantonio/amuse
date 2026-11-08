@@ -42,9 +42,9 @@ const navigation = [
   { id: 'talent' as View, label: 'Talent marketplace', icon: Users },
   { id: 'schedule' as View, label: 'Schedule lab', icon: Workflow },
 ];
-export function Workspace() {
+export function Workspace({ demo = true, onSignOut }: { demo?: boolean; onSignOut?: () => void }) {
   const [view, setView] = useState<View>('overview'),
-    [persona, setPersona] = useState('demo-manager'),
+    [persona, setPersona] = useState(demo ? 'demo-manager' : ''),
     [people, setPeople] = useState<Persona[]>([]),
     [data, setData] = useState<Dashboard | null>(null),
     [error, setError] = useState(''),
@@ -57,6 +57,11 @@ export function Workspace() {
     [disruption, setDisruption] = useState<Assignment | null>(null),
     [projectDetail, setProjectDetail] = useState<Project | null>(null);
   const generation = useRef(0);
+  useEffect(() => {
+    if (data && !data.projects.some((p) => p.id === selected)) {
+      setSelected(data.projects[0]?.id || '');
+    }
+  }, [data, selected]);
   const load = useCallback(async () => {
     const turn = ++generation.current;
     try {
@@ -66,9 +71,12 @@ export function Workspace() {
         setError('');
       }
     } catch (e) {
-      if (turn === generation.current) setError((e as Error).message);
+      if (turn === generation.current) {
+        setError((e as Error).message);
+        if (!demo) setData(null);
+      }
     }
-  }, [persona]);
+  }, [persona, demo]);
   useEffect(() => {
     setData(null);
     setDraft(null);
@@ -82,10 +90,11 @@ export function Workspace() {
     };
   }, [load]);
   useEffect(() => {
+    if (!demo) return;
     request<Persona[]>('/personas', 'demo-manager')
       .then(setPeople)
       .catch(() => {});
-  }, []);
+  }, [demo]);
   useEffect(() => {
     if (!notice) return;
     const id = setTimeout(() => setNotice(''), 6000);
@@ -153,7 +162,7 @@ export function Workspace() {
             <Building2 size={18} />
           </span>
           <div>
-            <strong>Northline Works</strong>
+            <strong>{data?.organization || 'Company workspace'}</strong>
             <small>Company workspace</small>
           </div>
           <ChevronDown size={14} />
@@ -206,11 +215,9 @@ export function Workspace() {
             </button>
           </div>
           <div className="profile">
-            <span className="avatar profile-avatar">
-              {initials(data?.persona.name || 'Alex Morgan')}
-            </span>
+            <span className="avatar profile-avatar">{initials(data?.persona.name || 'SHIFT')}</span>
             <div>
-              <strong>{data?.persona.name || 'Alex Morgan'}</strong>
+              <strong>{data?.persona.name || 'Loading…'}</strong>
               <small>
                 {data?.persona.role === 'admin'
                   ? 'Company administrator'
@@ -238,30 +245,39 @@ export function Workspace() {
             <strong>{navTitle}</strong>
           </div>
           <div className="topbar-right">
-            <span className="demo-badge">
-              <span /> FICTIONAL DEMO
-            </span>
-            <label className="persona-select">
-              <span className="sr-only">Demo persona</span>
-              <select
-                value={persona}
-                onChange={(e) => {
-                  setPersona(e.target.value);
-                  go('overview');
-                }}
-              >
-                {people.length ? (
-                  people.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} · {p.role}
-                    </option>
-                  ))
-                ) : (
-                  <option value="demo-manager">Alex Morgan · manager</option>
-                )}
-              </select>
-              <ChevronDown size={13} />
-            </label>
+            {demo && (
+              <>
+                <span className="demo-badge">
+                  <span /> FICTIONAL DEMO
+                </span>
+                <label className="persona-select">
+                  <span className="sr-only">Demo persona</span>
+                  <select
+                    value={persona}
+                    onChange={(e) => {
+                      setPersona(e.target.value);
+                      go('overview');
+                    }}
+                  >
+                    {people.length ? (
+                      people.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name} · {p.role}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="demo-manager">Alex Morgan · manager</option>
+                    )}
+                  </select>
+                  <ChevronDown size={13} />
+                </label>
+              </>
+            )}
+            {!demo && (
+              <Button variant="outline" size="sm" onClick={onSignOut}>
+                Sign out
+              </Button>
+            )}
           </div>
         </header>
         <div className="content">
@@ -284,7 +300,7 @@ export function Workspace() {
             <div className="loading-state">
               <LoaderCircle className="spin" size={26} />
               <h1>Getting your workspace ready</h1>
-              <p>Connecting to the local SHIFT API…</p>
+              <p>Connecting to the SHIFT API…</p>
             </div>
           ) : (
             <>
@@ -301,7 +317,7 @@ export function Workspace() {
                     </div>
                     <div className="heading-actions">
                       <span className="date-pill">
-                        <CalendarDays size={15} /> Nov 9 – 13, 2026
+                        <CalendarDays size={15} /> {weekLabel(data.week_start)}
                       </span>
                       <Button onClick={() => go(isWorker ? 'calendar' : 'schedule')}>
                         {isWorker ? 'View my schedule' : 'Plan your workforce'}
@@ -494,7 +510,7 @@ export function Workspace() {
                     description="Confirmed assignments and published availability · America/Edmonton"
                     action={
                       <span className="date-pill">
-                        <CalendarDays size={15} /> November 9–13, 2026
+                        <CalendarDays size={15} /> {weekLabel(data.week_start)}
                       </span>
                     }
                   />
@@ -672,7 +688,11 @@ export function Workspace() {
                         aria-label="Search marketplace"
                       />
                     </label>
-                    <span className="subtle">Fictional demonstration profiles · CAD rates</span>
+                    <span className="subtle">
+                      {demo
+                        ? 'Fictional demonstration profiles · CAD rates'
+                        : 'Workforce profiles · CAD rates'}
+                    </span>
                   </div>
                   {!isWorker && (
                     <>
@@ -971,35 +991,39 @@ export function Workspace() {
                     and partial-crew recovery are not yet modeled. No production scheduling claim is
                     made.
                   </div>
-                  <div className="demo-reset">
-                    <span>
-                      Need a fresh fixture? Demo reset restores fictional data and removes drafts.
-                    </span>
-                    <Button
-                      disabled={busy || data.persona.role !== 'admin'}
-                      variant="ghost"
-                      size="sm"
-                      onClick={async () => {
-                        if (
-                          !window.confirm('Reset all fictional demo data and discard local drafts?')
-                        )
-                          return;
-                        setBusy(true);
-                        try {
-                          await request('/demo/reset', persona, 'POST');
-                          await load();
-                          setDraft(null);
-                          setNotice('Fictional demo restored.');
-                        } catch (e) {
-                          setError((e as Error).message);
-                        } finally {
-                          setBusy(false);
-                        }
-                      }}
-                    >
-                      Reset demo (admin only)
-                    </Button>
-                  </div>
+                  {demo && (
+                    <div className="demo-reset">
+                      <span>
+                        Need a fresh fixture? Demo reset restores fictional data and removes drafts.
+                      </span>
+                      <Button
+                        disabled={busy || data.persona.role !== 'admin'}
+                        variant="ghost"
+                        size="sm"
+                        onClick={async () => {
+                          if (
+                            !window.confirm(
+                              'Reset all fictional demo data and discard local drafts?',
+                            )
+                          )
+                            return;
+                          setBusy(true);
+                          try {
+                            await request('/demo/reset', persona, 'POST');
+                            await load();
+                            setDraft(null);
+                            setNotice('Fictional demo restored.');
+                          } catch (e) {
+                            setError((e as Error).message);
+                          } finally {
+                            setBusy(false);
+                          }
+                        }}
+                      >
+                        Reset demo (admin only)
+                      </Button>
+                    </div>
+                  )}
                 </>
               )}
               {view === 'schedule' && isWorker && (
@@ -1012,7 +1036,11 @@ export function Workspace() {
                 <span>
                   <span className="footer-brand">shift.</span> Workforce, in sync.
                 </span>
-                <span>Local foundation · Fictional data · natHacks 2026</span>
+                <span>
+                  {demo
+                    ? 'Local foundation · Fictional data · natHacks 2026'
+                    : 'SHIFT · America/Edmonton · CAD'}
+                </span>
               </footer>
             </>
           )}
@@ -1112,4 +1140,11 @@ function AbsenceDialog({
       </section>
     </dialog>
   );
+}
+
+function weekLabel(start: string) {
+  const date = new Date(start + 'T12:00:00Z');
+  const end = new Date(date);
+  end.setUTCDate(end.getUTCDate() + 4);
+  return `${shortDate(date.toISOString())} – ${shortDate(end.toISOString())}, ${end.getUTCFullYear()}`;
 }

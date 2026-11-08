@@ -130,3 +130,10 @@ class DraftView(DTO):
     proposals: list[Proposal]
     blockers: list[str]
     cost_cents: int | None
+
+
+class Identity(BaseModel):
+    persona: Persona
+    organization_id: str
+    organization: str
+    demo: bool

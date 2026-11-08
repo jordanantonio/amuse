@@ -90,3 +90,10 @@ export type Draft = {
   blockers: string[];
   cost_cents: number | null;
 };
+
+export type Identity = {
+  persona: Persona;
+  organization_id: string;
+  organization: string;
+  demo: boolean;
+};

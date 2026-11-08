@@ -1,17 +1,28 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import select
 from .auth import Database, Actor, managed_project
 from .config import settings
 from .models import Membership, ScheduleDraft, Assignment, Task, AuditEvent, WorkerAbsence
-from .schemas import Dashboard, Persona, DraftView
+from .schemas import Dashboard, Persona, DraftView, Identity
 from .views import dashboard
 from .solver import solve
 from .seed import reset
 
+@asynccontextmanager
+async def lifespan(app):
+    settings.validate_hosted()
+    if not settings.demo_mode:
+        from .database import check_runtime_role
+        check_runtime_role()
+    yield
+
+
 app = FastAPI(
+    lifespan=lifespan,
     title="SHIFT Workforce API",
     version="0.1.0",
-    description="Local fictional-data foundation. Demo personas are not authentication.",
+    description="Workforce API with hosted Supabase identity and a separate local fictional demo.",
 )
 
 
@@ -20,7 +31,7 @@ def health():
     return {
         "status": "ok",
         "demo": settings.demo_mode,
-        "authentication": "local-demo-only",
+        "authentication": "local-demo-only" if settings.demo_mode else "supabase",
         "solver": "OR-Tools CP-SAT",
     }
 
@@ -31,6 +42,15 @@ def personas(db: Database):
         raise HTTPException(404, "Demo personas disabled")
     # This endpoint is intentionally available only in the local demo.
     return list(db.scalars(select(Membership).where(Membership.organization_id == "northline")))
+
+
+@app.get("/api/v1/me", response_model=Identity)
+def me(db: Database, actor: Actor):
+    from .models import Organization
+    return Identity(
+        persona=Persona.model_validate(actor), organization_id=actor.organization_id,
+        organization=db.get(Organization, actor.organization_id).name, demo=settings.demo_mode,
+    )
 
 
 @app.get("/api/v1/dashboard", response_model=Dashboard)

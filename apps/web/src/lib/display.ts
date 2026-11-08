@@ -21,3 +21,11 @@ export const initials = (name: string) =>
     .map((n) => n[0])
     .slice(0, 2)
     .join('');
+
+export const localDate = (v: string) =>
+  new Intl.DateTimeFormat('en-CA', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone: zone,
+  }).format(new Date(v));

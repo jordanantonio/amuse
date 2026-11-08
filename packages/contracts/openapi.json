@@ -240,6 +240,33 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "Identity": {
+        "properties": {
+          "demo": {
+            "title": "Demo",
+            "type": "boolean"
+          },
+          "organization": {
+            "title": "Organization",
+            "type": "string"
+          },
+          "organization_id": {
+            "title": "Organization Id",
+            "type": "string"
+          },
+          "persona": {
+            "$ref": "#/components/schemas/Persona"
+          }
+        },
+        "required": [
+          "persona",
+          "organization_id",
+          "organization",
+          "demo"
+        ],
+        "title": "Identity",
+        "type": "object"
+      },
       "JobView": {
         "properties": {
           "id": {
@@ -647,10 +674,16 @@
         "title": "WorkerView",
         "type": "object"
       }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
     }
   },
   "info": {
-    "description": "Local fictional-data foundation. Demo personas are not authentication.",
+    "description": "Workforce API with hosted Supabase identity and a separate local fictional demo.",
     "title": "SHIFT Workforce API",
     "version": "0.1.0"
   },
@@ -708,6 +741,11 @@
             "description": "Validation Error"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "Disrupt"
       }
     },
@@ -754,6 +792,11 @@
             "description": "Validation Error"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "Get Dashboard"
       }
     },
@@ -800,6 +843,11 @@
             "description": "Validation Error"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "Demo Reset"
       }
     },
@@ -850,6 +898,11 @@
             "description": "Validation Error"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "Get Drafts"
       }
     },
@@ -867,6 +920,57 @@
           }
         },
         "summary": "Health"
+      }
+    },
+    "/api/v1/me": {
+      "get": {
+        "operationId": "me_api_v1_me_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-demo-persona",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Persona"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Identity"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Me"
       }
     },
     "/api/v1/personas": {
@@ -943,6 +1047,11 @@
             "description": "Validation Error"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "Generate Draft"
       }
     }

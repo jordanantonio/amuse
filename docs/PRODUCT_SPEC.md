@@ -70,7 +70,17 @@ restart; key flows pass API and browser checks. Responsive and keyboard-usable U
 
 ## Foundation versus full MVP
 The foundation implements relational models, seed data, read dashboards, role-scoped
-API projections, and an initial CP-SAT recovery draft. Follow-up tasks deliver
-Supabase authentication/RLS, full project/profile/availability editing, marketplace
-application flows, versioned approval and acceptance transactions, PostgreSQL
-concurrency enforcement, and a complete repeatable recovery walkthrough.
+API projections, and an initial CP-SAT recovery draft. The identity/database-safety milestone adds hosted authentication/RLS and a
+PostgreSQL overlap constraint. Follow-up tasks deliver full project/profile/availability
+editing, marketplace applications, versioned approval and acceptance transactions,
+and a complete repeatable recovery walkthrough.
+
+## Identity and database safety milestone
+
+Hosted mode supports Supabase email/password login with administrator-provisioned
+memberships (one organization per account). FastAPI verifies asymmetric JWTs;
+PostgreSQL RLS and restricted runtime credentials enforce access boundaries.
+Confirmed assignment overlap is rejected by a PostgreSQL exclusion constraint.
+Local SQLite/persona mode remains separate and explicitly enabled. Approval and
+contractor acceptance, workforce editing, and self-service onboarding remain open.
+See HOSTED_SETUP.md for configuration and verification limits.

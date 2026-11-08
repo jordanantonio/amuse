@@ -9,6 +9,7 @@ from ortools.sat.python import cp_model
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from .models import *
+from .projections import hosted, busy_windows, external_commitments
 
 
 def utc(value: datetime):
@@ -58,6 +59,12 @@ def solve(
     sites = list(
         db.scalars(select(Worksite).where(Worksite.organization_id == project.organization_id))
     )
+    external = []
+    if hosted(db):
+        external = external_commitments(db, project.id)
+        external_ids = {a.id for a in external}
+        all_assignments = [a for a in all_assignments if a.task_id in {t.id for t in tasks}]
+        busy = [a for a in busy_windows(db) if a.id not in external_ids]
     # Fingerprint all scheduling-relevant inputs. Private labels never leave service.
     records = (
         [project]
@@ -72,19 +79,19 @@ def solve(
         + skills
         + certs
         + sites
+        + external
     )
-    snap = [
-        {
-            c.name: (
-                utc(getattr(r, c.name)).isoformat()
-                if isinstance(getattr(r, c.name), datetime)
-                else getattr(r, c.name)
-            )
-            for c in r.__table__.columns
-            if c.name != "private_label"
+    def snapshot(record):
+        values = (
+            {column.name: getattr(record, column.name) for column in record.__table__.columns}
+            if hasattr(record, "__table__") else vars(record)
+        )
+        return {
+            key: utc(value).isoformat() if isinstance(value, datetime) else value
+            for key, value in values.items() if key != "private_label"
         }
-        for r in records
-    ]
+
+    snap = [snapshot(record) for record in records]
     fingerprint = hashlib.sha256(json.dumps(snap, sort_keys=True, default=str).encode()).hexdigest()
 
     def result(status, blockers=None, proposals=None, cost=None):
@@ -170,6 +177,15 @@ def solve(
             if p.worksite_id == site.id and task.work_mode != "remote":
                 site_intervals.append(interval)
                 site_demands.append(1)
+    for a in external:
+        lo, hi = math.floor(hours(a.starts_at)), math.ceil(hours(a.ends_at))
+        if hi <= 0 or lo >= horizon:
+            continue
+        interval = model.new_fixed_size_interval_var(lo, hi - lo, "external_" + a.id)
+        worker_intervals[a.worker_id].append(interval)
+        if a.same_site and a.onsite:
+            site_intervals.append(interval)
+            site_demands.append(1)
     for t in tasks:
         fixed = [a for a in all_assignments if a.task_id == t.id]
         if fixed:

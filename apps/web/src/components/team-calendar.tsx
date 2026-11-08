@@ -1,8 +1,13 @@
 import { Check } from 'lucide-react';
 import type { Dashboard } from '@/lib/types';
-import { clock, day } from '@/lib/display';
+import { clock, day, localDate } from '@/lib/display';
 import { Avatar } from '@/components/ui/avatar';
 export function Calendar({ data, compact = false }: { data: Dashboard; compact?: boolean }) {
+  const days = Array.from({ length: 5 }, (_, i) => {
+    const date = new Date(data.week_start + 'T12:00:00Z');
+    date.setUTCDate(date.getUTCDate() + i);
+    return date.toISOString().slice(0, 10);
+  });
   const workers = compact ? data.workers.slice(0, 4) : data.workers;
   return (
     <div className="calendar-scroll">
@@ -16,8 +21,8 @@ export function Calendar({ data, compact = false }: { data: Dashboard; compact?:
             {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((d, i) => (
               <th key={d}>
                 <span>{d}</span>
-                <b>{i + 9}</b>
-                {i === 0 && <span className="week-tag">DEMO WEEK</span>}
+                <b>{day(days[i] + 'T12:00:00Z')}</b>
+                {i === 0 && data.demo && <span className="week-tag">DEMO WEEK</span>}
               </th>
             ))}
           </tr>
@@ -34,14 +39,14 @@ export function Calendar({ data, compact = false }: { data: Dashboard; compact?:
                   </div>
                 </div>
               </th>
-              {[9, 10, 11, 12, 13].map((d) => {
+              {days.map((d) => {
                 const assignments = data.assignments.filter(
                     (a) =>
                       a.worker_id === w.id &&
                       a.status === 'confirmed' &&
-                      Number(day(a.starts_at)) === d,
+                      localDate(a.starts_at) === d,
                   ),
-                  published = w.availability.some((a) => Number(day(a.starts_at)) === d);
+                  published = w.availability.some((a) => localDate(a.starts_at) === d);
                 return (
                   <td key={d}>
                     {assignments.length ? (
@@ -66,7 +71,7 @@ export function Calendar({ data, compact = false }: { data: Dashboard; compact?:
                       <div className={`calendar-free ${published ? '' : 'unavailable'}`}>
                         <span className="available-dot" />
                         {published ? 'Available windows' : 'Not published'}
-                        {w.busy.some((b) => Number(day(b.starts_at)) === d) && (
+                        {w.busy.some((b) => localDate(b.starts_at) === d) && (
                           <small>Busy intervals apply</small>
                         )}
                       </div>

@@ -2,6 +2,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from .models import *
 from .schemas import *
+from .config import settings
+from .projections import hosted, busy_windows
 
 
 def dashboard(db: Session, actor: Membership) -> Dashboard:
@@ -30,6 +32,7 @@ def dashboard(db: Session, actor: Membership) -> Dashboard:
         }
         projects = [p for p in projects if p.id in project_ids]
         all_tasks = [t for t in all_tasks if t.project_id in project_ids]
+    opaque = busy_windows(db) if hosted(db) else None
     wviews = []
     for w in workers:
         # Managers receive opaque cross-project busy intervals, not assignment details.
@@ -47,6 +50,9 @@ def dashboard(db: Session, actor: Membership) -> Dashboard:
                 )
             )
         )
+        if opaque is not None:
+            commitments = [a for a in opaque if a.worker_id == w.id]
+            other_assignments = []
         data = {
             c.name: getattr(w, c.name)
             for c in Worker.__table__.columns
@@ -145,8 +151,8 @@ def dashboard(db: Session, actor: Membership) -> Dashboard:
     return Dashboard(
         organization=org.name,
         persona=Persona.model_validate(actor),
-        demo=True,
-        week_start="2026-11-09",
+        demo=settings.demo_mode,
+        week_start=("2026-11-09" if settings.demo_mode else current_week()),
         timezone="America/Edmonton",
         workers=wviews,
         projects=pviews,
@@ -154,3 +160,10 @@ def dashboard(db: Session, actor: Membership) -> Dashboard:
         jobs=[JobView.model_validate(j) for j in jobs],
         staffing_gaps=gaps,
     )
+
+
+def current_week():
+    from datetime import datetime, timedelta
+    from zoneinfo import ZoneInfo
+    today = datetime.now(ZoneInfo("America/Edmonton")).date()
+    return (today - timedelta(days=today.weekday())).isoformat()

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ request }) => {
-  const response = await request.post('http://127.0.0.1:8000/api/v1/demo/reset', {
+  const response = await request.post('/api/v1/demo/reset', {
     headers: { 'X-Demo-Persona': 'demo-admin' },
   });
   expect(response.ok()).toBeTruthy();
