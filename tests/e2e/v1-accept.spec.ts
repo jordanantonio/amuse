@@ -28,6 +28,8 @@ test('accept an offer: withdraw overlaps, block dates, calendar, schedule', asyn
   await expect(done).toContainText(
     'Maintenance electrician, night shift with Prairie Harvest Foods',
   );
+  await expect(done.locator('.booked-stamp')).toHaveText('BOOKED');
+  await expect(done.locator('.mini-cal-day.booked').first()).toBeVisible();
   await expect(done.getByRole('link', { name: 'Add to Google Calendar' })).toHaveAttribute(
     'href',
     /calendar\.google\.com\/calendar\/render\?action=TEMPLATE&text=Shift.*&dates=\d{8}%2F\d{8}/,

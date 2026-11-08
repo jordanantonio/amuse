@@ -264,6 +264,85 @@ def clear_week_proposals(db: Database, user: CurrentUser, start: date | None = N
     return week_view(db, org.id, week)
 
 
+class ShiftBlock(BaseModel):
+    label: str
+    start_minute: int
+    end_minute: int
+
+
+class PersonDay(BaseModel):
+    day: date
+    free: list[list[int]]
+    booked: list[list[int]]
+    shifts: list[ShiftBlock]
+
+
+class PersonRow(BaseModel):
+    user_id: str
+    name: str
+    headline: str
+    week_hours: float
+    days: list[PersonDay]
+
+
+@router.get("/people", response_model=list[PersonRow])
+def people(db: Database, user: CurrentUser, start: date | None = None):
+    """CREW-4: crew x days heatmap. Each cell carries free windows and bookings (minutes)."""
+    from datetime import datetime
+
+    from .crew import clip_bar, free_windows
+    from .market_models import WorkerProfile
+
+    org = business(db, user)
+    week = week_start(start or date.today())
+    rows = []
+    crew = db.scalars(select(CrewMember.user_id).where(CrewMember.org_id == org.id)).all()
+    for uid in crew:
+        worker = db.get(User, uid)
+        profile = db.get(WorkerProfile, uid)
+        hours = hours_by_weekday(db, uid)
+        shifts = bookings(db, uid, week, week + timedelta(days=6), include_proposed=True)
+        days = []
+        for i in range(7):
+            d = week + timedelta(days=i)
+            base = datetime.combine(d, datetime.min.time())
+            todays = [
+                ShiftBlock(
+                    label=label,
+                    start_minute=max(0, int((s - base).total_seconds() // 60)),
+                    end_minute=min(1440, int((e - base).total_seconds() // 60)),
+                )
+                for s, e, label in shifts
+                if e > base and s < base + timedelta(days=1)
+            ]
+            days.append(
+                PersonDay(
+                    day=d,
+                    free=[[max(0, s), min(1440, e)] for s, e in free_windows(hours, d) if e > 0 and s < 1440],
+                    booked=clip_bar(shifts, d),
+                    shifts=todays,
+                )
+            )
+        week_end = datetime.combine(week + timedelta(days=7), datetime.min.time())
+        week_begin = datetime.combine(week, datetime.min.time())
+        total = sum(
+            (min(e, week_end) - max(s, week_begin)).total_seconds() / 3600
+            for s, e, _ in shifts
+            if e > week_begin and s < week_end
+        )
+        rows.append(
+            PersonRow(
+                user_id=uid,
+                name=worker.full_name,
+                headline=profile.headline if profile else "",
+                week_hours=round(total, 1),
+                days=days,
+            )
+        )
+    rows.sort(key=lambda r: r.name)
+    return rows
+
+
 @router.put("/rules", response_model=RulesView)
 def update_rules(payload: RulesView, db: Database, user: CurrentUser):
     org = business(db, user)

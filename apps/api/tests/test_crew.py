@@ -110,3 +110,14 @@ def test_crew_scope_and_rules(client, db):
     assert r.status_code == 200
     week = client.get("/api/v1/market/crew/week").json()
     assert week["rules"]["min_rest_hours"] == 11
+
+
+def test_people_view_heatmap(client, db):
+    as_user(client, "u-rahul")
+    rows = client.get("/api/v1/market/crew/people", params={"start": str(MONDAY)}).json()
+    assert len(rows) == 6
+    ilya = next(r for r in rows if r["name"] == "Ilya Sukhanov")
+    monday = ilya["days"][0]
+    assert monday["free"] == [[360, 1080]]
+    assert [s["label"] for s in monday["shifts"]] == ["Packaging line, Prairie Harvest Foods"]
+    assert monday["booked"] == [[750, 990]] and ilya["week_hours"] == 8.0

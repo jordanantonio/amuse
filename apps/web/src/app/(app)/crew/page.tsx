@@ -17,6 +17,7 @@ import { range, todayIso } from '@/lib/format';
 import { useSession } from '@/components/v1/session';
 import { PersonAvatar } from '@/components/v1/avatar';
 import { CandidatePanel } from '@/components/v1/crew';
+import { PeopleView } from '@/components/v1/crew-people';
 import { EmptyState, ErrorNote, Skeleton } from '@/components/v1/ui';
 
 const DAY = 86400000;
@@ -49,6 +50,7 @@ function CrewPlanner() {
   const [panel, setPanel] = useState<{ slot: CrewSlot; scope: 'crew' | 'market' } | null>(null);
   const [snapped, setSnapped] = useState<string | null>(null);
   const [rulesOpen, setRulesOpen] = useState(false);
+  const [view, setView] = useState<'board' | 'people'>('board');
   const load = useCallback(async () => {
     try {
       setWeek(await market<CrewWeek>(`/crew/week?start=${start}`));
@@ -118,12 +120,7 @@ function CrewPlanner() {
       <div className="page-head-row">
         <div>
           <h1 className="page-title">Crew planner</h1>
-          <p className="crew-sub">
-            {week ? `${week.crew_size} people on your crew` : ''} ·{' '}
-            <Link className="inline-link" href="/planner">
-              Weather and absence recovery
-            </Link>
-          </p>
+          <p className="crew-sub">{week ? `${week.crew_size} people on your crew` : ''}</p>
         </div>
         <div className="actions">
           <RulesButton
@@ -162,6 +159,14 @@ function CrewPlanner() {
           </button>
           <button className="text-button" onClick={() => setStart(monday(todayIso()))}>
             This week
+          </button>
+        </div>
+        <div className="segmented-v1" role="group" aria-label="View">
+          <button aria-pressed={view === 'board'} onClick={() => setView('board')}>
+            Shifts
+          </button>
+          <button aria-pressed={view === 'people'} onClick={() => setView('people')}>
+            People
           </button>
         </div>
         <ul className="schedule-legend" aria-label="Legend">
@@ -213,7 +218,8 @@ function CrewPlanner() {
 
       {error && <ErrorNote message={error} retry={() => void load()} />}
       {!week && !error && <Skeleton lines={3} />}
-      {week && (
+      {week && view === 'people' && <PeopleView start={start} />}
+      {week && view === 'board' && (
         <div className="crew-board" role="list" aria-label="Shifts this week">
           {days.map((d, i) => {
             const slots = week.slots.filter((s) => s.day === d);

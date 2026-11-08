@@ -85,6 +85,10 @@ function AcceptDialog({
     return (
       <Modal title="You’re booked" onClose={() => onClose(true)}>
         <div className="editor-fields accept-done">
+          <div className="booked-stamp" aria-hidden="true">
+            BOOKED
+          </div>
+          <MiniCalendar start={accepted.engagement.start_date} end={accepted.engagement.end_date} />
           <p className="match-line ok">
             <CircleCheck size={20} aria-hidden="true" />
             {p.title} with {p.org.name},{' '}
@@ -272,5 +276,45 @@ export function EngagementActions({
       </div>
       {error && <ErrorNote message={error} />}
     </div>
+  );
+}
+
+/** WOW-2: the booked dates fill into a small month calendar, one by one. */
+function MiniCalendar({ start, end }: { start: string; end: string }) {
+  const first = new Date(start.slice(0, 7) + '-01T00:00:00Z');
+  const year = first.getUTCFullYear();
+  const month = first.getUTCMonth();
+  const days = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+  const lead = (first.getUTCDay() + 6) % 7;
+  const label = first.toLocaleString('en-CA', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  let n = 0;
+  return (
+    <figure className="mini-cal" aria-label={`Booked days in ${label}`}>
+      <figcaption>{label}</figcaption>
+      <div className="mini-cal-grid">
+        {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
+          <span key={`h${i}`} className="mini-cal-head">
+            {d}
+          </span>
+        ))}
+        {Array.from({ length: lead }, (_, i) => (
+          <span key={`l${i}`} />
+        ))}
+        {Array.from({ length: days }, (_, i) => {
+          const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(i + 1).padStart(2, '0')}`;
+          const booked = iso >= start.slice(0, 10) && iso <= end.slice(0, 10);
+          const delay = booked ? 600 + 30 * n++ : 0;
+          return (
+            <span
+              key={iso}
+              className={`mini-cal-day ${booked ? 'booked' : ''}`}
+              style={booked ? { animationDelay: `${delay}ms` } : undefined}
+            >
+              {i + 1}
+            </span>
+          );
+        })}
+      </div>
+    </figure>
   );
 }

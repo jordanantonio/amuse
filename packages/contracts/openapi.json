@@ -2752,6 +2752,86 @@
         "title": "OrgWorkView",
         "type": "object"
       },
+      "PersonDay": {
+        "properties": {
+          "booked": {
+            "items": {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "title": "Booked",
+            "type": "array"
+          },
+          "day": {
+            "format": "date",
+            "title": "Day",
+            "type": "string"
+          },
+          "free": {
+            "items": {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "title": "Free",
+            "type": "array"
+          },
+          "shifts": {
+            "items": {
+              "$ref": "#/components/schemas/ShiftBlock"
+            },
+            "title": "Shifts",
+            "type": "array"
+          }
+        },
+        "required": [
+          "day",
+          "free",
+          "booked",
+          "shifts"
+        ],
+        "title": "PersonDay",
+        "type": "object"
+      },
+      "PersonRow": {
+        "properties": {
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/PersonDay"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "user_id": {
+            "title": "User Id",
+            "type": "string"
+          },
+          "week_hours": {
+            "title": "Week Hours",
+            "type": "number"
+          }
+        },
+        "required": [
+          "user_id",
+          "name",
+          "headline",
+          "week_hours",
+          "days"
+        ],
+        "title": "PersonRow",
+        "type": "object"
+      },
       "Persona": {
         "properties": {
           "id": {
@@ -4230,6 +4310,29 @@
           "auto_decline"
         ],
         "title": "ScreeningInput",
+        "type": "object"
+      },
+      "ShiftBlock": {
+        "properties": {
+          "end_minute": {
+            "title": "End Minute",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "start_minute": {
+            "title": "Start Minute",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "label",
+          "start_minute",
+          "end_minute"
+        ],
+        "title": "ShiftBlock",
         "type": "object"
       },
       "SlotView": {
@@ -7311,6 +7414,77 @@
           }
         },
         "summary": "Run Autofill",
+        "tags": [
+          "crew"
+        ]
+      }
+    },
+    "/api/v1/market/crew/people": {
+      "get": {
+        "description": "CREW-4: crew x days heatmap. Each cell carries free windows and bookings (minutes).",
+        "operationId": "people_api_v1_market_crew_people_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PersonRow"
+                  },
+                  "title": "Response People Api V1 Market Crew People Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "People",
         "tags": [
           "crew"
         ]

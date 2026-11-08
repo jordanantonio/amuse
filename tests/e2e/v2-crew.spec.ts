@@ -47,4 +47,16 @@ test('crew planner: assign with fatigue advice, auto-fill, find a replacement', 
   await page.getByRole('button', { name: 'Accept all' }).click();
   await expect(page.locator('.proposal-bar')).toHaveCount(0);
   await expect(page.locator('.spot.proposed')).toHaveCount(0);
+  await page.getByRole('button', { name: 'People', exact: true }).click();
+  const cells = page.locator('.heat-cell');
+  await expect(cells).toHaveCount(42);
+  await page
+    .locator('tr')
+    .filter({ hasText: 'Ilya Sukhanov' })
+    .locator('.heat-cell')
+    .first()
+    .click();
+  await expect(page.locator('.people-detail')).toContainText('Ilya Sukhanov');
+  await expect(page.locator('.people-detail')).toContainText('free 6 AM–6 PM');
+  await page.screenshot({ path: 'test-results/v2-people.png', fullPage: true });
 });
