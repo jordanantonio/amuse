@@ -13,7 +13,7 @@ test('Maya’s For You feed: eligible only, why, greyed reasons, one-tap apply',
   ).toBeVisible();
   await expect(page.getByRole('link', { name: /1 offer is waiting for your reply/ })).toBeVisible();
   const cards = page.locator('.feed-list .contract-card');
-  await expect(cards).toHaveCount(10);
+  await expect(cards).toHaveCount(11);
   await expect(cards.first()).toContainText('You have');
   await cards.first().getByRole('button', { name: 'Why am I seeing this?' }).click();
   await expect(page.getByRole('dialog', { name: 'Why you’re seeing this' })).toContainText(

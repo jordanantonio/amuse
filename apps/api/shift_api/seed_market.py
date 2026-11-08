@@ -77,6 +77,17 @@ OWNERS = [
 WORKERS = [
     # user id, name, headline, trades, city, radius km, rate min, rate max, bio
     (
+        "u-tyler",
+        "Tyler Brandt",
+        "Warehouse worker",
+        ["Forklift & warehouse", "General labour"],
+        "Red Deer",
+        30,
+        2200,
+        2800,
+        "Looking for steady warehouse hours.",
+    ),
+    (
         "u-ilya",
         "Ilya Sukhanov",
         "General labourer · 4 yrs in food processing & construction",
@@ -184,6 +195,10 @@ WORKERS = [
 
 # uid -> [(credential type, stored status, issued days ago, expires in days | None, number)]
 WALLETS = {
+    "u-tyler": [
+        ("whmis", "verified", 300, 795, None),
+        ("first-aid", "self_reported", 100, 995, None),
+    ],
     "u-ilya": [
         ("whmis", "verified", 1090, 6, "WHMIS-20931"),  # expires next week: amber on Home
         ("first-aid", "verified", 400, 695, "SFA-77120"),
@@ -252,6 +267,10 @@ ORG_WALLETS = {
 
 # uid -> [(role, company, city, started months ago, ended months ago | None, description)]
 HISTORY = {
+    "u-tyler": [
+        ("Warehouse associate", "Red Deer Distribution", "Red Deer", 14, 1, "Picking and packing."),
+        ("Labourer", "Central Alberta Builders", "Red Deer", 30, 15, "Site clean-up."),
+    ],
     "u-ilya": [
         ("Sanitation lead hand", "Prairie Harvest Foods", "Leduc", 20, 2,
          "Ran the overnight sanitation crew of six across two production lines."),
@@ -333,7 +352,7 @@ POSTINGS = [
      [("whmis", R, False), ("first-aid", R, False)]),
     ("p-sanitation", "prairie-harvest", "General Labourer — Sanitation Crew", "General labour", "individual",
      "Leduc", "6505 Sparrow Dr, Leduc", 12, 54, "nights", False, 2600, "hour", 4, "open", 20,
-     [("whmis", R, False), ("first-aid", R, False), ("csts-2020", R, False), ("forklift", N, False)]),
+     [("whmis", R, False), ("first-aid", R, False), ("csts-2020", R, False), ("forklift", N, False, "valuable")]),
     # Ilya's prepared state (DEMO-4): five more eligible contracts and a waiting offer.
     ("p-production-nights", "prairie-harvest", "Production line operator, nights", "Food processing",
      "individual", "Leduc", "6505 Sparrow Dr, Leduc", 7, 120, "nights", True, 2900, "hour", 1, "open", 150,
@@ -365,6 +384,9 @@ POSTINGS = [
     ("p-apprentice", "nisku-fab", "Electrical apprentice (level 3+)", "Electrical", "individual",
      "Nisku", None, 20, 110, "mon_fri", True, 3200, "hour", 1, "open", 40,
      [("apprentice", R, False), ("csts-2020", N, False)]),
+    ("p-warehouse", "prairie-harvest", "Warehouse associate, shipping dock", "Forklift & warehouse",
+     "individual", "Leduc", "6505 Sparrow Dr, Leduc", 18, 110, "mon_fri", True, 2700, "hour", 3, "open", 50,
+     [("whmis", R, False), ("forklift", N, False, "valuable"), ("first-aid", N, False, "nice")]),
     ("a-shutdown", "prairie-harvest", "Shutdown crew: 8 forklift operators", "Forklift & warehouse", "agency",
      "Leduc", "6505 Sparrow Dr, Leduc", 25, 35, "four_on_four_off", True, 3400, "hour", 8, "open", 30,
      [("wcb-clearance", R, False), ("cgl-insurance", N, False)]),
@@ -385,6 +407,13 @@ POSTINGS = [
 
 # posting, applicant (user id or org id), status, note, hours ago
 APPLICATIONS = [
+    ("p-warehouse", "u-amelia", "accepted", "", 300),
+    ("p-warehouse", "u-ilya", "applied", "Forklift-certified and can start early.", 30),
+    ("p-warehouse", "u-noah", "applied", "Happy to learn the dock.", 22),
+    ("p-warehouse", "u-sofia", "shortlisted", "", 40),
+    ("p-warehouse", "u-tyler", "applied", "", 3),
+    ("p-warehouse", "u-liam", "applied", "Cold storage experience.", 60),
+    ("p-warehouse", "u-lucas", "applied", "", 44),
     ("p-production-nights", "u-ilya", "offered", "Four years on night sanitation in Leduc.", 70),
     ("p-pack-lead", "u-ilya", "applied", "Happy to cover weekends between contracts.", 26),
     ("p-maint-elec", "u-maya", "offered", "Nine years on residential and light industrial.", 60),
@@ -419,6 +448,20 @@ POSTING_CONTENT = {
             {"id": "start", "prompt": "Earliest start date", "kind": "date"},
         ],
     },
+    "p-warehouse": {
+        "shift_hours": "7 AM – 3:30 PM, Mon–Fri",
+        "ppe_provided": ["Hi-vis vest", "Cut-resistant gloves"],
+        "ppe_required": ["CSA steel-toe boots"],
+        "typical_day": "Stage outbound pallets, load trailers on the shipping dock and keep the dock clear for the forklift crew.",
+        "questions": [
+            {"id": "lift", "prompt": "Comfortable lifting 50 lb all shift?", "kind": "yes_no"},
+            {"id": "start", "prompt": "Earliest start date", "kind": "date"},
+        ],
+        "coverage": [
+            {"credential_type_id": "forklift", "needed": 2},
+            {"credential_type_id": "first-aid", "needed": 1},
+        ],
+    },
     "p-forklift": {
         "shift_hours": "6 AM – 6 PM on a 4-on, 4-off rotation",
         "ppe_provided": ["Insulated freezer suit", "Hi-vis vest"],
@@ -429,6 +472,19 @@ POSTING_CONTENT = {
         ],
     },
 }
+
+
+# Screening answers (posting, applicant) -> answers. Tyler skipped them (RANK-4 signal).
+ANSWERS = {
+    ("p-warehouse", "u-ilya"): {"lift": "Yes", "start": "earliest"},
+    ("p-warehouse", "u-noah"): {"lift": "Yes"},
+    ("p-warehouse", "u-sofia"): {"lift": "Yes", "start": "earliest"},
+    ("p-warehouse", "u-liam"): {"lift": "Yes"},
+    ("p-warehouse", "u-lucas"): {"lift": "No"},
+}
+# Tyler sent 10 more applications in about three minutes.
+BURST = ["p-cleanup", "p-food-line", "p-shop-labour", "p-site-labour", "p-forklift", "p-pack-lead",
+         "p-yard-forklift", "p-sanitation", "p-temp-power", "p-service-elec"]
 
 
 def seed_postings(db: Session, today: date) -> None:
@@ -454,15 +510,24 @@ def seed_postings(db: Session, today: date) -> None:
             )
         )
         db.flush()
-        for tid, required, verified in reqs:
+        for tid, required, verified, *weight in reqs:
             db.add(PostingRequirement(posting_id=pid, credential_type_id=tid,
-                                      required=required, must_be_verified=verified))
+                                      required=required, must_be_verified=verified,
+                                      weight=None if required else (weight[0] if weight else "nice")))
     db.flush()
+    burst_start = now - timedelta(hours=3)
+    for i, pid in enumerate(BURST):
+        at = burst_start + timedelta(seconds=20 * i)
+        db.add(ContractApplication(posting_id=pid, applicant_user_id="u-tyler", status="applied",
+                                   created_at=at, updated_at=at, answers={}))
     for pid, who, status, note, hours in APPLICATIONS:
         owner = {"applicant_user_id": who} if who.startswith("u-") else {"applicant_org_id": who}
         at = now - timedelta(hours=hours)
+        answers = dict(ANSWERS.get((pid, who), {}))
+        if answers.get("start") == "earliest":
+            answers["start"] = str(today + timedelta(days=18))
         a = ContractApplication(posting_id=pid, status=status, note=note, created_at=at,
-                                updated_at=at, **owner)
+                                updated_at=at, answers=answers, **owner)
         db.add(a)
         db.flush()
         if status in {"accepted", "completed"}:

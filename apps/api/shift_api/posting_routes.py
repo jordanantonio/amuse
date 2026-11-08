@@ -39,6 +39,8 @@ from .market_schemas import (
     PostingCard,
     PostingDetail,
     PostingInput,
+    RankingView,
+    ScreeningInput,
     TalentCard,
     WorkView,
 )
@@ -129,7 +131,12 @@ def save_requirements(db, posting: Posting, payload: PostingInput, org: Organiza
         db.delete(old)
     db.flush()
     for r in payload.requirements:
-        db.add(PostingRequirement(posting_id=posting.id, **r.model_dump()))
+        data = r.model_dump()
+        if data["required"]:
+            data["weight"] = None
+        elif not data.get("weight"):
+            data["weight"] = "nice"
+        db.add(PostingRequirement(posting_id=posting.id, **data))
 
 
 def apply_posting(posting: Posting, payload: PostingInput) -> None:
@@ -395,6 +402,37 @@ def talent(
         )
     results.sort(key=lambda t: (t.distance_km if t.distance_km is not None else 9999, t.name))
     return results
+
+
+@router.get("/postings/{posting_id}/ranking", response_model=RankingView)
+def posting_ranking(posting_id: str, db: Database, user: CurrentUser):
+    from .applicant_ranking import ranking
+
+    p = db.get(Posting, posting_id)
+    if not p:
+        raise HTTPException(404, "Posting not found")
+    return ranking(db, user, p)
+
+
+@router.post("/postings/{posting_id}/decline-unqualified")
+def decline_unqualified(posting_id: str, db: Database, user: CurrentUser):
+    from .applicant_ranking import decline_pile
+
+    p = owned_posting(db, user, posting_id)
+    return {"declined": decline_pile(db, user, p)}
+
+
+@router.put("/postings/{posting_id}/screening", response_model=RankingView)
+def screening_settings(posting_id: str, payload: ScreeningInput, db: Database, user: CurrentUser):
+    from .applicant_ranking import decline_pile, ranking
+
+    p = owned_posting(db, user, posting_id)
+    p.auto_decline = payload.auto_decline
+    audit(db, user, "posting.auto_decline", "postings", p.id, enabled=payload.auto_decline)
+    db.commit()
+    if payload.auto_decline:
+        decline_pile(db, user, p, missing_only=True)
+    return ranking(db, user, p)
 
 
 dev = APIRouter(prefix="/api/v1/dev", tags=["dev"])

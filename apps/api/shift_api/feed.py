@@ -84,6 +84,7 @@ def evaluate(
                 "required": r.required,
                 "must_be_verified": r.must_be_verified,
                 "state": state,
+                "weight": r.weight,
             }
         )
         if r.required:

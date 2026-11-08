@@ -2,9 +2,9 @@
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Plus, Workflow } from 'lucide-react';
+import { CircleCheck, Plus, Users, Workflow } from 'lucide-react';
 import { market } from '@/lib/market';
-import type { ApplicationView, OrgWork, PostingCard, WorkView } from '@/lib/market-types';
+import type { ApplicationView, OrgWork, PostingCard, Ranking, WorkView } from '@/lib/market-types';
 import { dollars, range } from '@/lib/format';
 import { useSession } from '@/components/v1/session';
 import {
@@ -399,23 +399,24 @@ function ApplicantsTab({
 }) {
   const router = useRouter();
   const withApplicants = postings.filter((p) => p.status !== 'draft');
-  const fallback = [...withApplicants].sort(
-    (a, b) => (b.new_applicants || 0) - (a.new_applicants || 0),
-  )[0];
+  const fallback = [...withApplicants].sort((a, b) => (b.applicants || 0) - (a.applicants || 0))[0];
   const postingId = selected || fallback?.id || '';
-  const [apps, setApps] = useState<ApplicationView[] | null>(null);
+  const [view, setView] = useState<Ranking | null>(null);
   const [error, setError] = useState('');
-  useEffect(() => {
+  const [busy, setBusy] = useState(false);
+  const load = useCallback(async () => {
     if (!postingId) return;
-    setApps(null);
-    market<ApplicationView[]>(`/postings/${postingId}/applicants`).then(
-      (a) => {
-        setApps(a);
-        setError('');
-      },
-      (e) => setError((e as Error).message),
-    );
+    try {
+      setView(await market<Ranking>(`/postings/${postingId}/ranking`));
+      setError('');
+    } catch (e) {
+      setError((e as Error).message);
+    }
   }, [postingId]);
+  useEffect(() => {
+    setView(null);
+    void load();
+  }, [load]);
   if (!withApplicants.length)
     return (
       <EmptyState title="No postings yet">
@@ -438,17 +439,95 @@ function ApplicantsTab({
         </select>
       </label>
       {error && <ErrorNote message={error} />}
-      {!apps && !error && <Skeleton lines={2} />}
-      {apps && !apps.length && (
+      {!view && !error && <Skeleton lines={2} />}
+      {view && view.coverage.length > 0 && (
+        <ul className="coverage-strip" aria-label="Team coverage">
+          {view.coverage.map((c) => (
+            <li key={c.credential_type_id} className={c.covered ? 'covered' : 'gap'}>
+              {c.covered ? (
+                <CircleCheck size={16} aria-hidden="true" />
+              ) : (
+                <Users size={16} aria-hidden="true" />
+              )}
+              {c.label}
+            </li>
+          ))}
+        </ul>
+      )}
+      {view && (
+        <label className="toggle auto-decline">
+          <input
+            type="checkbox"
+            checked={view.auto_decline}
+            disabled={busy}
+            onChange={async (e) => {
+              setBusy(true);
+              try {
+                setView(
+                  await market<Ranking>(`/postings/${postingId}/screening`, {
+                    method: 'PUT',
+                    body: { auto_decline: e.target.checked },
+                  }),
+                );
+                onChanged();
+              } finally {
+                setBusy(false);
+              }
+            }}
+          />
+          Auto-decline applicants missing required certs
+        </label>
+      )}
+      {view && !view.applicants.length && !view.pile.length && (
         <EmptyState title="No applicants yet">
           Workers who hold the required certifications see this posting on their Home.
         </EmptyState>
       )}
       <ul className="work-list">
-        {apps?.map((a) => (
-          <ApplicantRow key={a.id} application={a} onChanged={onChanged} />
+        {view?.applicants.map((a) => (
+          <ApplicantRow
+            key={a.id}
+            application={a}
+            rank={a}
+            onChanged={() => {
+              onChanged();
+              void load();
+            }}
+          />
         ))}
       </ul>
+      {view && view.pile.length > 0 && (
+        <details className="pile">
+          <summary>Doesn’t meet requirements ({view.pile.length})</summary>
+          <p className="wallet-meta">
+            Missing a required certification, or already booked for these dates. Nobody here is
+            declined until you choose to.
+          </p>
+          <button
+            className="button button-outline button-sm"
+            disabled={busy}
+            onClick={async () => {
+              if (!window.confirm(`Decline ${view.pile.length} applicants with a polite message?`))
+                return;
+              setBusy(true);
+              try {
+                await market(`/postings/${postingId}/decline-unqualified`, { method: 'POST' });
+                await load();
+                onChanged();
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            Decline all with a polite message
+          </button>
+          <ul className="work-list">
+            {view.pile.map((a) => (
+              <ApplicantRow key={a.id} application={a} rank={a} onChanged={() => void load()} />
+            ))}
+          </ul>
+        </details>
+      )}
     </>
   );
 }

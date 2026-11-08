@@ -88,6 +88,24 @@
         "title": "ActionInput",
         "type": "object"
       },
+      "AnswerRow": {
+        "properties": {
+          "answer": {
+            "title": "Answer",
+            "type": "string"
+          },
+          "prompt": {
+            "title": "Prompt",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt",
+          "answer"
+        ],
+        "title": "AnswerRow",
+        "type": "object"
+      },
       "ApplicantSummary": {
         "properties": {
           "city": {
@@ -534,6 +552,29 @@
         "title": "BlockedPlan",
         "type": "object"
       },
+      "BonusChip": {
+        "properties": {
+          "held": {
+            "title": "Held",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "weight": {
+            "title": "Weight",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "weight",
+          "held"
+        ],
+        "title": "BonusChip",
+        "type": "object"
+      },
       "BreakdownRow": {
         "properties": {
           "kind": {
@@ -937,6 +978,44 @@
           "message"
         ],
         "title": "ConflictItem",
+        "type": "object"
+      },
+      "CoverageRow": {
+        "properties": {
+          "covered": {
+            "title": "Covered",
+            "type": "boolean"
+          },
+          "credential_type_id": {
+            "title": "Credential Type Id",
+            "type": "string"
+          },
+          "hired": {
+            "title": "Hired",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "needed": {
+            "title": "Needed",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "credential_type_id",
+          "name",
+          "needed",
+          "hired",
+          "covered",
+          "label"
+        ],
+        "title": "CoverageRow",
         "type": "object"
       },
       "CredentialInput": {
@@ -1541,6 +1620,34 @@
         "title": "FeedView",
         "type": "object"
       },
+      "FitRow": {
+        "properties": {
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "points": {
+            "title": "Points",
+            "type": "integer"
+          },
+          "strength": {
+            "title": "Strength",
+            "type": "number"
+          }
+        },
+        "required": [
+          "kind",
+          "label",
+          "points",
+          "strength"
+        ],
+        "title": "FitRow",
+        "type": "object"
+      },
       "ForecastInput": {
         "additionalProperties": false,
         "properties": {
@@ -1913,6 +2020,17 @@
             ],
             "title": "State",
             "type": "string"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
           }
         },
         "required": [
@@ -3415,6 +3533,179 @@
         "title": "Question",
         "type": "object"
       },
+      "RankedApplicant": {
+        "properties": {
+          "answers": {
+            "items": {
+              "$ref": "#/components/schemas/AnswerRow"
+            },
+            "title": "Answers",
+            "type": "array"
+          },
+          "applicant": {
+            "$ref": "#/components/schemas/ApplicantSummary"
+          },
+          "bonus": {
+            "items": {
+              "$ref": "#/components/schemas/BonusChip"
+            },
+            "title": "Bonus",
+            "type": "array"
+          },
+          "breakdown": {
+            "items": {
+              "$ref": "#/components/schemas/FitRow"
+            },
+            "title": "Breakdown",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "crew_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Crew Size"
+          },
+          "engagement": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EngagementSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fills_gap": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Fills Gap",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "initiated_by": {
+            "title": "Initiated By",
+            "type": "string"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "pile_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Pile Reasons",
+            "type": "array"
+          },
+          "posting": {
+            "$ref": "#/components/schemas/PostingCard"
+          },
+          "proposed_rate_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proposed Rate Cents"
+          },
+          "score": {
+            "title": "Score",
+            "type": "integer"
+          },
+          "signals": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Signals",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "note",
+          "proposed_rate_cents",
+          "crew_size",
+          "initiated_by",
+          "created_at",
+          "updated_at",
+          "applicant",
+          "posting",
+          "engagement",
+          "score",
+          "breakdown",
+          "bonus",
+          "fills_gap",
+          "signals",
+          "answers",
+          "pile_reasons"
+        ],
+        "title": "RankedApplicant",
+        "type": "object"
+      },
+      "RankingView": {
+        "properties": {
+          "applicants": {
+            "items": {
+              "$ref": "#/components/schemas/RankedApplicant"
+            },
+            "title": "Applicants",
+            "type": "array"
+          },
+          "auto_decline": {
+            "title": "Auto Decline",
+            "type": "boolean"
+          },
+          "coverage": {
+            "items": {
+              "$ref": "#/components/schemas/CoverageRow"
+            },
+            "title": "Coverage",
+            "type": "array"
+          },
+          "pile": {
+            "items": {
+              "$ref": "#/components/schemas/RankedApplicant"
+            },
+            "title": "Pile",
+            "type": "array"
+          }
+        },
+        "required": [
+          "coverage",
+          "applicants",
+          "pile",
+          "auto_decline"
+        ],
+        "title": "RankingView",
+        "type": "object"
+      },
       "RecoveryView": {
         "properties": {
           "confirmations": {
@@ -3558,6 +3849,22 @@
             "default": true,
             "title": "Required",
             "type": "boolean"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "enum": [
+                  "nice",
+                  "valuable",
+                  "very_valuable"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
           }
         },
         "required": [
@@ -3814,6 +4121,19 @@
           "points"
         ],
         "title": "ScorePart",
+        "type": "object"
+      },
+      "ScreeningInput": {
+        "properties": {
+          "auto_decline": {
+            "title": "Auto Decline",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "auto_decline"
+        ],
+        "title": "ScreeningInput",
         "type": "object"
       },
       "SlotView": {
@@ -8500,6 +8820,188 @@
           }
         },
         "summary": "Close Posting",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/postings/{posting_id}/decline-unqualified": {
+      "post": {
+        "operationId": "decline_unqualified_api_v1_market_postings__posting_id__decline_unqualified_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "posting_id",
+            "required": true,
+            "schema": {
+              "title": "Posting Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Decline Unqualified",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/postings/{posting_id}/ranking": {
+      "get": {
+        "operationId": "posting_ranking_api_v1_market_postings__posting_id__ranking_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "posting_id",
+            "required": true,
+            "schema": {
+              "title": "Posting Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RankingView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Posting Ranking",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/postings/{posting_id}/screening": {
+      "put": {
+        "operationId": "screening_settings_api_v1_market_postings__posting_id__screening_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "posting_id",
+            "required": true,
+            "schema": {
+              "title": "Posting Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScreeningInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RankingView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Screening Settings",
         "tags": [
           "market"
         ]

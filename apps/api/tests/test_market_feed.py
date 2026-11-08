@@ -8,7 +8,7 @@ from shift_api.market_models import ContractApplication, Posting
 
 MAYA_ELIGIBLE = {
     "p-rough-in", "p-service-elec", "p-temp-power", "p-sanitation", "p-line2", "p-panel",
-    "p-shop-labour", "p-cleanup", "p-food-line", "p-production-nights",
+    "p-shop-labour", "p-cleanup", "p-food-line", "p-production-nights", "p-warehouse",
 }
 ILYA_ELIGIBLE = {"p-sanitation", "p-shop-labour", "p-yard-forklift", "p-forklift", "p-food-line", "p-cleanup"}
 
@@ -211,6 +211,7 @@ def test_work_views_and_home(client):
         "Ella Thompson",
         "Noah Williams",
         "Timberline Framing Crew",
+        "Tyler Brandt",
     }
     org_work = client.get("/api/v1/market/org/work").json()
     assert any(e["applicant"]["name"] == "Ella Thompson" for e in org_work["active"])

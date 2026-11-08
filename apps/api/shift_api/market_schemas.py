@@ -286,6 +286,7 @@ class RequirementInput(BaseModel):
     credential_type_id: str
     required: bool = True
     must_be_verified: bool = False
+    weight: Literal["nice", "valuable", "very_valuable"] | None = None
 
 
 class PostingInput(BaseModel):
@@ -332,6 +333,7 @@ class MatchItem(BaseModel):
     required: bool
     must_be_verified: bool
     state: Literal["ok", "pending", "missing"]
+    weight: str | None = None
 
 
 class Match(BaseModel):
@@ -509,6 +511,54 @@ class TalentCard(BaseModel):
     distance_km: int | None
     verified_tickets: int
     tickets: int
+
+
+class CoverageRow(BaseModel):
+    credential_type_id: str
+    name: str
+    needed: int
+    hired: int
+    covered: bool
+    label: str
+
+
+class FitRow(BaseModel):
+    kind: str
+    label: str
+    points: int
+    strength: float
+
+
+class BonusChip(BaseModel):
+    name: str
+    weight: str
+    held: bool
+
+
+class AnswerRow(BaseModel):
+    prompt: str
+    answer: str
+
+
+class RankedApplicant(ApplicationView):
+    score: int
+    breakdown: list[FitRow]
+    bonus: list[BonusChip]
+    fills_gap: list[str]
+    signals: list[str]
+    answers: list[AnswerRow]
+    pile_reasons: list[str]
+
+
+class RankingView(BaseModel):
+    coverage: list[CoverageRow]
+    applicants: list[RankedApplicant]
+    pile: list[RankedApplicant]
+    auto_decline: bool
+
+
+class ScreeningInput(BaseModel):
+    auto_decline: bool
 
 
 class AcceptInput(BaseModel):

@@ -182,6 +182,10 @@ class Posting(Base):
     typical_day: Mapped[str | None] = mapped_column(String(1500), nullable=True)
     # [{id, prompt, kind: 'yes_no' | 'date' | 'text'}]
     questions: Mapped[list] = mapped_column(JSON, default=list)
+    # RANK-3: crew needs, e.g. [{"credential_type_id": "forklift", "needed": 2}]
+    coverage: Mapped[list] = mapped_column(JSON, default=list)
+    # RANK-4: off by default; when on, applicants missing required certs are declined politely.
+    auto_decline: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
 
 
 class PostingRequirement(Base):
@@ -193,6 +197,8 @@ class PostingRequirement(Base):
     # required=False means nice-to-have: improves ranking, never gates eligibility.
     required: Mapped[bool] = mapped_column(Boolean, default=True)
     must_be_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    # RANK-1: bonus (required=False) weight: 'nice' | 'valuable' | 'very_valuable'
+    weight: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
 
 class ContractApplication(Base):

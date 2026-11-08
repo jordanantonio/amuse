@@ -123,6 +123,7 @@ export type MatchItem = {
   required: boolean;
   must_be_verified: boolean;
   state: 'ok' | 'pending' | 'missing';
+  weight?: string | null;
 };
 
 export type PostingCard = {
@@ -304,6 +305,30 @@ export type ScheduleView = {
   items: ScheduleItem[];
   calendar_enabled: boolean;
   calendar_connected: boolean;
+};
+
+export type RankedApplicant = ApplicationView & {
+  score: number;
+  breakdown: { kind: string; label: string; points: number; strength: number }[];
+  bonus: { name: string; weight: string; held: boolean }[];
+  fills_gap: string[];
+  signals: string[];
+  answers: { prompt: string; answer: string }[];
+  pile_reasons: string[];
+};
+
+export type Ranking = {
+  coverage: {
+    credential_type_id: string;
+    name: string;
+    needed: number;
+    hired: number;
+    covered: boolean;
+    label: string;
+  }[];
+  applicants: RankedApplicant[];
+  pile: RankedApplicant[];
+  auto_decline: boolean;
 };
 
 export type DemoAccount = {
