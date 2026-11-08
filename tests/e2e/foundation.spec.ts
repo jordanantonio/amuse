@@ -14,7 +14,7 @@ test('weather and absence recovery → manager approval → worker acceptance �
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'A clear plan. A team in sync.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Week of November 9' })).toBeVisible();
   await page.screenshot({ path: 'test-results/shift-adaptive-overview.png', fullPage: true });
   await page.getByRole('link', { name: 'SHIFT Adaptive', exact: true }).click();
   await page.getByRole('button', { name: 'Simulate heavy rain', exact: true }).click();
@@ -78,11 +78,11 @@ test('worker mobile profile, availability, application and calendar date navigat
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'A clear plan. A team in sync.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Week of November 9' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   await page.screenshot({ path: 'test-results/shift-adaptive-mobile.png', fullPage: true });
   await page.getByLabel('Demo persona').selectOption('demo-sofia');
-  await expect(page.getByRole('heading', { name: 'Your next move, Sofia.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Your week, Sofia' })).toBeVisible();
   await page.getByRole('button', { name: 'Toggle menu' }).click();
   await page.getByRole('link', { name: 'Marketplace', exact: true }).click();
   await page.getByRole('textbox', { name: 'Search marketplace' }).fill('electrician');

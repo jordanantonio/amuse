@@ -66,7 +66,7 @@ Foundation snapshot implemented on `codex/shift-foundation` (commit 3239334, pus
 
 Concrete next-task ownership seams:
 - Calendar: `apps/web/src/components/team-calendar.tsx` and `src/lib/display.ts`.
-- Project cards: `apps/web/src/components/project-card.tsx`.
+- Overview project rows: `apps/web/src/components/project-card.tsx`.
 - Session/UI coordination: `apps/web/src/components/workspace.tsx` (one owner).
 - Policy/auth: `apps/api/shift_api/auth.py` and `views.py`.
 - Solver: `apps/api/shift_api/solver.py` and solver test additions.

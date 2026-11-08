@@ -23,13 +23,12 @@ import {
   MapPin,
   SlidersHorizontal,
   LogOut,
-  History,
   LoaderCircle,
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Avatar } from './ui/avatar';
 import { Calendar } from './team-calendar';
-import { ProjectCard } from './project-card';
+import { ProjectRow } from './project-card';
 import { DataEditor, type EditorSpec, type Field } from './data-editor';
 import { ProposalComparison, stateLabel } from './proposal-comparison';
 import { request } from '@/lib/api';
@@ -668,16 +667,7 @@ export function AdaptiveWorkspace() {
           </span>
           shift<span className="brand-period">.</span>
         </a>
-        <div className="org-switch">
-          <span className="org-icon">
-            <BriefcaseBusiness size={18} />
-          </span>
-          <div>
-            <strong>{data?.organization || 'SHIFT'}</strong>
-            <small>Connected workforce</small>
-          </div>
-        </div>
-        <p className="nav-caption">WORKSPACE</p>
+        <p className="org-name">{data?.organization || 'Connecting…'}</p>
         <nav aria-label="Workspace">
           {nav
             .filter((n) => (manager ? n.id !== 'profile' : n.id !== 'adaptive'))
@@ -703,35 +693,26 @@ export function AdaptiveWorkspace() {
               </a>
             ))}
         </nav>
-        <div className="sidebar-projects">
-          <p className="nav-caption">PROJECTS</p>
-          {activeProjects.map((p) => (
-            <a
-              key={p.id}
-              href={`?view=projects&project=${p.id}`}
-              className="project-nav"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('projects', p.id);
-              }}
-            >
-              <span className="project-dot" style={{ background: p.color }} />
-              {p.name}
-            </a>
-          ))}
-        </div>
-        <div className="sidebar-bottom">
-          <div className="demo-card">
-            <span>
-              <ShieldCheck size={15} />
-              Human-approved scheduling
-            </span>
-            <p>
-              SHIFT recommends.
-              <br />
-              Your team makes the decision.
-            </p>
+        {activeProjects.length > 0 && (
+          <div className="sidebar-projects">
+            <p className="nav-caption">Projects</p>
+            {activeProjects.map((p) => (
+              <a
+                key={p.id}
+                href={`?view=projects&project=${p.id}`}
+                className="project-nav"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('projects', p.id);
+                }}
+              >
+                <span className="project-dot" style={{ background: p.color }} />
+                {p.name}
+              </a>
+            ))}
           </div>
+        )}
+        <div className="sidebar-bottom">
           <div className="profile">
             <span className="avatar profile-avatar">{initials(data?.persona.name || 'SHIFT')}</span>
             <div>
@@ -760,12 +741,16 @@ export function AdaptiveWorkspace() {
             >
               <Menu size={20} />
             </button>
-            <span>Workspace</span>
-            <span>/</span>
-            <strong>{nav.find((n) => n.id === view)?.label}</strong>
+            <strong>
+              {!manager && view === 'calendar'
+                ? 'My schedule'
+                : !manager && view === 'inbox'
+                  ? 'My invitations'
+                  : nav.find((n) => n.id === view)?.label}
+            </strong>
           </div>
           <div className="topbar-right">
-            {data?.demo && <span className="demo-badge">FICTIONAL DEMO</span>}
+            {data?.demo && <span className="demo-badge">Fictional demo</span>}
             {data?.demo && people.length > 0 && (
               <label className="persona-select">
                 <span className="sr-only">Demo persona</span>
@@ -825,161 +810,126 @@ export function AdaptiveWorkspace() {
                   <PageHeading
                     title={
                       manager
-                        ? 'A clear plan. A team in sync.'
-                        : `Your next move, ${data.persona.name.split(' ')[0]}.`
+                        ? `Week of ${weekLabel(week)}`
+                        : `Your week, ${data.persona.name.split(' ')[0]}`
                     }
-                    eyebrow="WORKFORCE OPERATIONS"
                     description={
                       manager
-                        ? 'Act on staffing risks, pending decisions, and upcoming project work.'
-                        : 'Your assignments, invitations, and availability—all in one place.'
-                    }
-                    action={
-                      <Button onClick={() => navigate(manager ? 'adaptive' : 'inbox')}>
-                        <ArrowRight size={16} />
-                        {manager ? 'Review & recover' : 'Review invitations'}
-                      </Button>
+                        ? `${confirmed.length} confirmed assignments across ${activeProjects.length} projects. Times in ${data.timezone}.`
+                        : `${confirmed.length} confirmed assignments. Times in ${data.timezone}.`
                     }
                   />
-                  <div className="stats-grid">
-                    {[
-                      {
-                        label: manager ? 'Active projects' : 'My projects',
-                        value: activeProjects.length,
-                        icon: BriefcaseBusiness,
-                      },
-                      {
-                        label: 'Confirmed assignments',
-                        value: confirmed.length,
-                        icon: CalendarDays,
-                      },
-                      {
-                        label: manager ? 'Coverage gaps / absences' : 'Pending invitations',
-                        value: manager ? data.staffing_gaps : pending.length,
-                        icon: TriangleAlert,
-                      },
-                      {
-                        label: manager ? 'Pending decisions' : 'Open opportunities',
-                        value: manager ? pending.length : data.jobs.length,
-                        icon: Inbox,
-                      },
-                    ].map((s) => (
-                      <section className="stat-card" key={s.label}>
-                        <div>
-                          <span>{s.label}</span>
-                          <span className="stat-icon purple">
-                            <s.icon size={17} />
-                          </span>
-                        </div>
-                        <strong>{String(s.value).padStart(2, '0')}</strong>
-                        <p>From current workspace records</p>
-                      </section>
-                    ))}
-                  </div>
                   {manager ? (
-                    <div className="operations-grid">
-                      <section className="panel">
-                        <div className="section-heading">
-                          <div>
-                            <h2>Needs your attention</h2>
-                            <p>Prioritized actions, not decorative analytics.</p>
-                          </div>
-                        </div>
-                        <button className="operation-row" onClick={() => navigate('adaptive')}>
-                          <TriangleAlert size={20} />
-                          <div>
-                            <strong>{data.staffing_gaps} coverage gaps or recorded absences</strong>
-                            <p>Review affected tasks and generate feasible alternatives.</p>
-                          </div>
-                          <ArrowRight size={16} />
+                    <section className="pipeline" aria-label="Recovery pipeline">
+                      {[
+                        {
+                          label: 'Gaps and absences',
+                          count: data.staffing_gaps,
+                          hint: 'Find cover',
+                          yours: true,
+                          go: () => navigate('adaptive'),
+                        },
+                        {
+                          label: 'Awaiting your approval',
+                          count: pending.filter((p) => p.status === 'pending_approval').length,
+                          hint: 'Approve or request revision',
+                          yours: true,
+                          go: () => navigate('inbox'),
+                        },
+                        {
+                          label: 'Awaiting workers',
+                          count: pending.filter((p) => p.status === 'awaiting_confirmation').length,
+                          hint: 'Workers are reviewing',
+                          yours: false,
+                          go: () => navigate('inbox'),
+                        },
+                        {
+                          label: 'Ready to publish',
+                          count: pending.filter((p) => p.status === 'ready_to_publish').length,
+                          hint: 'Publish to update calendars',
+                          yours: true,
+                          go: () => navigate('inbox'),
+                        },
+                      ].map((s) => (
+                        <button
+                          key={s.label}
+                          className={`pipeline-stage ${s.count && s.yours ? 'needs-action' : ''}`}
+                          onClick={s.go}
+                        >
+                          <span className="pipeline-count">{s.count}</span>
+                          <span className="pipeline-label">{s.label}</span>
+                          <span className="pipeline-hint">
+                            {s.count ? s.hint : 'Nothing waiting'}
+                          </span>
                         </button>
-                        <button className="operation-row" onClick={() => navigate('inbox')}>
-                          <Inbox size={20} />
-                          <div>
-                            <strong>
-                              {pending.filter((p) => p.status === 'pending_approval').length}{' '}
-                              proposals awaiting approval
-                            </strong>
-                            <p>
-                              {pending.filter((p) => p.status === 'awaiting_confirmation').length}{' '}
-                              awaiting workers ·{' '}
-                              {pending.filter((p) => p.status === 'ready_to_publish').length} ready
-                              to publish
-                            </p>
-                          </div>
-                          <ArrowRight size={16} />
-                        </button>
-                      </section>
-                      <section className="panel">
-                        <div className="section-heading">
-                          <div>
-                            <h2>Recent activity</h2>
-                            <p>Persisted scheduling audit trail.</p>
-                          </div>
-                          <History size={18} />
-                        </div>
-                        {audit.slice(0, 4).map((e) => (
-                          <div className="activity-row" key={e.id}>
-                            <span className="project-dot" />
-                            <div>
-                              <strong>{e.action.replaceAll('.', ' ').replaceAll('_', ' ')}</strong>
-                              <p>
-                                {e.actor} · {shortDate(e.created_at)} {clock(e.created_at)}
-                              </p>
+                      ))}
+                    </section>
+                  ) : (
+                    <div className="overview-split">
+                      <section className="panel next-shift">
+                        {next ? (
+                          <>
+                            <p className="next-shift-label">Next confirmed assignment</p>
+                            <h2>{next.task_name}</h2>
+                            <p>{next.project_name}</p>
+                            <div className="next-shift-facts">
+                              <span>
+                                <CalendarDays size={18} />
+                                {shortDate(next.starts_at)}
+                              </span>
+                              <span>
+                                <Clock3 size={18} />
+                                {clock(next.starts_at)}–{clock(next.ends_at)}
+                              </span>
+                              <span>
+                                <MapPin size={18} />
+                                {activeProjects.find((p) => p.id === next.project_id)?.location}
+                              </span>
                             </div>
-                          </div>
-                        ))}
-                        {!audit.length && (
-                          <div className="empty-card">
-                            Your scheduling decisions will appear here.
-                          </div>
+                            <div className="actions">
+                              <Button onClick={() => setDetail(next)}>View assignment</Button>
+                              <Button variant="outline" onClick={() => absenceEditor(next)}>
+                                Report absence
+                              </Button>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <h2>No confirmed assignments yet</h2>
+                            <p>Apply for an open role. Accepted invitations appear here.</p>
+                            <div className="actions">
+                              <Button onClick={() => navigate('talent')}>
+                                Explore opportunities
+                              </Button>
+                            </div>
+                          </>
                         )}
                       </section>
+                      <section className="panel">
+                        <button className="operation-row" onClick={() => navigate('inbox')}>
+                          <strong className={pending.length ? 'count-lit' : ''}>
+                            {pending.length}
+                          </strong>
+                          <span>Invitations to review</span>
+                          <ArrowRight size={16} />
+                        </button>
+                        <button className="operation-row" onClick={() => navigate('talent')}>
+                          <strong>{data.jobs.length}</strong>
+                          <span>Open opportunities</span>
+                          <ArrowRight size={16} />
+                        </button>
+                        <button className="operation-row" onClick={() => navigate('talent')}>
+                          <strong>{apps.length}</strong>
+                          <span>My applications</span>
+                          <ArrowRight size={16} />
+                        </button>
+                      </section>
                     </div>
-                  ) : (
-                    <section className="panel next-shift">
-                      <div className="eyebrow">NEXT CONFIRMED ASSIGNMENT</div>
-                      {next ? (
-                        <>
-                          <h2>{next.task_name}</h2>
-                          <p>{next.project_name}</p>
-                          <div className="next-shift-facts">
-                            <span>
-                              <CalendarDays size={18} />
-                              {shortDate(next.starts_at)}
-                            </span>
-                            <span>
-                              <Clock3 size={18} />
-                              {clock(next.starts_at)}–{clock(next.ends_at)}
-                            </span>
-                            <span>
-                              <MapPin size={18} />
-                              {activeProjects.find((p) => p.id === next.project_id)?.location}
-                            </span>
-                          </div>
-                          <div className="actions">
-                            <Button onClick={() => setDetail(next)}>View assignment</Button>
-                            <Button variant="outline" onClick={() => absenceEditor(next)}>
-                              Report absence
-                            </Button>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <h2>Your next assignment starts with an invitation.</h2>
-                          <p>No confirmed assignments yet.</p>
-                          <Button onClick={() => navigate('talent')}>Explore opportunities</Button>
-                        </>
-                      )}
-                    </section>
                   )}
                   <section className="panel dashboard-calendar">
                     <div className="section-heading">
-                      <div>
-                        <h2>{manager ? 'Team schedule' : 'Your confirmed schedule'}</h2>
-                        <p>Actual available windows and commitments · {data.timezone}</p>
-                      </div>
-                      <Button variant="outline" onClick={() => navigate('calendar')}>
+                      <h2>{manager ? 'Team schedule' : 'Your schedule'}</h2>
+                      <Button variant="outline" size="sm" onClick={() => navigate('calendar')}>
                         Open calendar
                         <ArrowUpRight size={15} />
                       </Button>
@@ -992,23 +942,43 @@ export function AdaptiveWorkspace() {
                       onSelect={setDetail}
                     />
                   </section>
-                  <div className="section-title spaced-title">
-                    <h2>Projects in motion</h2>
-                    <Button variant="ghost" onClick={() => navigate('projects')}>
-                      View all
-                      <ArrowRight size={14} />
-                    </Button>
-                  </div>
-                  <div className="project-grid full-project-grid">
-                    {activeProjects.map((p) => (
-                      <ProjectCard
-                        key={p.id}
-                        project={p}
-                        workers={data.workers}
-                        assignments={confirmed}
-                        open={() => navigate('projects', p.id)}
-                      />
-                    ))}
+                  <div className={manager ? 'overview-split' : ''}>
+                    <section className="panel">
+                      <div className="section-heading">
+                        <h2>{manager ? 'Projects' : 'My projects'}</h2>
+                        <Button variant="ghost" size="sm" onClick={() => navigate('projects')}>
+                          View all
+                        </Button>
+                      </div>
+                      {activeProjects.map((p) => (
+                        <ProjectRow
+                          key={p.id}
+                          project={p}
+                          open={() => navigate('projects', p.id)}
+                        />
+                      ))}
+                      {!activeProjects.length && <div className="empty-card">No projects yet.</div>}
+                    </section>
+                    {manager && (
+                      <section className="panel">
+                        <div className="section-heading">
+                          <h2>Recent activity</h2>
+                        </div>
+                        {audit.slice(0, 5).map((e) => (
+                          <div className="activity-row" key={e.id}>
+                            <strong>{e.action.replaceAll('.', ' ').replaceAll('_', ' ')}</strong>
+                            <p>
+                              {e.actor}, {shortDate(e.created_at)} at {clock(e.created_at)}
+                            </p>
+                          </div>
+                        ))}
+                        {!audit.length && (
+                          <div className="empty-card">
+                            Approvals, publications and absences will be listed here.
+                          </div>
+                        )}
+                      </section>
+                    )}
                   </div>
                 </>
               )}
@@ -1020,7 +990,6 @@ export function AdaptiveWorkspace() {
                         ? 'Everyone’s time, clearly planned.'
                         : 'Your work. Your availability.'
                     }
-                    eyebrow="CONNECTED CALENDARS"
                     description="Switch weeks or inspect a single day. Private calendar reasons are never shared."
                     action={
                       !manager ? (
@@ -1062,7 +1031,6 @@ export function AdaptiveWorkspace() {
                 <>
                   <PageHeading
                     title="Turn scope into a shared plan."
-                    eyebrow="PROJECT WORKSPACE"
                     description="Manage tasks, dependencies, staffing requirements, and deadlines."
                     action={
                       manager ? (
@@ -1162,7 +1130,6 @@ export function AdaptiveWorkspace() {
                 <>
                   <PageHeading
                     title={manager ? 'Find the right fit for the work.' : 'Find your next project.'}
-                    eyebrow="PROJECT MARKETPLACE"
                     description="Search skills and certifications, publish roles, and turn applications into validated offers."
                     action={
                       manager ? (
@@ -1376,7 +1343,6 @@ export function AdaptiveWorkspace() {
                 <>
                   <PageHeading
                     title="When conditions change, recover with confidence."
-                    eyebrow="SHIFT ADAPTIVE"
                     description="Weather-aware CP-SAT planning. Every schedule change remains human-approved."
                     action={
                       <Button variant="outline" disabled={!policy || busy} onClick={policyEditor}>
@@ -1398,7 +1364,7 @@ export function AdaptiveWorkspace() {
                   {project && (
                     <>
                       <div className="adaptive-controls">
-                        <Button disabled={busy} onClick={() => void runReview()}>
+                        <Button disabled={busy} variant="outline" onClick={() => void runReview()}>
                           <ShieldCheck size={16} />
                           Run 14-day review
                         </Button>
@@ -1477,7 +1443,7 @@ export function AdaptiveWorkspace() {
                                 : 'No provider update yet'}
                             </p>
                           </div>
-                          <span className="demo-badge">SIMULATED WEATHER</span>
+                          <span className="demo-badge">Simulated weather</span>
                         </div>
                         <div className="weather-timeline">
                           {weather.map((f) => (
@@ -1630,7 +1596,6 @@ export function AdaptiveWorkspace() {
                         ? 'Every decision has a clear next step.'
                         : 'Your next assignments are ready to review.'
                     }
-                    eyebrow={manager ? 'APPROVAL INBOX' : 'WORKER CONFIRMATIONS'}
                     description={
                       manager
                         ? 'Approve, request revisions, and publish only after worker acceptance.'
@@ -1677,7 +1642,6 @@ export function AdaptiveWorkspace() {
                 <>
                   <PageHeading
                     title="Your skills. Your terms. Your time."
-                    eyebrow="MY PROFESSIONAL PROFILE"
                     description="Keep qualifications current and publish the availability you want companies to see."
                     action={<Button onClick={profileEditor}>Edit profile</Button>}
                   />
@@ -1725,14 +1689,6 @@ export function AdaptiveWorkspace() {
                   </section>
                 </>
               )}
-              <footer className="footer">
-                <span>
-                  <span className="footer-brand">shift.</span> Workforce, in sync.
-                </span>
-                <span>
-                  {data.demo ? 'Fictional demo · ' : ''}Human-approved scheduling · {data.timezone}
-                </span>
-              </footer>
             </>
           )}
         </div>
@@ -1764,21 +1720,22 @@ export function AdaptiveWorkspace() {
     </div>
   );
 }
+const weekLabel = (date: string) =>
+  new Intl.DateTimeFormat('en-CA', { month: 'long', day: 'numeric', timeZone: 'UTC' }).format(
+    new Date(date + 'T12:00:00Z'),
+  );
 function PageHeading({
   title,
-  eyebrow,
   description,
   action,
 }: {
   title: string;
-  eyebrow: string;
   description: string;
   action?: React.ReactNode;
 }) {
   return (
     <div className="page-heading">
       <div>
-        <div className="eyebrow">{eyebrow}</div>
         <h1>{title}</h1>
         <p>{description}</p>
       </div>
@@ -1825,10 +1782,7 @@ function AssignmentDetail({
   return (
     <dialog ref={ref} className="editor-dialog assignment-drawer" onCancel={close}>
       <div className="editor-heading">
-        <div>
-          <div className="eyebrow">ASSIGNMENT DETAILS</div>
-          <h2>{slot.task_name}</h2>
-        </div>
+        <h2>{slot.task_name}</h2>
         <button className="icon-button" aria-label="Close assignment" onClick={close}>
           <X size={20} />
         </button>

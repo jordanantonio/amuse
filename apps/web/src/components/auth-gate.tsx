@@ -43,7 +43,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
           }
         }}
       >
-        <div className="eyebrow">SHIFT / YOUR WORKFORCE, IN SYNC</div>
+        <p className="auth-wordmark">shift.</p>
         <h1>Welcome back.</h1>
         <p>Sign in to your organization’s workspace.</p>
         <label>

@@ -76,7 +76,7 @@ export function Calendar({
           <thead>
             <tr>
               <th>
-                TEAM MEMBER<small>{zone}</small>
+                Team member<small>{zone}</small>
               </th>
               {dates.map((d) => (
                 <th key={d}>
@@ -86,7 +86,6 @@ export function Calendar({
                     )}
                   </span>
                   <b>{Number(d.slice(-2))}</b>
-                  <small>00:00 – 24:00</small>
                 </th>
               ))}
             </tr>
