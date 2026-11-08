@@ -53,6 +53,82 @@ SCHEDULE_PATTERNS = {
 }
 
 
+ACSA = "Alberta Construction Safety Association"
+# (id, name, category, default issuer, applies_to, has_expiry) — seeded into
+# credential_types; the catalog is data and can grow without code changes.
+CREDENTIAL_TYPES = [
+    ("red-seal", "Red Seal endorsement", "Trade", "Red Seal Program", "worker", False),
+    (
+        "ab-journeyperson",
+        "Alberta journeyperson certificate",
+        "Trade",
+        "Alberta Apprenticeship and Industry Training",
+        "worker",
+        False,
+    ),
+    (
+        "apprentice",
+        "Apprentice level (1–4)",
+        "Trade",
+        "Alberta Apprenticeship and Industry Training",
+        "worker",
+        False,
+    ),
+    ("csts-2020", "CSTS-2020", "Safety", ACSA, "worker", False),
+    ("fall-protection", "Fall Protection", "Safety", ACSA, "worker", True),
+    ("whmis", "WHMIS", "Safety", "Training provider", "worker", True),
+    ("first-aid", "Standard First Aid & CPR", "Safety", "Canadian Red Cross", "worker", True),
+    ("h2s-alive", "H2S Alive", "Safety", "Energy Safety Canada", "worker", True),
+    ("confined-space", "Confined Space", "Safety", "Training provider", "worker", True),
+    ("ground-disturbance", "Ground Disturbance", "Safety", "Training provider", "worker", True),
+    (
+        "forklift",
+        "Forklift operator (CSA B335 training)",
+        "Equipment",
+        "Training provider",
+        "worker",
+        True,
+    ),
+    ("aerial-platform", "Aerial work platform", "Equipment", "Training provider", "worker", True),
+    ("telehandler", "Telehandler", "Equipment", "Training provider", "worker", True),
+    ("rigging", "Rigging / signalperson", "Equipment", "Training provider", "worker", True),
+    ("cwb-welding", "CWB welding ticket", "Trade", "Canadian Welding Bureau", "worker", True),
+    ("class-1", "Class 1 licence", "Driving", "Alberta Registries", "worker", True),
+    ("class-3", "Class 3 licence", "Driving", "Alberta Registries", "worker", True),
+    ("air-brake", "Air brake endorsement", "Driving", "Alberta Registries", "worker", False),
+    (
+        "business-registration",
+        "Business registration",
+        "Business",
+        "Alberta Corporate Registry",
+        "org",
+        False,
+    ),
+    ("trade-licence", "Trade licence held", "Business", "Alberta Municipal Affairs", "org", True),
+    ("cor", "COR (Certificate of Recognition)", "Safety", ACSA, "org", True),
+    ("wcb-clearance", "WCB-Alberta clearance letter", "Safety", "WCB-Alberta", "org", True),
+    ("equipment-fleet", "Equipment fleet list", "Equipment", "Self-declared", "org", False),
+    ("auto-insurance", "Commercial auto insurance", "Driving", "Insurer", "org", True),
+    (
+        "cgl-insurance",
+        "Commercial general liability insurance",
+        "Business",
+        "Insurer",
+        "org",
+        True,
+    ),
+    (
+        "prequal",
+        "Contractor prequalification (ISNetworld, ComplyWorks)",
+        "Business",
+        "Prequalification service",
+        "org",
+        True,
+    ),
+]
+CATEGORIES = ["Trade", "Safety", "Equipment", "Driving", "Business", "Other"]
+
+
 def coordinates(city: str | None) -> tuple[float | None, float | None]:
     if city and city in CITIES:
         return CITIES[city]

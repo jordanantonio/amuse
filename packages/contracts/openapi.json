@@ -230,6 +230,61 @@
         "title": "City",
         "type": "object"
       },
+      "Completeness": {
+        "properties": {
+          "next_step": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NextStep"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "percent": {
+            "title": "Percent",
+            "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/CompletenessStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "percent",
+          "steps",
+          "next_step"
+        ],
+        "title": "Completeness",
+        "type": "object"
+      },
+      "CompletenessStep": {
+        "properties": {
+          "done": {
+            "title": "Done",
+            "type": "boolean"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "done"
+        ],
+        "title": "CompletenessStep",
+        "type": "object"
+      },
       "ConfirmationInput": {
         "additionalProperties": false,
         "properties": {
@@ -274,6 +329,260 @@
           "status"
         ],
         "title": "ConfirmationView",
+        "type": "object"
+      },
+      "CredentialInput": {
+        "properties": {
+          "credential_type_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credential Type Id"
+          },
+          "custom_name": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Custom Name"
+          },
+          "expires_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires On"
+          },
+          "issued_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issued On"
+          },
+          "issuer": {
+            "default": "",
+            "maxLength": 160,
+            "title": "Issuer",
+            "type": "string"
+          },
+          "number": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number"
+          },
+          "scope": {
+            "default": "me",
+            "enum": [
+              "me",
+              "org"
+            ],
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "title": "CredentialInput",
+        "type": "object"
+      },
+      "CredentialTypeView": {
+        "properties": {
+          "applies_to": {
+            "title": "Applies To",
+            "type": "string"
+          },
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "default_issuer": {
+            "title": "Default Issuer",
+            "type": "string"
+          },
+          "has_expiry": {
+            "title": "Has Expiry",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "category",
+          "default_issuer",
+          "applies_to",
+          "has_expiry"
+        ],
+        "title": "CredentialTypeView",
+        "type": "object"
+      },
+      "CredentialView": {
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "credential_type_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credential Type Id"
+          },
+          "days_to_expiry": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days To Expiry"
+          },
+          "document_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Name"
+          },
+          "expires_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires On"
+          },
+          "expiring_soon": {
+            "title": "Expiring Soon",
+            "type": "boolean"
+          },
+          "has_document": {
+            "title": "Has Document",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "issued_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issued On"
+          },
+          "issuer": {
+            "title": "Issuer",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number"
+          },
+          "rejection_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejection Reason"
+          },
+          "status": {
+            "enum": [
+              "self_reported",
+              "pending",
+              "verified",
+              "expired",
+              "rejected"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "credential_type_id",
+          "name",
+          "category",
+          "issuer",
+          "number",
+          "issued_on",
+          "expires_on",
+          "status",
+          "expiring_soon",
+          "days_to_expiry",
+          "has_document",
+          "document_name",
+          "rejection_reason"
+        ],
+        "title": "CredentialView",
         "type": "object"
       },
       "Dashboard": {
@@ -456,6 +765,39 @@
           }
         },
         "title": "DemoSignIn",
+        "type": "object"
+      },
+      "DocumentUpload": {
+        "properties": {
+          "content_type": {
+            "enum": [
+              "application/pdf",
+              "image/jpeg",
+              "image/png",
+              "image/webp"
+            ],
+            "title": "Content Type",
+            "type": "string"
+          },
+          "data_base64": {
+            "maxLength": 7200000,
+            "minLength": 4,
+            "title": "Data Base64",
+            "type": "string"
+          },
+          "filename": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Filename",
+            "type": "string"
+          }
+        },
+        "required": [
+          "filename",
+          "content_type",
+          "data_base64"
+        ],
+        "title": "DocumentUpload",
         "type": "object"
       },
       "DraftView": {
@@ -873,6 +1215,104 @@
         "title": "Meta",
         "type": "object"
       },
+      "NextStep": {
+        "properties": {
+          "credential_type_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credential Type Id"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label"
+        ],
+        "title": "NextStep",
+        "type": "object"
+      },
+      "NotificationView": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read At"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "payload",
+          "read_at",
+          "created_at"
+        ],
+        "title": "NotificationView",
+        "type": "object"
+      },
+      "NotificationsView": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/NotificationView"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "unread": {
+            "title": "Unread",
+            "type": "integer"
+          },
+          "work_badge": {
+            "title": "Work Badge",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "unread",
+          "work_badge",
+          "items"
+        ],
+        "title": "NotificationsView",
+        "type": "object"
+      },
       "OnboardingInput": {
         "properties": {
           "city": {
@@ -986,6 +1426,92 @@
           }
         },
         "title": "OnboardingInput",
+        "type": "object"
+      },
+      "OrgInput": {
+        "properties": {
+          "about": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "About"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "industry": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Industry"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "pattern": "^(https?://[^\\s]+)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website"
+          }
+        },
+        "title": "OrgInput",
+        "type": "object"
+      },
+      "OrgProfileView": {
+        "properties": {
+          "credentials": {
+            "items": {
+              "$ref": "#/components/schemas/CredentialView"
+            },
+            "title": "Credentials",
+            "type": "array"
+          },
+          "organization": {
+            "$ref": "#/components/schemas/OrgView"
+          }
+        },
+        "required": [
+          "organization",
+          "credentials"
+        ],
+        "title": "OrgProfileView",
         "type": "object"
       },
       "OrgView": {
@@ -1184,67 +1710,40 @@
         "title": "PolicyInput",
         "type": "object"
       },
-      "ProfileInput": {
-        "additionalProperties": false,
+      "ProfileView": {
         "properties": {
-          "certifications": {
+          "completeness": {
+            "$ref": "#/components/schemas/Completeness"
+          },
+          "credentials": {
             "items": {
-              "$ref": "#/components/schemas/CertificateInput"
+              "$ref": "#/components/schemas/CredentialView"
             },
-            "maxItems": 40,
-            "title": "Certifications",
+            "title": "Credentials",
             "type": "array"
           },
-          "hourly_rate_cents": {
-            "maximum": 100000.0,
-            "minimum": 0.0,
-            "title": "Hourly Rate Cents",
-            "type": "integer"
-          },
-          "location": {
-            "maxLength": 100,
-            "minLength": 1,
-            "title": "Location",
-            "type": "string"
-          },
-          "skills": {
+          "history": {
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/WorkHistoryView"
             },
-            "maxItems": 40,
-            "title": "Skills",
+            "title": "History",
             "type": "array"
           },
-          "title": {
-            "maxLength": 160,
-            "minLength": 1,
-            "title": "Title",
-            "type": "string"
+          "profile": {
+            "$ref": "#/components/schemas/WorkerProfileView"
           },
-          "work_modes": {
-            "items": {
-              "enum": [
-                "on_site",
-                "hybrid",
-                "remote"
-              ],
-              "type": "string"
-            },
-            "maxItems": 3,
-            "minItems": 1,
-            "title": "Work Modes",
-            "type": "array"
+          "user": {
+            "$ref": "#/components/schemas/UserView"
           }
         },
         "required": [
-          "title",
-          "location",
-          "hourly_rate_cents",
-          "skills",
-          "certifications",
-          "work_modes"
+          "user",
+          "profile",
+          "credentials",
+          "history",
+          "completeness"
         ],
-        "title": "ProfileInput",
+        "title": "ProfileView",
         "type": "object"
       },
       "ProjectInput": {
@@ -1906,6 +2405,170 @@
         "title": "Window",
         "type": "object"
       },
+      "WorkHistoryInput": {
+        "properties": {
+          "city": {
+            "default": "",
+            "maxLength": 100,
+            "title": "City",
+            "type": "string"
+          },
+          "company": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Company",
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "maxLength": 1000,
+            "title": "Description",
+            "type": "string"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "reference_contact": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Contact"
+          },
+          "reference_name": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Name"
+          },
+          "role": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Role",
+            "type": "string"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "company",
+          "start_date"
+        ],
+        "title": "WorkHistoryInput",
+        "type": "object"
+      },
+      "WorkHistoryView": {
+        "properties": {
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "company": {
+            "title": "Company",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "engagement_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engagement Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "reference_contact": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Contact"
+          },
+          "reference_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Name"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "role",
+          "company",
+          "city",
+          "start_date",
+          "end_date",
+          "description",
+          "reference_name",
+          "reference_contact",
+          "engagement_id"
+        ],
+        "title": "WorkHistoryView",
+        "type": "object"
+      },
       "WorkerProfileView": {
         "properties": {
           "bio": {
@@ -2069,6 +2732,201 @@
           "busy"
         ],
         "title": "WorkerView",
+        "type": "object"
+      },
+      "shift_api__inputs__ProfileInput": {
+        "additionalProperties": false,
+        "properties": {
+          "certifications": {
+            "items": {
+              "$ref": "#/components/schemas/CertificateInput"
+            },
+            "maxItems": 40,
+            "title": "Certifications",
+            "type": "array"
+          },
+          "hourly_rate_cents": {
+            "maximum": 100000.0,
+            "minimum": 0.0,
+            "title": "Hourly Rate Cents",
+            "type": "integer"
+          },
+          "location": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Location",
+            "type": "string"
+          },
+          "skills": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 40,
+            "title": "Skills",
+            "type": "array"
+          },
+          "title": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "work_modes": {
+            "items": {
+              "enum": [
+                "on_site",
+                "hybrid",
+                "remote"
+              ],
+              "type": "string"
+            },
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Work Modes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "title",
+          "location",
+          "hourly_rate_cents",
+          "skills",
+          "certifications",
+          "work_modes"
+        ],
+        "title": "ProfileInput",
+        "type": "object"
+      },
+      "shift_api__market_schemas__ProfileInput": {
+        "properties": {
+          "bio": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bio"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "headline": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Headline"
+          },
+          "is_public": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Public"
+          },
+          "linkedin_url": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "pattern": "^(https://[^\\s]+)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Linkedin Url"
+          },
+          "rate_max_cents": {
+            "anyOf": [
+              {
+                "maximum": 100000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate Max Cents"
+          },
+          "rate_min_cents": {
+            "anyOf": [
+              {
+                "maximum": 100000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate Min Cents"
+          },
+          "trades": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 12,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trades"
+          },
+          "travel_radius_km": {
+            "anyOf": [
+              {
+                "maximum": 1000.0,
+                "minimum": 5.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Travel Radius Km"
+          }
+        },
+        "title": "ProfileInput",
         "type": "object"
       }
     }
@@ -3122,6 +3980,376 @@
         "summary": "Apply"
       }
     },
+    "/api/v1/market/credential-types": {
+      "get": {
+        "operationId": "credential_types_api_v1_market_credential_types_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CredentialTypeView"
+                  },
+                  "title": "Response Credential Types Api V1 Market Credential Types Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Credential Types",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/credentials": {
+      "post": {
+        "operationId": "add_credential_api_v1_market_credentials_post",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CredentialInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CredentialView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Credential",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/credentials/{credential_id}": {
+      "delete": {
+        "operationId": "delete_credential_api_v1_market_credentials__credential_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "credential_id",
+            "required": true,
+            "schema": {
+              "title": "Credential Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Credential",
+        "tags": [
+          "market"
+        ]
+      },
+      "put": {
+        "operationId": "edit_credential_api_v1_market_credentials__credential_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "credential_id",
+            "required": true,
+            "schema": {
+              "title": "Credential Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CredentialInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CredentialView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edit Credential",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/credentials/{credential_id}/document": {
+      "post": {
+        "operationId": "upload_document_api_v1_market_credentials__credential_id__document_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "credential_id",
+            "required": true,
+            "schema": {
+              "title": "Credential Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentUpload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CredentialView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Upload Document",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/credentials/{credential_id}/document-link": {
+      "get": {
+        "operationId": "document_link_api_v1_market_credentials__credential_id__document_link_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "credential_id",
+            "required": true,
+            "schema": {
+              "title": "Credential Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Document Link",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/files/{token}": {
+      "get": {
+        "operationId": "serve_file_api_v1_market_files__token__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "title": "Token",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Serve File",
+        "tags": [
+          "market"
+        ]
+      }
+    },
     "/api/v1/market/me": {
       "get": {
         "operationId": "me_api_v1_market_me_get",
@@ -3171,6 +4399,112 @@
         ]
       }
     },
+    "/api/v1/market/me/profile": {
+      "get": {
+        "operationId": "my_profile_api_v1_market_me_profile_get",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Profile",
+        "tags": [
+          "market"
+        ]
+      },
+      "put": {
+        "operationId": "update_profile_api_v1_market_me_profile_put",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/shift_api__market_schemas__ProfileInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Profile",
+        "tags": [
+          "market"
+        ]
+      }
+    },
     "/api/v1/market/meta": {
       "get": {
         "operationId": "meta_api_v1_market_meta_get",
@@ -3187,6 +4521,102 @@
           }
         },
         "summary": "Meta",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/notifications": {
+      "get": {
+        "operationId": "notifications_api_v1_market_notifications_get",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationsView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Notifications",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/notifications/read": {
+      "post": {
+        "operationId": "mark_read_api_v1_market_notifications_read_post",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Mark Read",
         "tags": [
           "market"
         ]
@@ -3247,6 +4677,293 @@
           }
         },
         "summary": "Onboarding",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/org/profile": {
+      "get": {
+        "operationId": "my_org_api_v1_market_org_profile_get",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgProfileView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Org",
+        "tags": [
+          "market"
+        ]
+      },
+      "put": {
+        "operationId": "update_org_api_v1_market_org_profile_put",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrgInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgProfileView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Org",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/work-history": {
+      "post": {
+        "operationId": "add_history_api_v1_market_work_history_post",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkHistoryInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkHistoryView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add History",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/work-history/{entry_id}": {
+      "delete": {
+        "operationId": "delete_history_api_v1_market_work_history__entry_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "title": "Entry Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete History",
+        "tags": [
+          "market"
+        ]
+      },
+      "put": {
+        "operationId": "edit_history_api_v1_market_work_history__entry_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "title": "Entry Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkHistoryInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkHistoryView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edit History",
         "tags": [
           "market"
         ]
@@ -3433,7 +5150,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ProfileInput"
+                "$ref": "#/components/schemas/shift_api__inputs__ProfileInput"
               }
             }
           },
