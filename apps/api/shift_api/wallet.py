@@ -74,8 +74,8 @@ def completeness(db: Session, user: User, profile: WorkerProfile) -> dict:
         ("city", "Set your home city", bool(profile.city)),
         ("rate", "Add your preferred rate", profile.rate_min_cents is not None),
         ("bio", "Write a short bio", bool(profile.bio)),
-        ("credential", "Add a ticket to your wallet", bool(creds)),
-        ("document", "Upload proof for a ticket", any(c.document_path for c in creds)),
+        ("credential", "Add a certification to your wallet", bool(creds)),
+        ("document", "Upload proof for a certification", any(c.document_path for c in creds)),
         ("history", "Add a past job", bool(history)),
     ]
     done = sum(1 for *_, ok in steps if ok)
@@ -102,8 +102,13 @@ def best_unlock(db: Session, user: User) -> dict | None:
     type_id, count = max(counts.items(), key=lambda kv: kv[1])
     name = type_map(db)[type_id].name
     noun = "contract" if count == 1 else "contracts"
+    kind = (
+        ""
+        if any(w in name.lower() for w in ("certificate", "certification", "licence", "endorsement"))
+        else " certification"
+    )
     return {
         "key": "unlock",
-        "label": f"Add your {name} ticket to unlock {count} more {noun}",
+        "label": f"Add your {name}{kind} to unlock {count} more {noun}",
         "credential_type_id": type_id,
     }

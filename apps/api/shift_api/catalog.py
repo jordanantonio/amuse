@@ -119,7 +119,7 @@ CREDENTIAL_TYPES = [
     ("aerial-platform", "Aerial work platform", "Equipment", "Training provider", "worker", True),
     ("telehandler", "Telehandler", "Equipment", "Training provider", "worker", True),
     ("rigging", "Rigging / signalperson", "Equipment", "Training provider", "worker", True),
-    ("cwb-welding", "CWB welding ticket", "Trade", "Canadian Welding Bureau", "worker", True),
+    ("cwb-welding", "CWB welding certification", "Trade", "Canadian Welding Bureau", "worker", True),
     ("class-1", "Class 1 licence", "Driving", "Alberta Registries", "worker", True),
     ("class-3", "Class 3 licence", "Driving", "Alberta Registries", "worker", True),
     ("air-brake", "Air brake endorsement", "Driving", "Alberta Registries", "worker", False),

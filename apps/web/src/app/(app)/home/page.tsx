@@ -236,14 +236,14 @@ function WorkerHome() {
                 </button>
               ) : (
                 <Link className="button button-outline" href="/profile">
-                  Add tickets to your wallet
+                  Add certifications to your wallet
                 </Link>
               )
             }
           >
             {filtered
               ? 'Try a wider distance or turn off “Only show ones I qualify for”.'
-              : 'New contracts are posted every day. Adding tickets opens up more of them.'}
+              : 'New contracts are posted every day. Adding certifications opens up more of them.'}
           </EmptyState>
         )}
         <div className="feed-list">
@@ -430,7 +430,7 @@ function BusinessHome() {
               <div className="talent-side">
                 <span className="status-chip ok">
                   <BadgeCheck size={15} aria-hidden="true" />
-                  {t.verified_tickets} verified {t.verified_tickets === 1 ? 'ticket' : 'tickets'}
+                  {t.verified_tickets} verified {t.verified_tickets === 1 ? 'cert' : 'certs'}
                 </span>
                 <span className="wallet-meta">{t.trades.join(', ')}</span>
               </div>

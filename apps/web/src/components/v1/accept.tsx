@@ -123,7 +123,7 @@ function AcceptDialog({
         {preview?.ticket_problems.length ? (
           <p className="conflict-note" role="alert">
             <TriangleAlert size={20} aria-hidden="true" />
-            Your tickets changed since you applied: {preview.ticket_problems.join('; ')}.{' '}
+            Your certifications changed since you applied: {preview.ticket_problems.join('; ')}.{' '}
             <Link className="inline-link" href="/profile">
               Update your wallet
             </Link>

@@ -40,8 +40,8 @@ export function MatchLine({ card }: { card: PostingCard }) {
         <CircleCheck size={18} aria-hidden="true" />
       )}
       {required_total
-        ? `You have ${required_held} of ${required_total} required tickets${pending ? ', some pending review' : ''}`
-        : 'No tickets required'}
+        ? `You have ${required_held} of ${required_total} required certs${pending ? ', some pending review' : ''}`
+        : 'No certifications required'}
     </p>
   );
 }
@@ -157,7 +157,7 @@ export function WhyPopover({ card }: { card: PostingCard }) {
       </button>
       {open && (
         <div className="popover-panel why-panel" role="dialog" aria-label="Why you’re seeing this">
-          <p className="popover-title">You qualify for every required ticket. Then:</p>
+          <p className="popover-title">You qualify for every required certification. Then:</p>
           <ul>
             {card.score_breakdown!.map((b) => (
               <li key={b.label}>
@@ -185,8 +185,8 @@ export function EligibilityBox({ items, reasons }: { items: MatchItem[]; reasons
   const booked = reasons.filter((r) => r.startsWith('You’re booked'));
   return (
     <section className="eligibility" aria-labelledby="eligibility-title">
-      <h2 id="eligibility-title">Your tickets for this contract</h2>
-      {!required.length && <p className="v1-lede">This contract doesn’t require any tickets.</p>}
+      <h2 id="eligibility-title">Your certifications for this contract</h2>
+      {!required.length && <p className="v1-lede">This contract doesn’t require any certifications.</p>}
       <ul>
         {required.map((i) => (
           <EligibilityRow key={i.credential_type_id} item={i} />

@@ -132,7 +132,7 @@ export default function PostingPage() {
               />
             </label>
             <p className="wallet-meta">
-              Your profile and ticket wallet are included automatically.
+              Your profile and certifications are included automatically.
             </p>
             <button className="button button-primary" disabled={busy}>
               {busy ? 'Applying…' : 'Apply'}
@@ -141,7 +141,7 @@ export default function PostingPage() {
         )}
         {!data.is_owner && !p.eligible && !mine && (
           <Link className="button button-outline" href="/profile">
-            Add the missing tickets
+            Add the missing certifications
           </Link>
         )}
       </section>

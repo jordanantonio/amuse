@@ -33,12 +33,12 @@ export function CredentialWallet({
     for (const c of credentials) by.set(c.category, [...(by.get(c.category) || []), c]);
     return CATEGORY_ORDER.filter((c) => by.has(c)).map((c) => [c, by.get(c)!] as const);
   }, [credentials]);
-  const noun = scope === 'me' ? 'ticket' : 'credential';
+  const noun = scope === 'me' ? 'certification' : 'credential';
   return (
     <section className="v1-section" aria-labelledby={`wallet-${scope}`}>
       <div className="v1-section-head">
         <h2 id={`wallet-${scope}`}>
-          {scope === 'me' ? 'Tickets and certifications' : 'Company credentials'}
+          {scope === 'me' ? 'Certifications' : 'Company credentials'}
         </h2>
         <button
           className="button button-outline"
@@ -61,7 +61,7 @@ export function CredentialWallet({
           }
         >
           {scope === 'me'
-            ? 'Contracts list the tickets they need. Add yours so Shift can show the work you qualify for.'
+            ? 'Contracts list the certifications they need. Add yours so Shift can show the work you qualify for.'
             : 'Verified company credentials (COR, WCB clearance, insurance) build trust with workers.'}
         </EmptyState>
       )}
@@ -74,7 +74,7 @@ export function CredentialWallet({
           }}
         >
           <Plus size={18} aria-hidden="true" />
-          Add {types.find((t) => t.id === highlightType)?.name || 'this ticket'}
+          Add {types.find((t) => t.id === highlightType)?.name || 'this certification'}
         </button>
       )}
       {groups.map(([category, items]) => (
@@ -247,7 +247,7 @@ function CredentialDialog({
         credential
           ? `Edit ${credential.name}`
           : scope === 'me'
-            ? 'Add a ticket'
+            ? 'Add a certification'
             : 'Add a credential'
       }
       description="Upload a photo or PDF as proof. Only you, Shift reviewers and businesses you apply to can open it."
@@ -298,7 +298,7 @@ function CredentialDialog({
             <input value={issuer} onChange={(e) => setIssuer(e.target.value)} maxLength={160} />
           </label>
           <label>
-            Certificate or ticket number <small>(optional)</small>
+            Certificate number <small>(optional)</small>
             <input value={number} onChange={(e) => setNumber(e.target.value)} maxLength={80} />
           </label>
           <div className="field-row">
@@ -321,7 +321,7 @@ function CredentialDialog({
               accept={ACCEPT}
               onChange={(e) => setFile(e.target.files?.[0] || null)}
             />
-            <small>Up to 5 MB. Uploading proof sends this ticket for review.</small>
+            <small>Up to 5 MB. Uploading proof sends this certification for review.</small>
           </label>
         </div>
         {error && (

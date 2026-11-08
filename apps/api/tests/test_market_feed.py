@@ -6,7 +6,11 @@ from shift_api.engagements import book
 from shift_api.feed_config import WEIGHTS
 from shift_api.market_models import ContractApplication, Posting
 
-MAYA_ELIGIBLE = {"p-rough-in", "p-service-elec", "p-temp-power", "p-sanitation", "p-line2", "p-panel"}
+MAYA_ELIGIBLE = {
+    "p-rough-in", "p-service-elec", "p-temp-power", "p-sanitation", "p-line2", "p-panel",
+    "p-shop-labour", "p-cleanup", "p-food-line", "p-production-nights",
+}
+ILYA_ELIGIBLE = {"p-sanitation", "p-shop-labour", "p-yard-forklift", "p-forklift", "p-food-line", "p-cleanup"}
 
 
 @pytest.fixture(autouse=True)
@@ -44,7 +48,7 @@ def test_score_breakdown_is_explainable(client):
     assert rough["score"] == sum(b["points"] for b in rough["score_breakdown"])
     points = {b["label"]: b["points"] for b in rough["score_breakdown"]}
     assert points["Matches your trade (Electrical)"] == WEIGHTS["trade_match"]
-    assert points["You hold every nice-to-have ticket"] == WEIGHTS["nice_to_haves"]
+    assert points["You hold every nice-to-have certification"] == WEIGHTS["nice_to_haves"]
     assert rough["match"] == {
         "required_total": 3,
         "required_held": 3,
@@ -65,7 +69,8 @@ def test_turning_off_the_filter_shows_greyed_reasons(client):
 
 def test_search_filters(client):
     as_user(client, "u-maya")
-    assert [c["id"] for c in feed(client, trade="General labour")["items"]] == ["p-sanitation"]
+    general = {c["id"] for c in feed(client, trade="General labour")["items"]}
+    assert general == {"p-sanitation", "p-shop-labour", "p-cleanup"}
     near = feed(client, max_km=15)["items"]
     assert near and all(c["distance_km"] <= 15 for c in near)
     assert all(c["pay_rate_cents"] >= 4800 for c in feed(client, min_pay_cents=4800)["items"])
@@ -196,7 +201,7 @@ def test_work_views_and_home(client):
     assert len(home["offers"]) == 1 and home["expiring"][0]["name"] == "WHMIS"
     profile = client.get("/api/v1/market/me/profile").json()
     assert profile["completeness"]["next_step"]["label"] == (
-        "Add your Fall Protection ticket to unlock 2 more contracts"
+        "Add your Fall Protection certification to unlock 1 more contract"
     )
     history = [h for h in profile["history"] if h["engagement_id"]]
     assert history and history[0]["description"] == "Completed on Shift."
@@ -235,3 +240,17 @@ def test_dev_reset_restores_demo_and_is_disabled_outside_demo(client, monkeypatc
     monkeypatch.setattr(settings, "demo_mode", False)
     monkeypatch.setattr(settings, "session_secret", "x")
     assert client.post("/api/v1/dev/reset").status_code == 404
+
+
+def test_ilya_demo_state(client):
+    as_user(client, "u-ilya")
+    body = feed(client)
+    assert {c["id"] for c in body["items"]} == ILYA_ELIGIBLE
+    assert body["items"][0]["id"] == "p-sanitation" and body["new_count"] == 1
+    assert body["items"][0]["distance_km"] == 9
+    work = client.get("/api/v1/market/work").json()
+    assert [a["posting"]["id"] for a in work["offers"]] == ["p-production-nights"]
+    home = client.get("/api/v1/market/home").json()
+    assert home["expiring"][0]["name"] == "WHMIS"
+    step = client.get("/api/v1/market/me/profile").json()["completeness"]["next_step"]
+    assert step["label"] == "Add your Fall Protection certification to unlock 1 more contract"

@@ -1,10 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { BadgeCheck, MapPin, CalendarRange, CircleCheck } from 'lucide-react';
+import { Quote } from 'lucide-react';
 import { market } from '@/lib/market';
 import type { Me } from '@/lib/market-types';
 import { GoogleMark } from '@/components/v1/google-mark';
+import { Blueprint } from '@/components/v1/blueprint';
+import { PersonAvatar } from '@/components/v1/avatar';
+import { TESTIMONIALS } from '@/data/people';
 
 const errors: Record<string, string> = {
   'google-cancelled': 'Google sign-in was cancelled. Try again when you’re ready.',
@@ -24,64 +27,55 @@ export default function Landing() {
       .catch(() => undefined);
   }, [router]);
   return (
-    <main className="landing">
-      <div className="landing-copy">
-        <p className="landing-wordmark">
-          shift<span>.</span>
-        </p>
-        <h1>Contract work in the trades, matched to the tickets you hold.</h1>
-        <p className="landing-lede">
-          See the contracts you’re qualified and free for. When you say yes, Shift blocks the dates
-          so you never double-book.
-        </p>
-        {error && (
-          <p className="v1-inline-error" role="alert">
-            {error}
+    <div className="landing-page">
+      <Blueprint parallax />
+      <main className="landing">
+        <div className="landing-copy">
+          <p className="landing-wordmark">
+            shift<span>.</span>
           </p>
-        )}
-        <a
-          className="google-button"
-          href={`/api/v1/auth/google/start?next=${encodeURIComponent(next)}`}
-        >
-          <GoogleMark />
-          Continue with Google
-        </a>
-        <p className="landing-fine">
-          For workers, hiring businesses and contracting crews in Alberta.
-        </p>
-      </div>
-      <aside className="landing-example" aria-label="Example contract">
-        <p className="landing-example-label">What a contract looks like on Shift</p>
-        <article className="contract-card is-example">
-          <div className="contract-card-head">
-            <h2>Electrical rough-in, 4-plex</h2>
-            <p>
-              Northline Homes
-              <span className="verified-mark">
-                <BadgeCheck size={16} aria-hidden="true" />
-                Verified
-              </span>
+          <h1>Contract work, made easy.</h1>
+          <p className="landing-lede">
+            See the jobs you’re qualified and free for. Say yes, and Shift books it.
+          </p>
+          {error && (
+            <p className="v1-inline-error" role="alert">
+              {error}
             </p>
-          </div>
-          <ul className="contract-facts">
-            <li>
-              <MapPin size={16} aria-hidden="true" />
-              Edmonton, 12 km away
-            </li>
-            <li>
-              <CalendarRange size={16} aria-hidden="true" />
-              Jan 6 – Jun 30, 6 months
-            </li>
+          )}
+          <a
+            className="google-button"
+            href={`/api/v1/auth/google/start?next=${encodeURIComponent(next)}`}
+          >
+            <GoogleMark />
+            Continue with Google
+          </a>
+          <p className="landing-fine">
+            For workers, hiring businesses and contracting crews in Alberta.
+          </p>
+        </div>
+        <section className="testimonials" aria-labelledby="testimonials-title">
+          <h2 id="testimonials-title" className="sr-only">
+            What people say
+          </h2>
+          <ul>
+            {TESTIMONIALS.map((t) => (
+              <li key={t.id} className="testimonial">
+                <Quote size={20} aria-hidden="true" className="testimonial-mark" />
+                <blockquote>{t.quote}</blockquote>
+                <div className="testimonial-who">
+                  <PersonAvatar id={t.id} name={t.name} size={48} />
+                  <span>
+                    <strong>{t.name}</strong>
+                    {t.role}
+                  </span>
+                </div>
+              </li>
+            ))}
           </ul>
-          <p className="contract-pay">
-            $48 <small>per hour</small>
-          </p>
-          <p className="match-line ok">
-            <CircleCheck size={18} aria-hidden="true" />
-            You have 4 of 4 required tickets
-          </p>
-        </article>
-      </aside>
-    </main>
+          <p className="testimonials-note">Illustrative feedback from our prototype</p>
+        </section>
+      </main>
+    </div>
   );
 }

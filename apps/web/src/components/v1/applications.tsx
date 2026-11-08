@@ -77,7 +77,7 @@ export function ApplicationStatusBlock({
               : a.status === 'shortlisted'
                 ? 'You’re on the shortlist.'
                 : a.status === 'applied'
-                  ? 'The business can see your profile and tickets.'
+                  ? 'The business can see your profile and certifications.'
                   : ''}
         </span>
       </div>
@@ -203,7 +203,7 @@ export function ApplicantRow({
           ) : (
             <CircleCheck size={18} aria-hidden="true" />
           )}
-          {m.required_held} of {m.required_total} required tickets
+          {m.required_held} of {m.required_total} required certs
           {pending.length ? `, ${pending.length} not yet verified` : ''}
           {missing.length ? `, missing ${missing.map((i) => i.name).join(', ')}` : ''}
         </p>

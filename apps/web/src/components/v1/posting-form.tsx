@@ -92,7 +92,7 @@ export function PostingForm({
   return (
     <Modal
       title={posting ? 'Edit posting' : 'New posting'}
-      description="Workers see contracts that match their tickets. The site address stays hidden until you send an offer."
+      description="Workers see contracts that match their certifications. The site address stays hidden until you send an offer."
       onClose={onClose}
       busy={busy}
     >
@@ -255,9 +255,9 @@ export function PostingForm({
             </label>
           </div>
           <fieldset className="req-field">
-            <legend>{form.posting_type === 'agency' ? 'Company credentials' : 'Tickets'}</legend>
+            <legend>{form.posting_type === 'agency' ? 'Company credentials' : 'Certifications'}</legend>
             <small>
-              Required tickets decide who can apply. Nice-to-haves only improve ranking.
+              Required certifications decide who can apply. Nice-to-haves only improve ranking.
             </small>
             <ul className="req-list">
               {options.map((t) => {

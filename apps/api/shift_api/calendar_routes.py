@@ -80,7 +80,7 @@ def accept(application_id: str, payload: AcceptInput, db: Database, user: Curren
     ensure_acceptable(db, a, p)
     problems = requirement_reasons(db, a, p)
     if problems:
-        raise HTTPException(409, "Your tickets changed since you applied. " + "; ".join(problems) + ".")
+        raise HTTPException(409, "Your certifications changed since you applied. " + "; ".join(problems) + ".")
     allowed = {o.id: o for o in overlapping_open(db, a, p)}
     if any(i not in allowed for i in payload.withdraw_ids):
         raise HTTPException(422, "Only overlapping applications can be withdrawn here")

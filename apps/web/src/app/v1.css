@@ -75,13 +75,90 @@
   background: var(--bg);
 }
 
-/* ---------- Landing ---------- */
+/* ---------- Blueprint palette (derived from Oxford Navy #003566 in OKLCH) ---------- */
+:root {
+  --bp-deep: #003c76; /* L+0.03, C x1.15: white text 11:1 */
+  --bp-vivid: #0052b1; /* L+0.12, C x1.75: white text 7.4:1 */
+  --bp-minor: rgb(255 255 255 / 0.06);
+  --bp-major: rgb(255 255 255 / 0.13);
+  --bp-mark: rgb(255 214 10 / 0.32);
+}
+
+/* ---------- Blueprint background (LAND-4) ---------- */
+.landing-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--bp-deep);
+  color: #fff;
+}
+.blueprint {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  --drift-x: 0px;
+  --drift-y: 0px;
+}
+.blueprint-grid {
+  position: absolute;
+  inset: -240px;
+  width: calc(100% + 480px);
+  height: calc(100% + 480px);
+  transform: translate3d(var(--drift-x), var(--drift-y), 0);
+  transition: transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.blueprint-marks {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: translate3d(calc(var(--drift-x) * 1.6), calc(var(--drift-y) * 1.6), 0);
+  transition: transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.blueprint-sweep {
+  position: absolute;
+  inset: -20% -50%;
+  background: linear-gradient(
+    100deg,
+    transparent 42%,
+    rgb(255 255 255 / 0.05) 48%,
+    rgb(255 214 10 / 0.07) 50%,
+    rgb(255 255 255 / 0.05) 52%,
+    transparent 58%
+  );
+  animation: blueprint-sweep 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes blueprint-sweep {
+  0% {
+    transform: translateX(-60%);
+  }
+  55%,
+  100% {
+    transform: translateX(60%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .blueprint-sweep {
+    animation: none;
+    opacity: 0;
+  }
+  .blueprint-grid,
+  .blueprint-marks {
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ---------- Landing (LAND-1..5) ---------- */
 .landing {
+  position: relative;
+  z-index: 1;
   min-height: 100vh;
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
-  gap: 64px;
+  gap: 56px;
   max-width: 1200px;
   margin: 0 auto;
   padding: 48px 32px;
@@ -92,22 +169,25 @@
   font-size: 34px;
   font-weight: 600;
   letter-spacing: -0.04em;
+  color: #fff;
 }
 .landing-wordmark span,
 .v1-wordmark span {
   color: var(--accent);
 }
-.landing h1 {
-  max-width: 16ch;
-  font-size: clamp(36px, 5vw, 58px);
-  line-height: 1.05;
+.landing h1,
+.demo-picker h1 {
+  max-width: 13ch;
+  font-size: clamp(40px, 6vw, 68px);
+  line-height: 1.02;
   letter-spacing: -0.02em;
+  color: #fff;
 }
 .landing-lede {
-  max-width: 48ch;
+  max-width: 40ch;
   margin: 20px 0 32px;
-  font-size: 18px;
-  color: var(--text-2);
+  font-size: 20px;
+  color: #dce8f6;
 }
 .landing .v1-inline-error {
   max-width: 48ch;
@@ -124,6 +204,10 @@
   color: var(--accent-ink);
   font-size: 17px;
   font-weight: 600;
+  box-shadow: 0 10px 30px rgb(0 8 20 / 0.35);
+  transition:
+    background-color 180ms ease,
+    transform 180ms ease;
 }
 .google-button svg {
   padding: 3px;
@@ -134,16 +218,352 @@
 }
 .google-button:hover {
   background: var(--accent-hover);
+  transform: translateY(-1px);
 }
 .landing-fine {
   margin-top: 16px;
   font-size: 15px;
+  color: #b9cde4;
+}
+.testimonials ul {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.testimonial {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  padding: 20px 22px;
+  border-radius: 16px;
+  background: #f5f8fc;
+  color: #001d3d;
+  box-shadow: 0 18px 40px rgb(0 8 20 / 0.28);
+}
+.testimonial:nth-child(2) {
+  margin-left: 32px;
+}
+.testimonial-mark {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  color: #c79500;
+}
+.testimonial blockquote {
+  margin: 0;
+  padding-right: 24px;
+  font-size: 17px;
+  line-height: 1.5;
+}
+.testimonial-who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.testimonial-who span {
+  display: grid;
+  font-size: 15px;
+  color: #3d5a7a;
+}
+.testimonial-who strong {
+  color: #001d3d;
+}
+.testimonials-note {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #b9cde4;
+}
+
+/* ---------- Avatars and company badges (ASSET-3/4) ---------- */
+.person-avatar {
+  display: inline-block;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #cfe0f2;
+}
+.person-avatar.ring {
+  box-shadow:
+    0 0 0 3px #fff,
+    0 0 0 6px var(--accent);
+}
+.company-badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  flex-shrink: 0;
+  border-radius: 22%;
+  font-family: var(--font-head);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- Demo picker (DEMO-1/2) ---------- */
+.demo-picker {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 24px;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 48px 20px 64px;
+  text-align: center;
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+.demo-picker .landing-wordmark {
+  margin-bottom: 0;
+}
+.demo-picker h1 {
+  max-width: none;
+  font-size: clamp(32px, 5vw, 48px);
+}
+.demo-picker.is-leaving {
+  opacity: 0.55;
+  transform: scale(0.99);
+}
+.persona-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  width: 100%;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.persona-card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  padding: 44px 20px 26px;
+  border: 0;
+  border-radius: 18px;
+  background: #f5f8fc;
+  color: #001d3d;
+  box-shadow: 0 14px 32px rgb(0 8 20 / 0.25);
+  transition:
+    transform 200ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 200ms ease;
+}
+.persona-card:hover:not(:disabled),
+.persona-card:focus-visible {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 48px rgb(0 8 20 / 0.35);
+}
+.persona-card:disabled {
+  opacity: 1;
+}
+.persona-tag {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: #e2ebf6;
+  color: #003c76;
+  font-size: 13px;
+  font-weight: 600;
+}
+.persona-card .person-avatar {
+  margin-bottom: 10px;
+}
+.persona-title {
+  font-family: var(--font-head);
+  font-size: 22px;
+  line-height: 1.2;
+}
+.persona-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: #003c76;
+}
+.persona-org {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #3d5a7a;
+}
+.persona-org.muted {
+  min-height: 28px;
+}
+.persona-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  color: #003c76;
+  font-weight: 600;
+}
+.text-button.on-blue {
+  color: #fff;
+}
+.text-button.on-blue:hover {
+  color: var(--gold);
+}
+.demo-picker .demo-new {
+  width: min(480px, 100%);
+  padding: 16px;
+  border-radius: 14px;
+  background: #f5f8fc;
+  color: #001d3d;
+  text-align: left;
+}
+.demo-picker .demo-new label {
+  color: #001d3d;
+}
+.demo-picker .demo-new input {
+  background: #fff;
+  border-color: #b7c9dd;
+  color: #001d3d;
+}
+@media (prefers-reduced-motion: reduce) {
+  .persona-card,
+  .demo-picker,
+  .google-button {
+    transition: none;
+  }
+}
+@media (max-width: 900px) {
+  .testimonial:nth-child(2) {
+    margin-left: 0;
+  }
+  .persona-cards {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+  }
+}
+
+/* ---------- Contract card (shared with the feed) ---------- */
+.contract-card {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+}
+.contract-card.is-example {
+  border-color: var(--line-strong);
+  box-shadow: 0 30px 80px #00081499;
+}
+.contract-card-head h2,
+.contract-card-head h3 {
+  font-size: 21px;
+}
+.contract-card-head p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+  color: var(--text-2);
+}
+.verified-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ok);
+}
+.contract-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text-2);
+}
+.contract-facts li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.contract-facts svg {
   color: var(--text-3);
 }
-.landing-example-label {
-  margin-bottom: 10px;
+.contract-pay {
+  font-family: var(--font-head);
+  font-size: 26px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.contract-pay small {
+  font-family: var(--font-ui);
   font-size: 15px;
+  font-weight: 400;
   color: var(--text-3);
+}
+.match-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+.match-line.ok {
+  color: var(--ok);
+}
+.match-line.warn {
+  color: var(--gold);
+}
+.match-line.bad {
+  color: var(--danger);
+}
+
+/* ---------- Centered pages: demo sign-in, errors ---------- */
+.v1-center {
+  min-height: 100vh;
+  display: grid;
+  place-items: start center;
+  padding: 64px 20px;
+}
+.v1-notice {
+  display: grid;
+  gap: 14px;
+  max-width: 480px;
+}
+.demo-new {
+  width: min(480px, 100%);
+  padding: 16px;
+  border-radius: 14px;
+  background: #f5f8fc;
+  color: #001d3d;
+  text-align: left;
+}
+.demo-picker .demo-new label {
+  color: #001d3d;
+}
+.demo-picker .demo-new input {
+  background: #fff;
+  border-color: #b7c9dd;
+  color: #001d3d;
+}
+@media (prefers-reduced-motion: reduce) {
+  .persona-card,
+  .demo-picker,
+  .google-button {
+    transition: none;
+  }
+}
+@media (max-width: 900px) {
+  .testimonial:nth-child(2) {
+    margin-left: 0;
+  }
+  .persona-cards {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+  }
 }
 
 /* ---------- Contract card (shared with the feed) ---------- */

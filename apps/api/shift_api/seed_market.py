@@ -69,10 +69,28 @@ OWNERS = [
     ("u-marcus", "Marcus Lee", "nisku-fab", None),
     ("u-dana", "Dana Whitford", "timberline", None),
     ("u-omar", "Omar Haddad", "liftright", None),
+    # v2 demo personas (DEMO-1): the team members who present the demo.
+    ("u-rahul", "Rahul Ghosh", "prairie-harvest", None),
+    ("u-jordan", "Jordan Antonio", "timberline", None),
 ]
 
 WORKERS = [
     # user id, name, headline, trades, city, radius km, rate min, rate max, bio
+    (
+        "u-ilya",
+        "Ilya Sukhanov",
+        "General labourer · 4 yrs in food processing & construction",
+        ["General labour", "Food processing", "Forklift & warehouse"],
+        "Nisku",
+        25,
+        2400,
+        3000,
+        "I’m the person crews call when a night shift needs to run clean. Four years between "
+        "a Leduc packing plant and residential sites taught me to keep a station spotless, "
+        "move product safely on a forklift and look out for the new guy. I like early starts, "
+        "clear checklists and finishing a shutdown ahead of schedule. Proudest moment: zero "
+        "recordables across a 14-night sanitation shutdown.",
+    ),
     (
         "u-maya",
         "Maya Brooks",
@@ -126,7 +144,7 @@ WORKERS = [
         40,
         2800,
         3400,
-        "Third-year apprentice looking for hours toward my ticket.",
+        "Third-year apprentice looking for hours toward my journeyperson certification.",
     ),
     (
         "u-isla",
@@ -166,6 +184,13 @@ WORKERS = [
 
 # uid -> [(credential type, stored status, issued days ago, expires in days | None, number)]
 WALLETS = {
+    "u-ilya": [
+        ("whmis", "verified", 1090, 6, "WHMIS-20931"),  # expires next week: amber on Home
+        ("first-aid", "verified", 400, 695, "SFA-77120"),
+        ("csts-2020", "verified", 800, None, "CSTS-55218"),
+        ("forklift", "verified", 500, 595, "FL-B335-4410"),
+        ("confined-space", "pending", 40, 1055, None),
+    ],
     "u-maya": [
         ("ab-journeyperson", "verified", 2900, None, "AB-JP-448120"),
         ("red-seal", "verified", 2900, None, "RS-309-ELEC"),
@@ -227,6 +252,14 @@ ORG_WALLETS = {
 
 # uid -> [(role, company, city, started months ago, ended months ago | None, description)]
 HISTORY = {
+    "u-ilya": [
+        ("Sanitation lead hand", "Prairie Harvest Foods", "Leduc", 20, 2,
+         "Ran the overnight sanitation crew of six across two production lines."),
+        ("General labourer", "Westline Builders", "Edmonton", 34, 21,
+         "Site clean-up, material handling and framing support on mid-rise builds."),
+        ("Forklift operator", "ColdLink Storage", "Leduc", 48, 35,
+         "Loaded and staged pallets in a -20 °C freezer warehouse."),
+    ],
     "u-maya": [
         ("Electrician", "Riverbend Homes", "Edmonton", 30, 4, "Rough-in and finish on 60+ homes."),
         ("Electrician", "Capital Electric Ltd.", "Edmonton", 70, 31, "Commercial tenant fit-outs."),
@@ -298,9 +331,25 @@ POSTINGS = [
     ("p-pack-lead", "prairie-harvest", "Packaging line lead, weekends", "Food processing", "individual",
      "Leduc", None, 10, 100, "weekends", False, 3000, "hour", 1, "open", 120,
      [("whmis", R, False), ("first-aid", R, False)]),
-    ("p-sanitation", "prairie-harvest", "General labourer, sanitation crew", "General labour", "individual",
-     "Leduc", None, 2, 30, "nights", False, 2600, "hour", 4, "open", 10,
-     [("whmis", R, False)]),
+    ("p-sanitation", "prairie-harvest", "General Labourer — Sanitation Crew", "General labour", "individual",
+     "Leduc", "6505 Sparrow Dr, Leduc", 12, 54, "nights", False, 2600, "hour", 4, "open", 20,
+     [("whmis", R, False), ("first-aid", R, False), ("csts-2020", R, False), ("forklift", N, False)]),
+    # Ilya's prepared state (DEMO-4): five more eligible contracts and a waiting offer.
+    ("p-production-nights", "prairie-harvest", "Production line operator, nights", "Food processing",
+     "individual", "Leduc", "6505 Sparrow Dr, Leduc", 7, 120, "nights", True, 2900, "hour", 1, "open", 150,
+     [("whmis", R, False), ("first-aid", R, False)]),
+    ("p-food-line", "prairie-harvest", "Food production worker, line 1", "Food processing", "individual",
+     "Leduc", None, 21, 90, "mon_fri", False, 2500, "hour", 3, "open", 60,
+     [("whmis", R, False), ("first-aid", R, False)]),
+    ("p-shop-labour", "nisku-fab", "Shop labourer, steel yard", "General labour", "individual",
+     "Nisku", "1004 8 St, Nisku", 14, 70, "mon_fri", False, 2700, "hour", 2, "open", 30,
+     [("csts-2020", R, False), ("whmis", R, False)]),
+    ("p-yard-forklift", "nisku-fab", "Yard forklift operator", "Forklift & warehouse", "individual",
+     "Nisku", None, 28, 85, "mon_fri", False, 2850, "hour", 1, "open", 80,
+     [("forklift", R, True), ("csts-2020", R, False)]),
+    ("p-cleanup", "northline", "Site clean-up crew, 4-plex", "General labour", "individual",
+     "Edmonton", None, 35, 65, "mon_fri", False, 2600, "hour", 3, "open", 110,
+     [("csts-2020", R, False)]),
     ("p-line2", "prairie-harvest", "Electrician, line 2 upgrade", "Electrical", "individual",
      "Leduc", None, 50, 80, "mon_fri", False, 5000, "hour", 1, "open", 90,
      [("ab-journeyperson", R, False), ("whmis", R, False), ("csts-2020", R, False)]),
@@ -336,6 +385,8 @@ POSTINGS = [
 
 # posting, applicant (user id or org id), status, note, hours ago
 APPLICATIONS = [
+    ("p-production-nights", "u-ilya", "offered", "Four years on night sanitation in Leduc.", 70),
+    ("p-pack-lead", "u-ilya", "applied", "Happy to cover weekends between contracts.", 26),
     ("p-maint-elec", "u-maya", "offered", "Nine years on residential and light industrial.", 60),
     ("p-pack-lead", "u-maya", "applied", "Happy to cover weekends between contracts.", 30),
     ("p-finish-carp", "u-ella", "applied", "Trim and stairs are my specialty.", 5),

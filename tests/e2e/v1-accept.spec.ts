@@ -10,7 +10,7 @@ test('accept an offer: withdraw overlaps, block dates, calendar, schedule', asyn
   page,
   browser,
 }) => {
-  await signInAs(page, /Maya Brooks/);
+  await signInAs(page, 'u-maya');
   await page.goto('/work?tab=offers');
   const offer = page
     .locator('.offer-card')
@@ -60,7 +60,7 @@ test('accept an offer: withdraw overlaps, block dates, calendar, schedule', asyn
 
   // The business sees its new crew member on its schedule.
   const priya = await (await browser.newContext()).newPage();
-  await signInAs(priya, /Priya Desai/);
+  await signInAs(priya, 'u-priya');
   await priya.goto('/schedule');
   await expect(priya.locator('.agenda')).toContainText('Maya Brooks');
 });

@@ -270,7 +270,7 @@ function BusinessWork() {
                 </button>
               }
             >
-              Post a contract and workers who hold the right tickets will see it on their Home.
+              Post a contract and workers who hold the right certifications will see it on their Home.
             </EmptyState>
           )}
           <ul className="work-list">
@@ -444,7 +444,7 @@ function ApplicantsTab({
       {!apps && !error && <Skeleton lines={2} />}
       {apps && !apps.length && (
         <EmptyState title="No applicants yet">
-          Workers who hold the required tickets see this posting on their Home.
+          Workers who hold the required certifications see this posting on their Home.
         </EmptyState>
       )}
       <ul className="work-list">

@@ -1,26 +1,37 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { LoaderCircle } from 'lucide-react';
 import { api } from '@/lib/market';
-import type { DemoAccount } from '@/lib/market-types';
+import { PEOPLE } from '@/data/people';
+import { Blueprint } from '@/components/v1/blueprint';
+import { CompanyBadge, PersonAvatar } from '@/components/v1/avatar';
 
-const groups: { title: string; test: (a: DemoAccount) => boolean }[] = [
-  { title: 'Workers', test: (a) => a.mode === 'worker' },
-  { title: 'Hiring businesses', test: (a) => a.mode === 'business' },
-  { title: 'Contracting companies', test: (a) => a.mode === 'agency' },
-];
+/** DEMO-1: one card per demo role. Other personas stay in the seed data (DEMO-3). */
+const CARDS = [
+  { id: 'u-ilya', title: 'I’m looking for work', org: null, industry: null, tag: 'Worker' },
+  {
+    id: 'u-rahul',
+    title: 'I’m hiring',
+    org: 'Prairie Harvest Foods',
+    industry: 'Food processing',
+    tag: 'Hiring business',
+  },
+  {
+    id: 'u-jordan',
+    title: 'I run a contracting company',
+    org: 'Timberline Framing Crew',
+    industry: 'Residential construction',
+    tag: 'Contracting company',
+  },
+] as const;
 
 export default function DemoSignIn() {
   const router = useRouter();
-  const [accounts, setAccounts] = useState<DemoAccount[] | null>(null);
-  const [name, setName] = useState('');
-  const [error, setError] = useState('');
   const [busy, setBusy] = useState('');
-  useEffect(() => {
-    api<DemoAccount[]>('/auth/demo-accounts')
-      .then(setAccounts)
-      .catch((e) => setError((e as Error).message));
-  }, []);
+  const [error, setError] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [name, setName] = useState('');
   const signIn = async (body: { user_id?: string; full_name?: string }, key: string) => {
     setBusy(key);
     setError('');
@@ -33,45 +44,57 @@ export default function DemoSignIn() {
     }
   };
   return (
-    <main className="v1-center">
-      <div className="demo-signin">
-        <h1>Choose a demo account</h1>
-        <p className="v1-lede">
-          Google sign-in isn’t set up on this server yet, so this local demo uses fictional
-          accounts. Nothing here is real data.
+    <div className="landing-page">
+      <Blueprint />
+      <main className={`demo-picker ${busy ? 'is-leaving' : ''}`}>
+        <p className="landing-wordmark">
+          shift<span>.</span>
         </p>
+        <h1>How do you want to use Shift?</h1>
         {error && (
           <p className="v1-inline-error" role="alert">
             {error}
           </p>
         )}
-        {!accounts && !error && <div className="skeleton-block" aria-label="Loading accounts" />}
-        {accounts &&
-          groups.map((g) => {
-            const list = accounts.filter(g.test);
-            if (!list.length) return null;
+        <ul className="persona-cards">
+          {CARDS.map((c) => {
+            const person = PEOPLE[c.id];
             return (
-              <section key={g.title} className="demo-group">
-                <h2>{g.title}</h2>
-                <ul>
-                  {list.map((a) => (
-                    <li key={a.id}>
-                      <button
-                        className="demo-account"
-                        disabled={!!busy}
-                        onClick={() => void signIn({ user_id: a.id }, a.id)}
-                      >
-                        <strong>{a.full_name}</strong>
-                        <span>{a.mode === 'worker' ? 'Worker' : a.label}</span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </section>
+              <li key={c.id}>
+                <button
+                  className="persona-card"
+                  disabled={!!busy}
+                  aria-busy={busy === c.id}
+                  onClick={() => void signIn({ user_id: c.id }, c.id)}
+                >
+                  <span className="persona-tag">{c.tag}</span>
+                  <PersonAvatar id={c.id} name={person.name} size={88} ring />
+                  <strong className="persona-title">{c.title}</strong>
+                  <span className="persona-name">{person.name.split(' ')[0]}</span>
+                  {c.org ? (
+                    <span className="persona-org">
+                      <CompanyBadge name={c.org} industry={c.industry} size={28} />
+                      {c.org}
+                    </span>
+                  ) : (
+                    <span className="persona-org muted">Independent worker</span>
+                  )}
+                  {busy === c.id && (
+                    <span className="persona-loading">
+                      <LoaderCircle size={18} className="spin" aria-hidden="true" />
+                      Signing in…
+                    </span>
+                  )}
+                </button>
+              </li>
             );
           })}
-        <section className="demo-group">
-          <h2>Start a new account</h2>
+        </ul>
+        {!creating ? (
+          <button className="text-button on-blue" onClick={() => setCreating(true)}>
+            or create a new account
+          </button>
+        ) : (
           <form
             className="demo-new"
             onSubmit={(e) => {
@@ -87,14 +110,16 @@ export default function DemoSignIn() {
                 required
                 maxLength={160}
                 autoComplete="name"
+                autoFocus
               />
             </label>
             <button className="button button-primary" disabled={!!busy || !name.trim()}>
               {busy === 'new' ? 'Creating…' : 'Create account'}
             </button>
           </form>
-        </section>
-      </div>
-    </main>
+        )}
+        <p className="landing-fine">Demo sign-in. Accounts and data are for demonstration only.</p>
+      </main>
+    </div>
   );
 }

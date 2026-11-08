@@ -7,13 +7,13 @@ test.beforeEach(async ({ request, page }) => {
 });
 
 test('Maya’s For You feed: eligible only, why, greyed reasons, one-tap apply', async ({ page }) => {
-  await signInAs(page, /Maya Brooks/);
+  await signInAs(page, 'u-maya');
   await expect(
     page.getByRole('heading', { name: /3 new contracts fit you since yesterday/ }),
   ).toBeVisible();
   await expect(page.getByRole('link', { name: /1 offer is waiting for your reply/ })).toBeVisible();
   const cards = page.locator('.feed-list .contract-card');
-  await expect(cards).toHaveCount(6);
+  await expect(cards).toHaveCount(10);
   await expect(cards.first()).toContainText('You have');
   await cards.first().getByRole('button', { name: 'Why am I seeing this?' }).click();
   await expect(page.getByRole('dialog', { name: 'Why you’re seeing this' })).toContainText(
@@ -38,7 +38,7 @@ test('Maya’s For You feed: eligible only, why, greyed reasons, one-tap apply',
 test('posting page shows the eligibility box and hides the site until an offer', async ({
   page,
 }) => {
-  await signInAs(page, /Maya Brooks/);
+  await signInAs(page, 'u-maya');
   await page.goto('/postings/p-site-labour');
   const box = page.locator('.eligibility');
   await expect(box.locator('.elig-row.missing')).toContainText('Fall Protection');
@@ -52,7 +52,7 @@ test('Northline reviews three applicants, sends an offer, and posts a contract',
   page,
   browser,
 }) => {
-  await signInAs(page, /Alex Morgan/);
+  await signInAs(page, 'u-alex');
   await expect(page.getByRole('link', { name: /new applicants/ })).toBeVisible();
   await navLink(page, 'Work').click();
   await page.getByRole('button', { name: 'Review applicants' }).first().click();
@@ -60,7 +60,7 @@ test('Northline reviews three applicants, sends an offer, and posts a contract',
   const rows = page.locator('.applicant-row');
   await expect(rows).toHaveCount(3);
   const ella = rows.filter({ hasText: 'Ella Thompson' });
-  await expect(ella).toContainText('2 of 2 required tickets');
+  await expect(ella).toContainText('2 of 2 required certs');
   await ella.getByRole('button', { name: 'Send offer' }).click();
   await expect(ella).toContainText('Offer waiting');
   await page.screenshot({ path: 'test-results/v1-work-business.png', fullPage: true });
@@ -84,7 +84,7 @@ test('Northline reviews three applicants, sends an offer, and posts a contract',
 
   // Ella sees the offer with the site address revealed.
   const ellaPage = await (await browser.newContext()).newPage();
-  await signInAs(ellaPage, /Ella Thompson/);
+  await signInAs(ellaPage, 'u-ella');
   await ellaPage.goto('/work?tab=offers');
   await expect(ellaPage.locator('.offer-card')).toContainText('4210 Allard Way SW, Edmonton');
 });
