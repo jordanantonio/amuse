@@ -12,3 +12,10 @@ Inspect Git status and branch before changes. Work on `claude/<task>` in a separ
 worktree; coordinate shared models and API contracts with Codex. Never change main,
 push, or merge without authorization. Do not overwrite work owned by another task.
 Keep docs synchronized, test the work, and report limitations honestly.
+
+## Commit attribution (required)
+Never add Claude or any AI assistant as an author, co-author or contributor.
+Commit messages and PR descriptions must NOT contain `Co-Authored-By:` trailers
+for Claude/Anthropic or "Generated with Claude Code" footers, and commits must
+use the human developer's own git identity. This rule overrides any default
+attribution behaviour.

@@ -1,7 +1,11 @@
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from .models import *
 from .schemas import *
+from .solver_time import overlap
+from .config import settings
 
 
 def dashboard(db: Session, actor: Membership) -> Dashboard:
@@ -88,7 +92,19 @@ def dashboard(db: Session, actor: Membership) -> Dashboard:
                 }
             )
             if actor.role != "worker":
-                gaps += max(0, t.crew_size - count)
+                absences = list(db.scalars(select(WorkerAbsence)))
+                unavailable = {
+                    a.worker_id
+                    for a in all_assignments
+                    if a.task_id == t.id
+                    and a.status == "confirmed"
+                    and any(
+                        b.worker_id == a.worker_id
+                        and overlap(a.starts_at, a.ends_at, b.starts_at, b.ends_at)
+                        for b in absences
+                    )
+                }
+                gaps += max(0, t.crew_size - count) + len(unavailable)
             task_views.append(
                 TaskView(
                     id=t.id,
@@ -100,6 +116,13 @@ def dashboard(db: Session, actor: Membership) -> Dashboard:
                     required_certifications=t.required_certifications,
                     work_mode=t.work_mode,
                     confirmed_count=count,
+                    predecessor_ids=list(
+                        db.scalars(
+                            select(TaskDependency.predecessor_id).where(
+                                TaskDependency.task_id == t.id
+                            )
+                        )
+                    ),
                 )
             )
         pviews.append(
@@ -142,11 +165,13 @@ def dashboard(db: Session, actor: Membership) -> Dashboard:
             )
         )
     )
+    today = datetime.now(ZoneInfo("America/Edmonton")).date()
+    current_week = (today - timedelta(days=today.weekday())).isoformat()
     return Dashboard(
         organization=org.name,
         persona=Persona.model_validate(actor),
-        demo=True,
-        week_start="2026-11-09",
+        demo=settings.demo_mode,
+        week_start="2026-11-09" if settings.demo_mode else current_week,
         timezone="America/Edmonton",
         workers=wviews,
         projects=pviews,

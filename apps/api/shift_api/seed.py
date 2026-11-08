@@ -6,6 +6,7 @@ from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 from .models import *
 from .database import Base
+from .seed_market import seed_market
 
 ZONE = ZoneInfo("America/Edmonton")
 
@@ -16,8 +17,10 @@ def at(day: int, hour: int):
 
 def seed(db: Session):
     if db.scalar(select(Organization.id).limit(1)):
+        seed_adaptive(db)
+        seed_market(db)
         return
-    db.add(Organization(id="northline", name="Northline Works"))
+    db.add(Organization(id="northline", name="Northline Homes", is_demo=True))
     db.flush()
     db.add_all(
         [
@@ -340,10 +343,121 @@ def seed(db: Session):
         ]
     )
     db.commit()
+    seed_adaptive(db)
+    seed_market(db)
+
+
+def seed_adaptive(db):
+    # Upgrade only the known fictional workspace, never arbitrary production tenants.
+    if not db.get(Organization, "northline"):
+        return
+    extras = [
+        (
+            "isla",
+            "Isla Nguyen",
+            "Concrete specialist",
+            ["Concrete placement"],
+            ["Concrete Safety"],
+            5800,
+        ),
+        (
+            "lucas",
+            "Lucas Martin",
+            "Site carpenter",
+            ["Carpentry", "Blueprint reading"],
+            ["Carpentry"],
+            5700,
+        ),
+        (
+            "amelia",
+            "Amelia Singh",
+            "Crane operator",
+            ["Equipment operation"],
+            ["Heavy Equipment"],
+            6300,
+        ),
+        (
+            "jack",
+            "Jack Anderson",
+            "Field electrician",
+            ["Electrical"],
+            ["Red Seal Electrical"],
+            7600,
+        ),
+    ]
+    for wid, name, title, skills, certs, rate in extras:
+        if db.get(Worker, wid):
+            continue
+        mid = "demo-" + wid
+        db.add(
+            Membership(
+                id=mid,
+                organization_id="northline",
+                auth_subject="demo:" + wid,
+                name=name,
+                role="worker",
+            )
+        )
+        db.flush()
+        db.add(
+            Worker(
+                id=wid,
+                membership_id=mid,
+                organization_id="northline",
+                name=name,
+                title=title,
+                location="Edmonton, AB",
+                hourly_rate_cents=rate,
+                employment_type="contractor",
+                work_modes=["on_site", "hybrid"],
+                color="#759fa7",
+            )
+        )
+        db.flush()
+        db.add_all(Skill(worker_id=wid, name=skill) for skill in skills)
+        db.add_all(Certification(worker_id=wid, name=cert, expires_at=at(30, 17)) for cert in certs)
+        db.add_all(
+            AvailabilityWindow(
+                worker_id=wid, starts_at=at(d, 9 if wid == "jack" else 8), ends_at=at(d, 16)
+            )
+            for d in range(9, 14)
+            if not (wid == "amelia" and d == 10)
+        )
+    from .weather import refresh_forecast
+
+    for project in db.scalars(select(Project).where(Project.organization_id == "northline")):
+        if not db.get(SchedulingPolicy, project.id):
+            rules = (
+                {"rough-in": {"max_rain_probability": 70, "max_wind_kph": 50}}
+                if project.id == "eastside"
+                else {"site-prep": {"max_precipitation_mm": 10, "max_wind_kph": 60}}
+                if project.id == "river"
+                else {}
+            )
+            db.add(
+                SchedulingPolicy(
+                    project_id=project.id,
+                    task_buffer_percent=0,
+                    transition_minutes=0,
+                    contingency_minutes=0,
+                    freeze_hours=48,
+                    task_weather_rules=rules,
+                )
+            )
+            db.flush()
+        if not db.scalar(
+            select(WeatherForecast.id).where(WeatherForecast.project_id == project.id).limit(1)
+        ):
+            refresh_forecast(db, project, False)
+    db.commit()
 
 
 def reset(db: Session):
-    if db.scalar(select(Organization.id).where(Organization.id != "northline").limit(1)):
+    if db.scalar(
+        select(Organization.id)
+        .where(Organization.id != "northline", Organization.is_demo.is_(False))
+        .limit(1)
+    ):
         raise ValueError("Reset refused: database contains non-demo organizations")
     for table in reversed(Base.metadata.sorted_tables):
         db.execute(delete(table))

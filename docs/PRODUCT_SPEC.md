@@ -42,7 +42,7 @@ start, deadline, work mode, site capacity, and optional labour budget.
 
 ## Lifecycle
 Task: unstaffed → proposed coverage → invited coverage → confirmed coverage.
-Draft: draft → approved or rejected; stale inputs require regeneration.
+Recovery proposal: pending approval → awaiting worker confirmation → ready to publish → published. Rejected, revision requested and expired are separate terminal paths. Stale inputs require regeneration.
 Invitation: pending → accepted, declined, or expired. Acceptance revalidates all
 constraints in a transaction. Approval is not contractor acceptance.
 Assignment: confirmed → completed, cancelled, or disrupted, via authorized actions.
@@ -68,9 +68,18 @@ or unauthorized approvals fail; no draft becomes confirmed without acceptance;
 infeasibility is explained; demo reset is repeatable; persisted data survives
 restart; key flows pass API and browser checks. Responsive and keyboard-usable UI.
 
-## Foundation versus full MVP
-The foundation implements relational models, seed data, read dashboards, role-scoped
-API projections, and an initial CP-SAT recovery draft. Follow-up tasks deliver
-Supabase authentication/RLS, full project/profile/availability editing, marketplace
-application flows, versioned approval and acceptance transactions, PostgreSQL
-concurrency enforcement, and a complete repeatable recovery walkthrough.
+## SHIFT Adaptive implementation (2026-11-07)
+The local application now supports project/task editing, DAG validation, profiles,
+qualifications, published availability, job posting/search/applications, validated
+contractor offers, exact absences, weather review, separately optimized alternatives,
+manager decisions, worker acceptance/reservations and revalidated publication.
+Calendar navigation uses full local dates and real free windows. The mobile worker
+workspace prioritizes assignments and invitations. Persisted query URLs open the
+same view/project/proposal after reload.
+
+Supabase sign-in/JWT support and PostgreSQL RLS/exclusion protections are implemented;
+actual hosted identity verification requires operator-provided project credentials.
+There is no fake production login or claimed live weather connection. Full Adaptive
+semantics and operational limits are in ADAPTIVE.md. Legal overtime compliance,
+equipment/material resource models, split shifts and resilience benchmarks remain
+future extensions. See TESTING.md for executed evidence, not inferred readiness.
