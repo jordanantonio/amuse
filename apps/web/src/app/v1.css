@@ -1,0 +1,434 @@
+/*
+ * Shift V1 surfaces. Reuses the Golden Twilight tokens from globals.css.
+ * V1 rules: 16px minimum body text, 44px minimum tap targets, status = colour + icon + word.
+ */
+:is(.landing, .v1-center, .onboarding, .v1-shell) {
+  --fs-body: 16px;
+  --tap: 44px;
+  font-size: var(--fs-body);
+  line-height: 1.55;
+}
+:is(.landing, .v1-center, .onboarding, .v1-shell) .button {
+  min-height: var(--tap);
+  padding: 10px 18px;
+  font-size: 16px;
+}
+:is(.landing, .v1-center, .onboarding, .v1-shell) .button-sm {
+  min-height: 36px;
+  padding: 6px 12px;
+  font-size: 14px;
+}
+:is(.landing, .v1-center, .onboarding, .v1-shell) :is(input, select, textarea) {
+  min-height: var(--tap);
+  padding: 10px 12px;
+  font-size: 16px;
+}
+:is(.landing, .v1-center, .onboarding, .v1-shell) label {
+  display: grid;
+  gap: 6px;
+  font-weight: 500;
+  color: var(--text);
+}
+:is(.landing, .v1-center, .onboarding, .v1-shell) label small {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-3);
+}
+.v1-lede {
+  max-width: 62ch;
+  color: var(--text-2);
+}
+.v1-inline-error {
+  padding: 10px 14px;
+  border: 1px solid color-mix(in oklab, var(--danger) 50%, transparent);
+  border-radius: var(--r-control);
+  background: var(--danger-soft);
+  color: #ffd2cb;
+}
+.text-button {
+  min-height: var(--tap, 44px);
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--text-2);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.text-button:hover {
+  color: var(--gold);
+}
+.skeleton-block {
+  height: 120px;
+  border-radius: var(--r-panel);
+  background: linear-gradient(90deg, var(--surface), var(--raised), var(--surface));
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+.shell-loading {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ---------- Landing ---------- */
+.landing {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-items: center;
+  gap: 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 32px;
+}
+.landing-wordmark {
+  margin-bottom: 40px;
+  font-family: var(--font-head);
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+.landing-wordmark span,
+.v1-wordmark span {
+  color: var(--accent);
+}
+.landing h1 {
+  max-width: 16ch;
+  font-size: clamp(36px, 5vw, 58px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+.landing-lede {
+  max-width: 48ch;
+  margin: 20px 0 32px;
+  font-size: 18px;
+  color: var(--text-2);
+}
+.landing .v1-inline-error {
+  max-width: 48ch;
+  margin-bottom: 16px;
+}
+.google-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 0 22px;
+  border-radius: var(--r-control);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 17px;
+  font-weight: 600;
+}
+.google-button svg {
+  padding: 3px;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  background: #fff;
+}
+.google-button:hover {
+  background: var(--accent-hover);
+}
+.landing-fine {
+  margin-top: 16px;
+  font-size: 15px;
+  color: var(--text-3);
+}
+.landing-example-label {
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: var(--text-3);
+}
+
+/* ---------- Contract card (shared with the feed) ---------- */
+.contract-card {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+}
+.contract-card.is-example {
+  border-color: var(--line-strong);
+  box-shadow: 0 30px 80px #00081499;
+}
+.contract-card-head h2,
+.contract-card-head h3 {
+  font-size: 21px;
+}
+.contract-card-head p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+  color: var(--text-2);
+}
+.verified-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ok);
+}
+.contract-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text-2);
+}
+.contract-facts li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.contract-facts svg {
+  color: var(--text-3);
+}
+.contract-pay {
+  font-family: var(--font-head);
+  font-size: 26px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.contract-pay small {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text-3);
+}
+.match-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+.match-line.ok {
+  color: var(--ok);
+}
+.match-line.warn {
+  color: var(--gold);
+}
+.match-line.bad {
+  color: var(--danger);
+}
+
+/* ---------- Centered pages: demo sign-in, errors ---------- */
+.v1-center {
+  min-height: 100vh;
+  display: grid;
+  place-items: start center;
+  padding: 64px 20px;
+}
+.v1-notice {
+  display: grid;
+  gap: 14px;
+  max-width: 480px;
+}
+.demo-signin {
+  display: grid;
+  gap: 20px;
+  width: min(560px, 100%);
+}
+.demo-group h2 {
+  margin-bottom: 8px;
+  font-size: 18px;
+  color: var(--text-2);
+}
+.demo-group ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.demo-account {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-control);
+  background: var(--surface);
+  text-align: left;
+}
+.demo-account:hover:not(:disabled) {
+  border-color: var(--yellow);
+}
+.demo-account span {
+  color: var(--text-3);
+  font-size: 15px;
+}
+.demo-new {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+.demo-new label {
+  flex: 1;
+}
+
+/* ---------- Onboarding ---------- */
+.onboarding {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 64px 20px;
+}
+.onboarding h1 {
+  margin-bottom: 8px;
+}
+.step-count {
+  margin-bottom: 12px;
+  color: var(--gold);
+  font-weight: 500;
+}
+.role-choices {
+  display: grid;
+  gap: 12px;
+  margin-top: 28px;
+}
+.role-choice {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  align-items: center;
+  gap: 4px 16px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--surface);
+  text-align: left;
+}
+.role-choice svg {
+  grid-row: span 2;
+  color: var(--gold);
+}
+.role-choice strong {
+  font-family: var(--font-head);
+  font-size: 22px;
+}
+.role-choice span {
+  color: var(--text-2);
+}
+.role-choice:hover:not(:disabled) {
+  border-color: var(--yellow);
+}
+.onboarding-form {
+  display: grid;
+  gap: 20px;
+}
+.onboarding-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 8px;
+}
+.onboarding-actions .skip {
+  margin-left: auto;
+}
+.chip-field {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.chip-field legend {
+  padding: 0;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+label.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 0 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 22px;
+  cursor: pointer;
+  font-weight: 500;
+}
+label.chip input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+label.chip.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+label.chip:focus-within {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+input[type='range'] {
+  accent-color: var(--yellow);
+  padding: 0;
+}
+
+/* ---------- Signed-in shell ---------- */
+.v1-shell {
+  min-height: 100vh;
+}
+.v1-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--line);
+}
+.v1-wordmark {
+  font-family: var(--font-head);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+.v1-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-2);
+}
+.v1-main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 32px 24px 96px;
+}
+
+@media (max-width: 900px) {
+  .landing {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 40px 20px;
+  }
+  .landing-wordmark {
+    margin-bottom: 28px;
+  }
+}
+@media (max-width: 600px) {
+  .demo-new {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .onboarding {
+    padding: 40px 16px;
+  }
+}

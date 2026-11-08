@@ -2,7 +2,7 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 from shift_api.config import settings
 from shift_api.database import Base
-from shift_api import models
+from shift_api import models, market_models  # noqa: F401  (register tables)
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.database_url.replace("%", "%%"))

@@ -148,8 +148,12 @@ def demo_reset(db: Database, actor: Actor):
 
 
 from .adaptive_routes import router as adaptive_router
+from .auth_routes import router as auth_router
+from .market_routes import router as market_router
 
 app.include_router(adaptive_router)
+app.include_router(auth_router)
+app.include_router(market_router)
 
 
 @app.exception_handler(IntegrityError)

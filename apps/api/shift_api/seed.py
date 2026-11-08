@@ -6,6 +6,7 @@ from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 from .models import *
 from .database import Base
+from .seed_market import seed_market
 
 ZONE = ZoneInfo("America/Edmonton")
 
@@ -17,8 +18,9 @@ def at(day: int, hour: int):
 def seed(db: Session):
     if db.scalar(select(Organization.id).limit(1)):
         seed_adaptive(db)
+        seed_market(db)
         return
-    db.add(Organization(id="northline", name="Northline Works"))
+    db.add(Organization(id="northline", name="Northline Homes", is_demo=True))
     db.flush()
     db.add_all(
         [
@@ -342,6 +344,7 @@ def seed(db: Session):
     )
     db.commit()
     seed_adaptive(db)
+    seed_market(db)
 
 
 def seed_adaptive(db):
@@ -450,7 +453,11 @@ def seed_adaptive(db):
 
 
 def reset(db: Session):
-    if db.scalar(select(Organization.id).where(Organization.id != "northline").limit(1)):
+    if db.scalar(
+        select(Organization.id)
+        .where(Organization.id != "northline", Organization.is_demo.is_(False))
+        .limit(1)
+    ):
         raise ValueError("Reset refused: database contains non-demo organizations")
     for table in reversed(Base.metadata.sorted_tables):
         db.execute(delete(table))

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Barlow, Barlow_Semi_Condensed } from 'next/font/google';
 import './globals.css';
+import './v1.css';
 
 const body = Barlow({
   subsets: ['latin'],
@@ -14,9 +15,9 @@ const display = Barlow_Semi_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: 'SHIFT — Workforce, in sync.',
+  title: 'Shift — contract work in the trades',
   description:
-    'Workforce scheduling, project talent, and constraint-based planning. SHIFT local demonstration.',
+    'Find and fill construction and manufacturing contracts, matched to verified tickets and real availability.',
 };
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

@@ -9,6 +9,9 @@ from sqlalchemy import (
     UniqueConstraint,
     CheckConstraint,
     Index,
+    Float,
+    Boolean,
+    false,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 from .database import Base
@@ -23,9 +26,23 @@ def utcnow():
 
 
 class Organization(Base):
+    """A company. V1 marketplace fields extend the original scheduling tenant."""
+
     __tablename__ = "organizations"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
     name: Mapped[str] = mapped_column(String(160))
+    kind: Mapped[str] = mapped_column(String(20), default="business", server_default="business")
+    handle: Mapped[str | None] = mapped_column(String(60), nullable=True, unique=True, index=True)
+    industry: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    city: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    lat: Mapped[float | None] = mapped_column(Float, nullable=True)
+    lng: Mapped[float | None] = mapped_column(Float, nullable=True)
+    website: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    about: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+    verification_status: Mapped[str] = mapped_column(
+        String(20), default="unverified", server_default="unverified"
+    )
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
 
 
 class Membership(Base):
