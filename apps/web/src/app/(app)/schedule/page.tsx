@@ -2,7 +2,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { CalendarCheck, ChevronLeft, ChevronRight, Plus, Workflow } from 'lucide-react';
+import {
+  CalendarCheck,
+  CalendarPlus,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  ExternalLink,
+  Plus,
+  Workflow,
+} from 'lucide-react';
+import { googleEventUrl, googleWeekUrl } from '@/lib/gcal';
 import { market } from '@/lib/market';
 import type { ScheduleItem, ScheduleView } from '@/lib/market-types';
 import { day, range, todayIso } from '@/lib/format';
@@ -104,6 +114,15 @@ export default function SchedulePage() {
       <div className="page-head-row">
         <h1 className="page-title">Schedule</h1>
         <div className="actions">
+          <a
+            className="button button-outline"
+            href={googleWeekUrl(mode === 'week' ? start : addDays(anchor, -weekday(anchor)))}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ExternalLink size={18} aria-hidden="true" />
+            Open in Google Calendar
+          </a>
           {me.mode === 'business' && (
             <Link className="text-button" href="/crew">
               <Workflow size={18} aria-hidden="true" /> Crew planner
@@ -245,7 +264,7 @@ export default function SchedulePage() {
         )}
         <ul className="agenda">
           {upcoming.map((i) => (
-            <li key={i.id}>
+            <li key={i.id} className="agenda-row">
               <button className={`agenda-item ${i.kind}`} onClick={() => open(i)}>
                 {i.kind === 'manual' ? (
                   <i className="swatch unavailable" aria-hidden="true" />
@@ -258,6 +277,34 @@ export default function SchedulePage() {
                   {i.subtitle ? ` · ${i.subtitle}` : ''}
                 </span>
               </button>
+              {i.kind === 'engagement' && i.engagement_id && (
+                <div className="agenda-links">
+                  <a
+                    className="text-button"
+                    href={googleEventUrl({
+                      title: `Shift: ${i.title} @ ${me.mode === 'business' ? me.organization?.name : i.subtitle}`,
+                      start: i.start_date,
+                      end: i.end_date,
+                      details:
+                        me.mode === 'business'
+                          ? `${i.subtitle} booked through Shift.`
+                          : 'Booked through Shift.',
+                      location: i.location || '',
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <CalendarPlus size={16} aria-hidden="true" /> Add to Google Calendar
+                  </a>
+                  <a
+                    className="text-button"
+                    href={`/api/v1/market/engagements/${i.engagement_id}/calendar.ics`}
+                    download
+                  >
+                    <Download size={16} aria-hidden="true" /> .ics
+                  </a>
+                </div>
+              )}
             </li>
           ))}
         </ul>

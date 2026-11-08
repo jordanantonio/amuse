@@ -12,6 +12,7 @@ import {
   Users,
 } from 'lucide-react';
 import { CompanyBadge } from './avatar';
+import { WhySheet } from './why-sheet';
 import type { MatchItem, PostingCard } from '@/lib/market-types';
 import { dollars, duration, payUnit, range } from '@/lib/format';
 
@@ -104,11 +105,14 @@ export function ContractCard({
   card,
   action,
   footer,
+  onApply,
 }: {
   card: PostingCard;
   action?: React.ReactNode;
   footer?: React.ReactNode;
+  onApply?: () => void;
 }) {
+  const [why, setWhy] = useState(false);
   return (
     <article className={`contract-card ${card.eligible ? '' : 'ineligible'}`}>
       <span className="contract-card-badge">
@@ -128,9 +132,27 @@ export function ContractCard({
       <MatchLine card={card} />
       <div className="contract-card-actions">
         {action}
-        {card.score_breakdown && card.score_breakdown.length > 0 && <WhyPopover card={card} />}
+        {card.score_breakdown && card.score_breakdown.length > 0 && (
+          <button className="text-button" onClick={() => setWhy(true)}>
+            Why am I seeing this?
+          </button>
+        )}
       </div>
       {footer}
+      {why && (
+        <WhySheet
+          card={card}
+          onClose={() => setWhy(false)}
+          onApply={
+            onApply
+              ? () => {
+                  setWhy(false);
+                  onApply();
+                }
+              : undefined
+          }
+        />
+      )}
     </article>
   );
 }

@@ -310,6 +310,7 @@ def schedule(
                     "engagement_id": e.id,
                     "status": e.status,
                     "person_id": a.applicant_user_id,
+                    "location": p.site_address or p.city,
                 }
             )
     else:
@@ -344,6 +345,7 @@ def schedule(
                         "engagement_id": e.id,
                         "status": e.status,
                         "industry": owner.industry,
+                        "location": p.site_address or p.city,
                     }
                 )
             else:

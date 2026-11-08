@@ -1,9 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { CalendarCheck, CalendarPlus, Download, TriangleAlert, CircleCheck } from 'lucide-react';
+import { CalendarPlus, Download, TriangleAlert, CircleCheck } from 'lucide-react';
 import { market } from '@/lib/market';
-import type { AcceptPreview, ApplicationView, CalendarResult } from '@/lib/market-types';
+import type { AcceptPreview, ApplicationView } from '@/lib/market-types';
+import { googleEventUrl } from '@/lib/gcal';
 import { range } from '@/lib/format';
 import { ErrorNote, Modal, Skeleton } from './ui';
 
@@ -93,10 +94,7 @@ function AcceptDialog({
             Shift has blocked {p.is_exclusive ? 'these dates' : 'the scheduled days'} so you can’t
             be double-booked. Add them to your phone’s calendar too.
           </p>
-          <CalendarButtons
-            engagementId={accepted.engagement.id}
-            synced={accepted.engagement.calendar_synced}
-          />
+          <CalendarButtons engagementId={accepted.engagement.id} event={eventFor(accepted)} />
         </div>
         <div className="editor-actions">
           <button className="text-button" onClick={() => onClose(true)}>
@@ -187,54 +185,25 @@ function AcceptDialog({
   );
 }
 
-/** CAL-1 / CAL-3: Google Calendar when available, and the .ics file always. */
+/** SCHED-2 / CAL-3: Google's event template link (no OAuth) and the .ics file. */
 export function CalendarButtons({
   engagementId,
-  synced,
+  event,
 }: {
   engagementId: string;
-  synced: boolean;
+  event: { title: string; start: string; end: string; details?: string; location?: string };
 }) {
-  const [state, setState] = useState<'idle' | 'busy' | 'added'>(synced ? 'added' : 'idle');
-  const [message, setMessage] = useState('');
-  const add = async () => {
-    setState('busy');
-    setMessage('');
-    try {
-      const r = await market<CalendarResult>(`/engagements/${engagementId}/google`, {
-        method: 'POST',
-      });
-      if (r.status === 'needs_auth' && r.url) {
-        window.location.assign(r.url);
-        return;
-      }
-      if (r.status === 'added') setState('added');
-      else {
-        setState('idle');
-        setMessage(r.message || 'Google Calendar isn’t available right now.');
-      }
-    } catch (e) {
-      setState('idle');
-      setMessage((e as Error).message);
-    }
-  };
   return (
     <div className="calendar-buttons">
-      {state === 'added' ? (
-        <span className="status-chip ok">
-          <CalendarCheck size={16} aria-hidden="true" />
-          In your Google Calendar
-        </span>
-      ) : (
-        <button
-          className="button button-primary"
-          disabled={state === 'busy'}
-          onClick={() => void add()}
-        >
-          <CalendarPlus size={18} aria-hidden="true" />
-          {state === 'busy' ? 'Adding…' : 'Add to Google Calendar'}
-        </button>
-      )}
+      <a
+        className="button button-primary"
+        href={googleEventUrl(event)}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <CalendarPlus size={18} aria-hidden="true" />
+        Add to Google Calendar
+      </a>
       <a
         className="button button-outline"
         href={`/api/v1/market/engagements/${engagementId}/calendar.ics`}
@@ -243,9 +212,19 @@ export function CalendarButtons({
         <Download size={18} aria-hidden="true" />
         Download .ics
       </a>
-      {message && <p className="wallet-meta calendar-message">{message}</p>}
     </div>
   );
+}
+
+export function eventFor(a: ApplicationView) {
+  const p = a.posting;
+  return {
+    title: `Shift: ${p.title} @ ${p.org.name}`,
+    start: a.engagement?.start_date || p.start_date,
+    end: a.engagement?.end_date || p.end_date,
+    details: `${p.trade} contract with ${p.org.name}, booked through Shift.`,
+    location: p.site_address || p.city,
+  };
 }
 
 /** Active contracts: calendar, schedule and cancel. */
@@ -261,7 +240,7 @@ export function EngagementActions({
   if (!a.engagement) return null;
   return (
     <div className="engagement-actions">
-      <CalendarButtons engagementId={a.engagement.id} synced={a.engagement.calendar_synced} />
+      <CalendarButtons engagementId={a.engagement.id} event={eventFor(a)} />
       <div className="actions">
         <Link className="text-button" href="/schedule">
           See on Schedule

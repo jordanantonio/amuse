@@ -416,14 +416,33 @@ class ApplicationView(BaseModel):
     engagement: EngagementSummary | None
 
 
+class Question(BaseModel):
+    id: str
+    prompt: str
+    kind: Literal["yes_no", "date", "text"]
+
+
+class CalendarCheck(BaseModel):
+    status: Literal["clear", "conflict", "warning"]
+    message: str
+
+
 class PostingDetail(BaseModel):
     posting: PostingCard
     description: str
     is_owner: bool
     my_application: ApplicationView | None
+    shift_hours: str | None = None
+    ppe_provided: list[str] = []
+    ppe_required: list[str] = []
+    typical_day: str | None = None
+    questions: list[Question] = []
+    org_about: str | None = None
+    calendar: CalendarCheck | None = None
 
 
 class ApplyInput(BaseModel):
+    answers: dict[str, str] = Field(default_factory=dict, max_length=20)
     note: str = Field("", max_length=1000)
     proposed_rate_cents: int | None = Field(None, gt=0, le=10_000_000)
     crew_size: int | None = Field(None, ge=1, le=500)
@@ -536,6 +555,7 @@ class ScheduleItem(BaseModel):
     status: str | None = None
     person_id: str | None = None
     industry: str | None = None
+    location: str | None = None
 
 
 class ScheduleView(BaseModel):

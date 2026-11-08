@@ -5,7 +5,9 @@ test.beforeEach(async ({ request }) => {
   expect((await request.post('/api/v1/dev/reset')).ok()).toBeTruthy();
 });
 
-test('worker wallet: expiring warning, add a certification with proof, four-tab nav', async ({ page }) => {
+test('worker wallet: expiring warning, add a certification with proof, four-tab nav', async ({
+  page,
+}) => {
   await signInAs(page, 'u-maya');
   await expect(page.getByRole('link', { name: /WHMIS expires/ })).toBeVisible();
   const nav = page.locator('.v1-nav').getByRole('link');

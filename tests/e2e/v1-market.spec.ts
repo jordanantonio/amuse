@@ -17,7 +17,7 @@ test('Maya’s For You feed: eligible only, why, greyed reasons, one-tap apply',
   await expect(cards.first()).toContainText('You have');
   await cards.first().getByRole('button', { name: 'Why am I seeing this?' }).click();
   await expect(page.getByRole('dialog', { name: 'Why you’re seeing this' })).toContainText(
-    'Matches your trade (Electrical)',
+    'You hold 3 of 3 required certs',
   );
   await page.keyboard.press('Escape');
   await page.screenshot({ path: 'test-results/v1-home-worker.png', fullPage: true });
@@ -29,6 +29,10 @@ test('Maya’s For You feed: eligible only, why, greyed reasons, one-tap apply',
 
   const panel = cards.filter({ hasText: 'Shop electrician, panel builds' });
   await panel.getByRole('button', { name: 'Apply' }).click();
+  const sheet = page.getByRole('dialog', { name: /Apply to Shop electrician/ });
+  for (let i = 0; i < 3; i++) await sheet.getByRole('button', { name: 'Continue' }).click();
+  await sheet.getByRole('button', { name: 'Send application' }).click();
+  await sheet.getByRole('button', { name: 'Close' }).click();
   await expect(panel.getByRole('link', { name: 'Applied, see Work' })).toBeVisible();
   await navLink(page, 'Work').click();
   await page.getByRole('tab', { name: /Applied/ }).click();

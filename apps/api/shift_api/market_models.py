@@ -175,6 +175,13 @@ class Posting(Base):
     headcount: Mapped[int] = mapped_column(Integer, default=1)
     status: Mapped[str] = mapped_column(String(10), default="open", index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    # V2 apply flow content (APPLY-1); all optional.
+    shift_hours: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    ppe_provided: Mapped[list] = mapped_column(JSON, default=list)
+    ppe_required: Mapped[list] = mapped_column(JSON, default=list)
+    typical_day: Mapped[str | None] = mapped_column(String(1500), nullable=True)
+    # [{id, prompt, kind: 'yes_no' | 'date' | 'text'}]
+    questions: Mapped[list] = mapped_column(JSON, default=list)
 
 
 class PostingRequirement(Base):
@@ -215,6 +222,8 @@ class ContractApplication(Base):
     crew_size: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    # Screening answers keyed by question id (APPLY-1 step 3).
+    answers: Mapped[dict] = mapped_column(JSON, default=dict)
 
 
 class Engagement(Base):

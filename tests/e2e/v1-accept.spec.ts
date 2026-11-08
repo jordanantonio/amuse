@@ -28,8 +28,10 @@ test('accept an offer: withdraw overlaps, block dates, calendar, schedule', asyn
   await expect(done).toContainText(
     'Maintenance electrician, night shift with Prairie Harvest Foods',
   );
-  await done.getByRole('button', { name: 'Add to Google Calendar' }).click();
-  await expect(done).toContainText('Google Calendar isn’t set up on this server');
+  await expect(done.getByRole('link', { name: 'Add to Google Calendar' })).toHaveAttribute(
+    'href',
+    /calendar\.google\.com\/calendar\/render\?action=TEMPLATE&text=Shift.*&dates=\d{8}%2F\d{8}/,
+  );
   const [download] = await Promise.all([
     page.waitForEvent('download'),
     done.getByRole('link', { name: 'Download .ics' }).click(),

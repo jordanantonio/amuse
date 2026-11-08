@@ -15,6 +15,7 @@ import type { Feed, HomeView, Meta, PostingCard, TalentCard } from '@/lib/market
 import { day, dollars, range } from '@/lib/format';
 import { useSession } from '@/components/v1/session';
 import { ContractCard } from '@/components/v1/contract';
+import { ApplySheet } from '@/components/v1/apply-sheet';
 import { EmptyState, ErrorNote, Modal, Skeleton } from '@/components/v1/ui';
 import { CompanyBadge, PersonAvatar } from '@/components/v1/avatar';
 
@@ -72,6 +73,7 @@ function WorkerHome() {
   const [error, setError] = useState('');
   const [applied, setApplied] = useState<Record<string, 'sending' | 'done'>>({});
   const [applyError, setApplyError] = useState('');
+  const [applying, setApplying] = useState<PostingCard | null>(null);
   useEffect(() => {
     market<Meta>('/meta').then(setMeta, () => undefined);
   }, []);
@@ -107,22 +109,6 @@ function WorkerHome() {
   const set = (patch: Partial<Filters>) => setFilters((f) => ({ ...f, ...patch }));
   const filtered = JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS);
 
-  // Optimistic one-tap apply (FLOW-1): the button flips immediately, reverts on error.
-  const apply = async (card: PostingCard) => {
-    setApplyError('');
-    setApplied((a) => ({ ...a, [card.id]: 'sending' }));
-    try {
-      await market(`/postings/${card.id}/apply`, { method: 'POST', body: {} });
-      setApplied((a) => ({ ...a, [card.id]: 'done' }));
-    } catch (e) {
-      setApplied((a) => {
-        const next = { ...a };
-        delete next[card.id];
-        return next;
-      });
-      setApplyError(`${card.title}: ${(e as Error).message}`);
-    }
-  };
   const newest = feed?.items.filter((c) => c.is_new && c.eligible).slice(0, 3) || [];
 
   return (
@@ -252,6 +238,7 @@ function WorkerHome() {
             <ContractCard
               key={c.id}
               card={c}
+              onApply={c.eligible && !applied[c.id] ? () => setApplying(c) : undefined}
               action={
                 c.eligible ? (
                   applied[c.id] ? (
@@ -259,7 +246,7 @@ function WorkerHome() {
                       {applied[c.id] === 'sending' ? 'Applying…' : 'Applied, see Work'}
                     </Link>
                   ) : (
-                    <button className="button button-primary" onClick={() => void apply(c)}>
+                    <button className="button button-primary" onClick={() => setApplying(c)}>
                       Apply
                     </button>
                   )
@@ -273,6 +260,13 @@ function WorkerHome() {
           ))}
         </div>
       </section>
+      {applying && (
+        <ApplySheet
+          postingId={applying.id}
+          onClose={() => setApplying(null)}
+          onApplied={() => setApplied((a) => ({ ...a, [applying.id]: 'done' }))}
+        />
+      )}
     </>
   );
 }

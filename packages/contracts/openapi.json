@@ -243,6 +243,14 @@
       },
       "ApplyInput": {
         "properties": {
+          "answers": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "maxProperties": 20,
+            "title": "Answers",
+            "type": "object"
+          },
           "crew_size": {
             "anyOf": [
               {
@@ -552,6 +560,29 @@
           "strength"
         ],
         "title": "BreakdownRow",
+        "type": "object"
+      },
+      "CalendarCheck": {
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "clear",
+              "conflict",
+              "warning"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "message"
+        ],
+        "title": "CalendarCheck",
         "type": "object"
       },
       "CalendarResult": {
@@ -2892,6 +2923,16 @@
       },
       "PostingDetail": {
         "properties": {
+          "calendar": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CalendarCheck"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "description": {
             "title": "Description",
             "type": "string"
@@ -2910,8 +2951,65 @@
               }
             ]
           },
+          "org_about": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Org About"
+          },
           "posting": {
             "$ref": "#/components/schemas/PostingCard"
+          },
+          "ppe_provided": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Ppe Provided",
+            "type": "array"
+          },
+          "ppe_required": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Ppe Required",
+            "type": "array"
+          },
+          "questions": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Question"
+            },
+            "title": "Questions",
+            "type": "array"
+          },
+          "shift_hours": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shift Hours"
+          },
+          "typical_day": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Typical Day"
           }
         },
         "required": [
@@ -3289,6 +3387,34 @@
         "title": "ProposalInput",
         "type": "object"
       },
+      "Question": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "yes_no",
+              "date",
+              "text"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "prompt": {
+            "title": "Prompt",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "prompt",
+          "kind"
+        ],
+        "title": "Question",
+        "type": "object"
+      },
       "RecoveryView": {
         "properties": {
           "confirmations": {
@@ -3509,6 +3635,17 @@
             ],
             "title": "Kind",
             "type": "string"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
           },
           "person_id": {
             "anyOf": [

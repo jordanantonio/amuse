@@ -401,6 +401,36 @@ APPLICATIONS = [
 ]
 
 
+# Full apply-flow content for the demo posting (APPLY-1); others use sensible defaults.
+POSTING_CONTENT = {
+    "p-sanitation": {
+        "shift_hours": "10 PM – 6 AM, Mon–Fri (8 h with a paid 30-minute break)",
+        "ppe_provided": ["Hairnet and beard net", "Chemical-resistant gloves", "Face shield", "Rubber apron"],
+        "ppe_required": ["CSA steel-toe rubber boots"],
+        "typical_day": (
+            "Start with a 10-minute crew huddle and a lock-out check with the lead hand. Break "
+            "down and foam the two packaging lines, rinse, sanitize, then swab surfaces for the "
+            "QA team before the 6 AM restart. You're on your feet in a wet, cool (6 °C) room, "
+            "with a hot meal break at 2 AM."
+        ),
+        "questions": [
+            {"id": "overnight", "prompt": "Comfortable with overnight shifts?", "kind": "yes_no"},
+            {"id": "boots", "prompt": "Do you have CSA steel-toe boots?", "kind": "yes_no"},
+            {"id": "start", "prompt": "Earliest start date", "kind": "date"},
+        ],
+    },
+    "p-forklift": {
+        "shift_hours": "6 AM – 6 PM on a 4-on, 4-off rotation",
+        "ppe_provided": ["Insulated freezer suit", "Hi-vis vest"],
+        "ppe_required": ["CSA steel-toe boots"],
+        "questions": [
+            {"id": "cold", "prompt": "Comfortable working in -20 °C for an hour at a time?", "kind": "yes_no"},
+            {"id": "start", "prompt": "Earliest start date", "kind": "date"},
+        ],
+    },
+}
+
+
 def seed_postings(db: Session, today: date) -> None:
     from datetime import datetime, timezone
     from .engagements import book
@@ -420,6 +450,7 @@ def seed_postings(db: Session, today: date) -> None:
                 end_date=today + timedelta(days=e), schedule_pattern=pattern, is_exclusive=excl,
                 pay_rate_cents=pay, pay_unit=unit, headcount=head, status=status,
                 created_at=now - timedelta(hours=hours),
+                **POSTING_CONTENT.get(pid, {}),
             )
         )
         db.flush()

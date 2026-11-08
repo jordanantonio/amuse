@@ -203,11 +203,20 @@ export type ApplicationView = {
   engagement: EngagementSummary | null;
 };
 
+export type Question = { id: string; prompt: string; kind: 'yes_no' | 'date' | 'text' };
+
 export type PostingDetail = {
   posting: PostingCard;
   description: string;
   is_owner: boolean;
   my_application: ApplicationView | null;
+  shift_hours?: string | null;
+  ppe_provided?: string[];
+  ppe_required?: string[];
+  typical_day?: string | null;
+  questions?: Question[];
+  org_about?: string | null;
+  calendar?: { status: 'clear' | 'conflict' | 'warning'; message: string } | null;
 };
 
 export type WorkView = {
@@ -288,6 +297,7 @@ export type ScheduleItem = {
   status?: string | null;
   person_id?: string | null;
   industry?: string | null;
+  location?: string | null;
 };
 
 export type ScheduleView = {

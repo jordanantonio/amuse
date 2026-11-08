@@ -237,7 +237,40 @@ def posting_detail(posting_id: str, db: Database, user: CurrentUser):
         description=p.description,
         is_owner=is_owner,
         my_application=application_view(db, mine, user) if mine else None,
+        shift_hours=p.shift_hours,
+        ppe_provided=p.ppe_provided or [],
+        ppe_required=p.ppe_required or [],
+        typical_day=p.typical_day,
+        questions=p.questions or [],
+        org_about=org.about,
+        calendar=calendar_check(db, user, p) if user.default_mode == "worker" else None,
     )
+
+
+def calendar_check(db, user, p: Posting) -> dict:
+    """APPLY-1 step 2: the contract dates against the worker's schedule."""
+    from .feed import booked_ranges, booking_conflict, posting_ranges
+    from .market_models import AvailabilityBlock
+    from .schedule import overlap
+
+    conflict = booking_conflict(booked_ranges(db, user.id), p)
+    if conflict:
+        return {"status": "conflict", "message": conflict}
+    manual = [
+        b
+        for b in db.scalars(
+            select(AvailabilityBlock).where(
+                AvailabilityBlock.user_id == user.id, AvailabilityBlock.source == "manual"
+            )
+        )
+        if overlap(posting_ranges(p), [(b.start_date, b.end_date)])
+    ]
+    if manual:
+        return {
+            "status": "warning",
+            "message": f"You marked yourself unavailable {manual[0].start_date:%b} {manual[0].start_date.day}. Check with the business.",
+        }
+    return {"status": "clear", "message": "No conflicts with your schedule"}
 
 
 @router.post("/postings/{posting_id}/apply", response_model=ApplicationView, status_code=201)
@@ -245,7 +278,12 @@ def apply_to_posting(posting_id: str, payload: ApplyInput, db: Database, user: C
     p = db.get(Posting, posting_id)
     if not p or p.status == "draft":
         raise HTTPException(404, "Posting not found")
+    valid = {q["id"] for q in (p.questions or [])}
+    if any(k not in valid for k in payload.answers):
+        raise HTTPException(422, "Answer only this contract’s questions")
     a = apply(db, user, p, payload.note.strip(), payload.proposed_rate_cents, payload.crew_size)
+    a.answers = {k: v.strip()[:200] for k, v in payload.answers.items() if v.strip()}
+    db.commit()
     return application_view(db, a, user)
 
 
