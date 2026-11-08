@@ -444,6 +444,28 @@
         "title": "AutofillResult",
         "type": "object"
       },
+      "Availability": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "booked"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "label"
+        ],
+        "title": "Availability",
+        "type": "object"
+      },
       "AvailabilityInput": {
         "additionalProperties": false,
         "properties": {
@@ -1174,6 +1196,17 @@
               }
             ],
             "title": "Document Name"
+          },
+          "document_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Type"
           },
           "expires_on": {
             "anyOf": [
@@ -3262,6 +3295,16 @@
       },
       "ProfileView": {
         "properties": {
+          "availability": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Availability"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "completeness": {
             "$ref": "#/components/schemas/Completeness"
           },
@@ -3281,6 +3324,14 @@
           },
           "profile": {
             "$ref": "#/components/schemas/WorkerProfileView"
+          },
+          "reviews": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ReviewView"
+            },
+            "title": "Reviews",
+            "type": "array"
           },
           "user": {
             "$ref": "#/components/schemas/UserView"
@@ -3871,6 +3922,51 @@
           "credential_type_id"
         ],
         "title": "RequirementInput",
+        "type": "object"
+      },
+      "ReviewView": {
+        "properties": {
+          "author_name": {
+            "title": "Author Name",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "org_industry": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Org Industry"
+          },
+          "org_name": {
+            "title": "Org Name",
+            "type": "string"
+          },
+          "quote": {
+            "title": "Quote",
+            "type": "string"
+          },
+          "rating": {
+            "title": "Rating",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "org_name",
+          "org_industry",
+          "author_name",
+          "rating",
+          "quote"
+        ],
+        "title": "ReviewView",
         "type": "object"
       },
       "RulesView": {
@@ -4700,6 +4796,25 @@
             "title": "Id",
             "type": "string"
           },
+          "photo_paths": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Photo Paths",
+            "type": "array"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
           "reference_contact": {
             "anyOf": [
               {
@@ -4809,6 +4924,14 @@
             "title": "Is Public",
             "type": "boolean"
           },
+          "languages": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Languages",
+            "type": "array"
+          },
           "linkedin_url": {
             "anyOf": [
               {
@@ -4841,6 +4964,14 @@
               }
             ],
             "title": "Rate Min Cents"
+          },
+          "tools": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Tools",
+            "type": "array"
           },
           "trades": {
             "items": {
@@ -5112,6 +5243,21 @@
             ],
             "title": "Is Public"
           },
+          "languages": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 12,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Languages"
+          },
           "linkedin_url": {
             "anyOf": [
               {
@@ -5150,6 +5296,21 @@
               }
             ],
             "title": "Rate Min Cents"
+          },
+          "tools": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 20,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tools"
           },
           "trades": {
             "anyOf": [

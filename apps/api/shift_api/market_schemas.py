@@ -53,6 +53,8 @@ class WorkerProfileView(BaseModel):
     bio: str
     linkedin_url: str | None
     is_public: bool
+    tools: list[str] = []
+    languages: list[str] = []
 
 
 class OrgView(BaseModel):
@@ -135,6 +137,7 @@ class CredentialView(BaseModel):
     days_to_expiry: int | None
     has_document: bool
     document_name: str | None
+    document_type: str | None = None
     rejection_reason: str | None
 
 
@@ -175,6 +178,8 @@ class WorkHistoryView(BaseModel):
     reference_name: str | None
     reference_contact: str | None
     engagement_id: str | None
+    photo_paths: list[str] = []
+    rating: int | None = None
 
 
 class WorkHistoryInput(BaseModel):
@@ -205,6 +210,8 @@ class ProfileInput(BaseModel):
     bio: str | None = Field(None, max_length=1000)
     linkedin_url: str | None = Field(None, max_length=300, pattern=r"^(https://[^\s]+)?$")
     is_public: bool | None = None
+    tools: list[str] | None = Field(None, max_length=20)
+    languages: list[str] | None = Field(None, max_length=12)
 
     _trades = field_validator("trades")(classmethod(lambda cls, v: check_trades(v)))
     _city = field_validator("city")(classmethod(lambda cls, v: check_city(v)))
@@ -249,12 +256,28 @@ class Completeness(BaseModel):
     next_step: NextStep | None
 
 
+class ReviewView(BaseModel):
+    id: str
+    org_name: str
+    org_industry: str | None
+    author_name: str
+    rating: int
+    quote: str
+
+
+class Availability(BaseModel):
+    status: Literal["open", "booked"]
+    label: str
+
+
 class ProfileView(BaseModel):
     user: UserView
     profile: WorkerProfileView
     credentials: list[CredentialView]
     history: list[WorkHistoryView]
     completeness: Completeness
+    reviews: list[ReviewView] = []
+    availability: Availability | None = None
 
 
 class OrgProfileView(BaseModel):

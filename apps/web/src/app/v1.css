@@ -3548,3 +3548,286 @@ label.toggle input {
 .pile > .wallet-meta {
   color: var(--text-2);
 }
+
+/* ---------- LinkedIn-style worker profile (PROFILE-1..7) ---------- */
+.lprofile {
+  display: grid;
+  gap: 18px;
+}
+.lprofile-head {
+  padding: 0 !important;
+  overflow: hidden;
+}
+.lprofile-banner {
+  position: relative;
+  height: 150px;
+  overflow: hidden;
+  background: var(--bp-vivid);
+}
+.lprofile-id {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  padding: 0 28px 24px;
+}
+.lprofile-photo {
+  margin-top: -64px;
+  margin-bottom: 8px;
+}
+.lprofile-pencil {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+}
+.lprofile-id h1 {
+  font-size: 34px;
+}
+.lprofile-headline {
+  font-size: 19px;
+  color: var(--text);
+}
+.lprofile-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-2);
+}
+.avail-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 4px 14px;
+  border-radius: 16px;
+  font-weight: 600;
+}
+.avail-pill.open {
+  background: #dff2e8;
+  color: #0f6b45;
+}
+.avail-pill.booked {
+  background: #e2ebf6;
+  color: #003c76;
+}
+.lprofile-next {
+  color: var(--text);
+  font-weight: 500;
+}
+.lprofile-section {
+  display: grid;
+  gap: 12px;
+  padding: 22px 26px !important;
+}
+.lprofile-section > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.lprofile-section > header h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 22px;
+}
+.lprofile-about {
+  max-width: 70ch;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--text);
+}
+.lprofile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.lprofile-certs .v1-section {
+  margin-top: 6px;
+}
+.lprofile-foot {
+  color: var(--text-2);
+  font-size: 15px;
+}
+.tag-list.big li {
+  padding: 6px 14px;
+  border-radius: 16px;
+  background: #e2ebf6;
+  color: #003c76;
+  font-size: 15px;
+  font-weight: 500;
+}
+.inline-form {
+  display: grid;
+  gap: 12px;
+}
+.timeline {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.timeline > li {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 16px;
+  padding: 16px 0;
+}
+.timeline > li + li {
+  border-top: 1px solid var(--line);
+}
+.timeline-body {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.timeline-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.timeline-top strong {
+  font-size: 18px;
+}
+.timeline-top p:not(.wallet-meta) {
+  color: var(--text);
+}
+.timeline-desc {
+  max-width: 70ch;
+  color: var(--text-2);
+}
+.shift-done {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.stars {
+  display: inline-flex;
+  gap: 2px;
+}
+.stars svg {
+  color: #b7c9dd;
+}
+.stars svg.on {
+  color: #c79500;
+  fill: #ffc300;
+}
+.gallery {
+  display: flex;
+  gap: 10px;
+  margin: 4px 0 0;
+  padding: 0 0 4px;
+  overflow-x: auto;
+  list-style: none;
+}
+.gallery img {
+  display: block;
+  width: 160px;
+  height: 100px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.reviews {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.review {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding: 16px;
+  border-radius: 12px;
+  background: #fff;
+}
+.review blockquote {
+  margin: 0;
+  line-height: 1.55;
+}
+.review-who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text-2);
+}
+.review-who > span:not(.company-badge) {
+  flex: 1;
+}
+.doc-thumb {
+  display: grid;
+  place-items: center;
+  height: 96px;
+  margin: -6px -8px 6px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #e2ebf6;
+  color: #003c76;
+}
+.doc-thumb.empty {
+  background: repeating-linear-gradient(135deg, #eef3f9 0 6px, #e4ecf5 6px 12px);
+  color: #52708f;
+}
+.doc-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.drop-zone {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 20px;
+  border: 2px dashed #9fb4cc;
+  border-radius: 14px;
+  background: #fff;
+  text-align: center;
+  color: var(--text-2);
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+.drop-zone.over {
+  border-color: #003c76;
+  background: #e2ebf6;
+}
+.drop-zone p strong {
+  color: var(--text);
+}
+.drop-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+.drop-preview img {
+  width: 88px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+.drop-preview span {
+  display: grid;
+  font-size: 14px;
+}
+.drop-browse {
+  display: inline-block !important;
+}
+@media (max-width: 900px) {
+  .lprofile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 767px) {
+  .lprofile-id {
+    padding: 0 18px 20px;
+  }
+  .lprofile-section {
+    padding: 18px !important;
+  }
+}

@@ -80,6 +80,7 @@ def credential_view(c: Credential, types) -> CredentialView:
         days_to_expiry=days_to_expiry(c),
         has_document=bool(c.document_path),
         document_name=c.document_name,
+        document_type=c.document_type,
         rejection_reason=c.rejection_reason,
     )
 
@@ -98,7 +99,46 @@ def profile_view(db, user: User) -> ProfileView:
         credentials=[credential_view(c, types) for c in user_credentials(db, user.id)],
         history=[WorkHistoryView.model_validate(h) for h in history],
         completeness=completeness(db, user, profile),
+        reviews=reviews_for(db, user.id),
+        availability=availability_pill(db, user.id),
     )
+
+
+def reviews_for(db, user_id: str) -> list[dict]:
+    from .market_models import Review
+    from .models import Organization
+
+    rows = db.execute(
+        select(Review, Organization)
+        .join(Organization, Review.org_id == Organization.id)
+        .where(Review.worker_user_id == user_id)
+        .order_by(Review.rating.desc(), Review.created_at.desc())
+    )
+    return [
+        {"id": r.id, "org_name": o.name, "org_industry": o.industry, "author_name": r.author_name,
+         "rating": r.rating, "quote": r.quote}
+        for r, o in rows
+    ]
+
+
+def availability_pill(db, user_id: str) -> dict:
+    """PROFILE-1: 'Booked until Mar 2' while booked today, otherwise 'Open to work'."""
+    from datetime import date, timedelta
+    from .feed import booked_ranges
+
+    today = date.today()
+    ranges = sorted(r for r, _ in booked_ranges(db, user_id))
+    end = next((stop for start, stop in ranges if start <= today <= stop), None)
+    if end:
+        for start, stop in ranges:  # extend through back-to-back bookings
+            if start <= end + timedelta(days=1) and stop > end:
+                end = stop
+        return {"status": "booked", "label": f"Booked until {end:%b} {end.day}"}
+    upcoming = [start for start, _ in ranges if start > today]
+    if upcoming:
+        nxt = min(upcoming)
+        return {"status": "open", "label": f"Open to work until {nxt:%b} {nxt.day}"}
+    return {"status": "open", "label": "Open to work now"}
 
 
 @router.get("/credential-types", response_model=list[CredentialTypeView])

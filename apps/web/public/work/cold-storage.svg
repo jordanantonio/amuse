@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Illustration: racking in a cold storage warehouse">
+  <rect width="320" height="200" fill="#a8c5e6"/>
+  <rect y="168" width="320" height="32" fill="#cfe0f2"/>
+  <g stroke="#003c76" stroke-width="4"><path d="M30 24v144M150 24v144M170 24v144M290 24v144"/><path d="M30 64h120M30 108h120M30 152h120M170 64h120M170 108h120M170 152h120"/></g>
+  <g fill="#e9eef4" stroke="#003c76" stroke-width="2.5">
+    <rect x="40" y="38" width="44" height="26"/><rect x="94" y="44" width="46" height="20"/>
+    <rect x="44" y="84" width="40" height="24"/><rect x="180" y="40" width="50" height="24"/>
+    <rect x="236" y="80" width="46" height="28"/><rect x="186" y="126" width="44" height="26"/>
+  </g>
+  <g fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+    <path d="M110 120l8 8M118 120l-8 8M114 118v12M108 124h12"/><path d="M252 132l8 8M260 132l-8 8M256 130v12M250 136h12"/>
+  </g>
+  <rect x="96" y="128" width="40" height="22" fill="#ffc300" stroke="#003c76" stroke-width="2.5"/>
+</svg>

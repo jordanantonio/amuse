@@ -20,6 +20,8 @@ export type WorkerProfileView = {
   bio: string;
   linkedin_url: string | null;
   is_public: boolean;
+  tools?: string[];
+  languages?: string[];
 };
 
 export type OrgView = {
@@ -76,6 +78,7 @@ export type Credential = {
   days_to_expiry: number | null;
   has_document: boolean;
   document_name: string | null;
+  document_type?: string | null;
   rejection_reason: string | null;
 };
 
@@ -90,6 +93,8 @@ export type WorkHistory = {
   reference_name: string | null;
   reference_contact: string | null;
   engagement_id: string | null;
+  photo_paths?: string[];
+  rating?: number | null;
 };
 
 export type Completeness = {
@@ -104,6 +109,15 @@ export type Profile = {
   credentials: Credential[];
   history: WorkHistory[];
   completeness: Completeness;
+  reviews: {
+    id: string;
+    org_name: string;
+    org_industry: string | null;
+    author_name: string;
+    rating: number;
+    quote: string;
+  }[];
+  availability: { status: 'open' | 'booked'; label: string } | null;
 };
 
 export type OrgProfile = { organization: OrgView; credentials: Credential[] };

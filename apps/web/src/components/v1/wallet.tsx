@@ -46,7 +46,7 @@ export function CredentialWallet({
           }}
         >
           <Plus size={18} aria-hidden="true" />
-          Add {noun}
+          {scope === 'me' ? 'Upload certification' : `Add ${noun}`}
         </button>
       </div>
       {!credentials.length && (
@@ -81,6 +81,7 @@ export function CredentialWallet({
           <ul className="wallet-grid">
             {items.map((c) => (
               <li key={c.id} className={`wallet-card ${c.status}`}>
+                <DocThumb credential={c} />
                 <div className="wallet-card-top">
                   <strong>{c.name}</strong>
                   <StatusChip status={c.status} />
@@ -309,18 +310,7 @@ function CredentialDialog({
               <input type="date" value={expires} onChange={(e) => setExpires(e.target.value)} />
             </label>
           </div>
-          <label className="file-field">
-            <span>
-              <Upload size={18} aria-hidden="true" />
-              {credential?.has_document ? 'Replace proof (photo or PDF)' : 'Proof (photo or PDF)'}
-            </span>
-            <input
-              type="file"
-              accept={ACCEPT}
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-            />
-            <small>Up to 5 MB. Uploading proof sends this certification for review.</small>
-          </label>
+          <DropZone file={file} setFile={setFile} hasDocument={!!credential?.has_document} />
         </div>
         {error && (
           <div className="form-error" role="alert">
@@ -347,5 +337,105 @@ function CredentialDialog({
         </div>
       </form>
     </Modal>
+  );
+}
+
+/** PROFILE-4: thumbnail of the uploaded proof (image via a short-lived link, PDFs as an icon). */
+function DocThumb({ credential }: { credential: Credential }) {
+  const [src, setSrc] = useState<string | null>(null);
+  const isImage = credential.document_type?.startsWith('image/');
+  useEffect(() => {
+    if (!credential.has_document || !isImage) return;
+    market<{ url: string }>(`/credentials/${credential.id}/document-link`).then(
+      (r) => setSrc(r.url),
+      () => setSrc(null),
+    );
+  }, [credential.id, credential.has_document, isImage]);
+  return (
+    <div className={`doc-thumb ${credential.has_document ? '' : 'empty'}`} aria-hidden="true">
+      {src ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={src} alt="" />
+      ) : credential.has_document ? (
+        <FileText size={28} />
+      ) : (
+        <Paperclip size={22} />
+      )}
+    </div>
+  );
+}
+
+/** Drag-and-drop or browse for a photo or PDF, with a preview before saving. */
+function DropZone({
+  file,
+  setFile,
+  hasDocument,
+}: {
+  file: File | null;
+  setFile: (f: File | null) => void;
+  hasDocument: boolean;
+}) {
+  const [over, setOver] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+  useEffect(() => {
+    if (!file || !file.type.startsWith('image/')) {
+      setPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+  return (
+    <div
+      className={`drop-zone ${over ? 'over' : ''}`}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setOver(true);
+      }}
+      onDragLeave={() => setOver(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setOver(false);
+        const f = e.dataTransfer.files?.[0];
+        if (f) setFile(f);
+      }}
+    >
+      {file ? (
+        <div className="drop-preview">
+          {preview ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={preview} alt="Preview of the selected certification" />
+          ) : (
+            <FileText size={36} aria-hidden="true" />
+          )}
+          <span>
+            <strong>{file.name}</strong>
+            {(file.size / 1024).toFixed(0)} KB
+          </span>
+          <button type="button" className="text-button" onClick={() => setFile(null)}>
+            Remove
+          </button>
+        </div>
+      ) : (
+        <>
+          <Upload size={28} aria-hidden="true" />
+          <p>
+            <strong>Drag a photo or PDF here</strong>
+            {hasDocument ? ' to replace the current proof' : ''}
+          </p>
+        </>
+      )}
+      <label className="drop-browse">
+        <span className="button button-outline button-sm">Browse files</span>
+        <input
+          type="file"
+          accept={ACCEPT}
+          className="sr-only"
+          onChange={(e) => setFile(e.target.files?.[0] || null)}
+        />
+      </label>
+      <small>Up to 5 MB. Uploading proof sends this certification for review.</small>
+    </div>
   );
 }

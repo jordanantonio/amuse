@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Illustration: timber house framing on a residential site">
+  <rect width="320" height="200" fill="#cfe0f2"/>
+  <circle cx="270" cy="40" r="18" fill="#ffd60a"/>
+  <rect y="160" width="320" height="40" fill="#a8c5e6"/>
+  <g fill="none" stroke="#c79500" stroke-width="6" stroke-linejoin="round">
+    <path d="M70 160V90l90-56 90 56v70"/>
+    <path d="M70 90h180M95 90v70M125 90v70M160 90v70M195 90v70M225 90v70"/>
+    <path d="M115 62v28M205 62v28"/>
+  </g>
+  <g stroke="#003c76" stroke-width="3" fill="#ffc300"><rect x="20" y="140" width="40" height="20" rx="3"/></g>
+  <path d="M262 160v-46h22v46" fill="#e9eef4" stroke="#003c76" stroke-width="3"/>
+</svg>

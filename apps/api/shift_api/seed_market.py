@@ -273,11 +273,14 @@ HISTORY = {
     ],
     "u-ilya": [
         ("Sanitation lead hand", "Prairie Harvest Foods", "Leduc", 20, 2,
-         "Ran the overnight sanitation crew of six across two production lines."),
+         "Ran the overnight sanitation crew of six across two production lines.",
+         ["/work/sanitation-line.svg"]),
         ("General labourer", "Westline Builders", "Edmonton", 34, 21,
-         "Site clean-up, material handling and framing support on mid-rise builds."),
+         "Site clean-up, material handling and framing support on mid-rise builds.",
+         ["/work/framing-site.svg"]),
         ("Forklift operator", "ColdLink Storage", "Leduc", 48, 35,
-         "Loaded and staged pallets in a -20 °C freezer warehouse."),
+         "Loaded and staged pallets in a -20 °C freezer warehouse.",
+         ["/work/cold-storage.svg", "/work/forklift-dock.svg"]),
     ],
     "u-maya": [
         ("Electrician", "Riverbend Homes", "Edmonton", 30, 4, "Rough-in and finish on 60+ homes."),
@@ -394,6 +397,9 @@ POSTINGS = [
      "Edmonton", None, 30, 150, "mon_fri", True, 3800, "hour", 6, "open", 60,
      [("cor", R, False), ("cgl-insurance", R, False)]),
     # History: contracts that already ran, for Active / Past and "Completed on Shift".
+    ("p-shutdown", "prairie-harvest", "Sanitation shutdown crew, 14 nights", "General labour", "individual",
+     "Leduc", "6505 Sparrow Dr, Leduc", -75, -61, "nights", True, 2800, "hour", 6, "filled", 2900,
+     [("whmis", R, False)]),
     ("p-upgrade", "northline", "Electrical service upgrade, 2 homes", "Electrical", "individual",
      "Edmonton", "9640 76 Ave NW, Edmonton", -90, -40, "mon_fri", True, 4600, "hour", 1, "filled", 2600,
      [("ab-journeyperson", R, False)]),
@@ -425,6 +431,7 @@ APPLICATIONS = [
     ("p-apprentice", "u-sofia", "shortlisted", "Third-year apprentice, need hours.", 30),
     ("a-framing", "timberline", "applied", "Six framers and a lead hand available.", 25),
     ("p-upgrade", "u-maya", "completed", "", 2500),
+    ("p-shutdown", "u-ilya", "completed", "", 2850),
     ("p-trim", "u-ella", "accepted", "", 500),
     ("p-welder-done", "u-noah", "accepted", "", 300),
 ]
@@ -473,6 +480,27 @@ POSTING_CONTENT = {
     },
 }
 
+
+RATINGS = {("p-shutdown", "u-ilya"): 5, ("p-upgrade", "u-maya"): 5}
+COMPLETED_NOTES = {
+    ("p-shutdown", "u-ilya"): "Led a six-person night crew through a two-line sanitation shutdown with zero recordables.",
+}
+COMPLETED_PHOTOS = {("p-shutdown", "u-ilya"): ["/work/sanitation-line.svg"]}
+# (worker, org, author, rating, quote)
+REVIEWS = [
+    ("u-ilya", "prairie-harvest", "Priya Desai, Prairie Harvest Foods", 5,
+     "Ilya ran our 14-night shutdown crew without a single recordable. The lines were swab-clean every morning."),
+    ("u-ilya", "northline", "Alex Morgan, Northline Homes", 5,
+     "Dependable on site clean-up and easy to work with. The trades noticed the difference."),
+    ("u-ilya", "nisku-fab", "Marcus Lee, Nisku Fabrication Works", 4,
+     "Showed up early every shift and kept the steel yard tidy. Would book again."),
+    ("u-maya", "northline", "Alex Morgan, Northline Homes", 5,
+     "Maya's rough-in passed inspection first time on both homes."),
+]
+PROFILE_EXTRAS = {
+    "u-ilya": (["CSA steel-toe rubber boots", "Own hand tools", "Pickup truck"], ["English", "Russian"]),
+    "u-maya": (["Full electrician's hand tools", "Multimeter", "Cube van"], ["English", "Spanish"]),
+}
 
 # Screening answers (posting, applicant) -> answers. Tyler skipped them (RANK-4 signal).
 ANSWERS = {
@@ -538,7 +566,9 @@ def seed_postings(db: Session, today: date) -> None:
                 db.add(WorkHistory(
                     user_id=who, role=posting.title, company=org.name, city=posting.city,
                     start_date=posting.start_date, end_date=posting.end_date,
-                    description="Completed on Shift.", engagement_id=e.id,
+                    description=COMPLETED_NOTES.get((pid, who), "Completed on Shift."),
+                    engagement_id=e.id, rating=RATINGS.get((pid, who)),
+                    photo_paths=COMPLETED_PHOTOS.get((pid, who), []),
                 ))
 
 
@@ -615,6 +645,16 @@ def seed_crew(db: Session, today: date) -> None:
         db.add(CrewAssignment(slot_id=sid, user_id=uid, status="assigned"))
 
 
+def seed_reviews(db: Session) -> None:
+    from .market_models import Review
+
+    for uid, (tools, languages) in PROFILE_EXTRAS.items():
+        profile = db.get(WorkerProfile, uid)
+        profile.tools, profile.languages = tools, languages
+    for uid, oid, author, rating, quote in REVIEWS:
+        db.add(Review(worker_user_id=uid, org_id=oid, author_name=author, rating=rating, quote=quote))
+
+
 def seed_catalog(db: Session) -> None:
     from .catalog import CREDENTIAL_TYPES
     from .market_models import CredentialType
@@ -666,7 +706,7 @@ def seed_wallets(db: Session, today: date) -> None:
                 )
             )
     for uid, entries in HISTORY.items():
-        for role, company, city, start_ago, end_ago, description in entries:
+        for role, company, city, start_ago, end_ago, description, *photos in entries:
             db.add(
                 WorkHistory(
                     user_id=uid,
@@ -676,6 +716,7 @@ def seed_wallets(db: Session, today: date) -> None:
                     start_date=today - timedelta(days=30 * start_ago),
                     end_date=today - timedelta(days=30 * end_ago) if end_ago is not None else None,
                     description=description,
+                    photo_paths=photos[0] if photos else [],
                 )
             )
 
@@ -740,6 +781,7 @@ def seed_market(db: Session) -> None:
     seed_postings(db, today)
     db.flush()
     seed_crew(db, today)
+    seed_reviews(db)
     db.commit()
 
 

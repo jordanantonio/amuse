@@ -19,7 +19,7 @@ test('worker wallet: expiring warning, add a certification with proof, four-tab 
   await expect(whmis).toContainText('Verified');
   await page.screenshot({ path: 'test-results/v1-profile-desktop.png', fullPage: true });
 
-  await page.getByRole('button', { name: 'Add certification' }).click();
+  await page.getByRole('button', { name: 'Upload certification' }).click();
   const dialog = page.getByRole('dialog', { name: 'Add a certification' });
   await dialog.getByLabel('Type').selectOption('fall-protection');
   await dialog.getByLabel('Expires on').fill('2029-03-31');

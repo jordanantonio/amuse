@@ -56,6 +56,9 @@ class WorkerProfile(Base):
     bio: Mapped[str] = mapped_column(String(1000), default="")
     linkedin_url: Mapped[str | None] = mapped_column(String(300), nullable=True)
     is_public: Mapped[bool] = mapped_column(Boolean, default=True)
+    # PROFILE-5
+    tools: Mapped[list] = mapped_column(JSON, default=list)
+    languages: Mapped[list] = mapped_column(JSON, default=list)
 
 
 class AuditLog(Base):
@@ -132,6 +135,23 @@ class WorkHistory(Base):
     reference_contact: Mapped[str | None] = mapped_column(String(160), nullable=True)
     # Set when the entry was created from a completed Shift contract.
     engagement_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    # PROFILE-3: public paths of work photos, and the employer's rating for Shift contracts.
+    photo_paths: Mapped[list] = mapped_column(JSON, default=list)
+    rating: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+
+class Review(Base):
+    """A short review from a past employer on Shift (PROFILE-5)."""
+
+    __tablename__ = "reviews"
+    __table_args__ = (CheckConstraint("rating BETWEEN 1 AND 5"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    worker_user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    org_id: Mapped[str] = mapped_column(ForeignKey("organizations.id"))
+    author_name: Mapped[str] = mapped_column(String(160))
+    rating: Mapped[int] = mapped_column(Integer)
+    quote: Mapped[str] = mapped_column(String(600))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
 class Notification(Base):
