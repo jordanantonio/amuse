@@ -14,6 +14,12 @@ def check_trades(value):
     return value
 
 
+def check_trade(value):
+    if value not in TRADES:
+        raise ValueError("Choose a trade from the list")
+    return value
+
+
 def check_city(value):
     if value is not None and value not in CITIES:
         raise ValueError("Choose a city from the list")
@@ -269,6 +275,219 @@ class NotificationsView(BaseModel):
     unread: int
     work_badge: int
     items: list[NotificationView]
+
+
+PostingType = Literal["individual", "agency"]
+PayUnit = Literal["hour", "day", "fixed"]
+Pattern = Literal["mon_fri", "nights", "four_on_four_off", "weekends"]
+
+
+class RequirementInput(BaseModel):
+    credential_type_id: str
+    required: bool = True
+    must_be_verified: bool = False
+
+
+class PostingInput(BaseModel):
+    title: str = Field(min_length=3, max_length=160)
+    trade: str
+    description: str = Field("", max_length=3000)
+    posting_type: PostingType = "individual"
+    city: str
+    site_address: str | None = Field(None, max_length=300)
+    start_date: date
+    end_date: date
+    schedule_pattern: Pattern = "mon_fri"
+    is_exclusive: bool = True
+    pay_rate_cents: int = Field(gt=0, le=10_000_000)
+    pay_unit: PayUnit = "hour"
+    headcount: int = Field(1, ge=1, le=200)
+    requirements: list[RequirementInput] = Field(default_factory=list, max_length=20)
+    status: Literal["draft", "open"] = "open"
+
+    _trade = field_validator("trade")(classmethod(lambda cls, v: check_trade(v)))
+    _city = field_validator("city")(classmethod(lambda cls, v: check_city(v)))
+
+    @model_validator(mode="after")
+    def dates(self):
+        if self.end_date < self.start_date:
+            raise ValueError("The end date must be on or after the start date")
+        ids = [r.credential_type_id for r in self.requirements]
+        if len(ids) != len(set(ids)):
+            raise ValueError("Each credential can be listed once")
+        return self
+
+
+class OrgRef(BaseModel):
+    id: str
+    name: str
+    kind: str
+    verified: bool
+
+
+class MatchItem(BaseModel):
+    credential_type_id: str
+    name: str
+    required: bool
+    must_be_verified: bool
+    state: Literal["ok", "pending", "missing"]
+
+
+class Match(BaseModel):
+    required_total: int
+    required_held: int
+    items: list[MatchItem]
+
+
+class ScorePart(BaseModel):
+    label: str
+    points: int
+
+
+class PostingCard(BaseModel):
+    id: str
+    title: str
+    trade: str
+    posting_type: PostingType
+    org: OrgRef
+    city: str
+    start_date: date
+    end_date: date
+    schedule_pattern: str
+    is_exclusive: bool
+    pay_rate_cents: int
+    pay_unit: PayUnit
+    headcount: int
+    status: str
+    created_at: datetime
+    match: Match
+    eligible: bool
+    reasons: list[str]
+    distance_km: int | None = None
+    score: int | None = None
+    score_breakdown: list[ScorePart] = []
+    is_new: bool = False
+    site_address: str | None = None
+    description: str | None = None
+    applicants: int | None = None
+    new_applicants: int | None = None
+    offers_out: int | None = None
+    hired: int | None = None
+
+
+class FeedView(BaseModel):
+    items: list[PostingCard]
+    new_count: int
+
+
+class ApplicantSummary(BaseModel):
+    kind: Literal["worker", "agency"]
+    id: str
+    name: str
+    headline: str
+    city: str
+    distance_km: int | None = None
+    verified: bool | None = None
+
+
+class EngagementSummary(BaseModel):
+    id: str
+    start_date: date
+    end_date: date
+    is_exclusive: bool
+    schedule_pattern: str
+    status: str
+    calendar_synced: bool
+
+
+class ApplicationView(BaseModel):
+    id: str
+    status: str
+    note: str
+    proposed_rate_cents: int | None
+    crew_size: int | None
+    initiated_by: str
+    created_at: datetime
+    updated_at: datetime
+    applicant: ApplicantSummary
+    posting: PostingCard
+    engagement: EngagementSummary | None
+
+
+class PostingDetail(BaseModel):
+    posting: PostingCard
+    description: str
+    is_owner: bool
+    my_application: ApplicationView | None
+
+
+class ApplyInput(BaseModel):
+    note: str = Field("", max_length=1000)
+    proposed_rate_cents: int | None = Field(None, gt=0, le=10_000_000)
+    crew_size: int | None = Field(None, ge=1, le=500)
+
+
+class ActionInput(BaseModel):
+    action: Literal["shortlist", "offer", "decline", "withdraw_offer", "decline_offer", "withdraw"]
+
+
+class WorkView(BaseModel):
+    applied: list[ApplicationView]
+    offers: list[ApplicationView]
+    active: list[ApplicationView]
+    past: list[ApplicationView]
+
+
+class OrgEngagementItem(BaseModel):
+    engagement: EngagementSummary
+    application_id: str
+    posting_id: str
+    posting_title: str
+    applicant: ApplicantSummary
+
+
+class OrgWorkView(BaseModel):
+    postings: list[PostingCard]
+    active: list[OrgEngagementItem]
+    past: list[OrgEngagementItem]
+
+
+class NewApplicant(BaseModel):
+    application_id: str
+    posting_id: str
+    posting_title: str
+    name: str
+    created_at: datetime
+
+
+class NextShift(BaseModel):
+    application_id: str
+    posting_title: str
+    org_name: str
+    start_date: date
+    end_date: date
+    city: str
+
+
+class HomeView(BaseModel):
+    next_shift: NextShift | None = None
+    offers: list[ApplicationView] = []
+    expiring: list[CredentialView] = []
+    new_applicants: list[NewApplicant] = []
+    offers_awaiting: int = 0
+    open_postings: int = 0
+    active_contracts: int = 0
+
+
+class TalentCard(BaseModel):
+    id: str
+    name: str
+    headline: str
+    trades: list[str]
+    city: str
+    distance_km: int | None
+    verified_tickets: int
+    tickets: int
 
 
 class City(BaseModel):

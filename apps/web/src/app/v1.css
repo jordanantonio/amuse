@@ -947,6 +947,563 @@ input[type='range'] {
   color: var(--text-2);
 }
 
+/* ---------- Home: Today, feed, filters ---------- */
+.today {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.today .today-item {
+  margin: 0;
+}
+.today-item.ok svg {
+  color: var(--ok);
+}
+.today-item:hover {
+  border-color: var(--line-strong);
+}
+.new-since {
+  margin-top: 28px;
+  padding: 16px 18px;
+  border-radius: var(--r-panel);
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+}
+.new-since h2 {
+  font-size: 20px;
+}
+.new-since ul {
+  display: grid;
+  gap: 4px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.new-since a {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  min-height: 44px;
+  align-items: center;
+}
+.new-since a span {
+  color: var(--text-3);
+}
+.new-since a:hover strong {
+  color: var(--gold);
+}
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--surface);
+}
+.filters label {
+  font-size: 15px;
+}
+.filters select,
+.filters input[type='date'] {
+  min-width: 150px;
+}
+.filter-search {
+  flex: 1 1 260px;
+  position: relative;
+}
+.filter-search svg {
+  position: absolute;
+  left: 12px;
+  bottom: 13px;
+  color: var(--text-3);
+}
+.filter-search input {
+  width: 100%;
+  padding-left: 40px !important;
+}
+label.toggle {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-weight: 500;
+}
+label.toggle input {
+  width: 22px;
+  height: 22px;
+  min-height: 0 !important;
+  accent-color: var(--yellow);
+}
+.feed-list {
+  display: grid;
+  gap: 14px;
+}
+.contract-card h3 a:hover {
+  color: var(--gold);
+}
+.contract-card.ineligible {
+  border-style: dashed;
+}
+.contract-card.ineligible .contract-card-head,
+.contract-card.ineligible .contract-facts,
+.contract-card.ineligible .contract-pay {
+  opacity: 0.6;
+}
+.contract-card-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.new-chip {
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+.contract-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+}
+.why .popover-panel {
+  left: 0;
+  right: auto;
+  width: min(380px, calc(100vw - 48px));
+}
+.why-panel ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0 10px;
+  list-style: none;
+}
+.why-panel li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-2);
+}
+.why-panel li strong {
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+.why-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding: 10px;
+  border-top: 1px solid var(--line);
+}
+.inline-link {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.talent-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--surface);
+}
+.talent-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+}
+.talent-row + .talent-row {
+  border-top: 1px solid var(--line);
+}
+.talent-row p:not(.wallet-meta) {
+  color: var(--text-2);
+}
+.talent-side {
+  display: grid;
+  justify-items: end;
+  align-content: start;
+  gap: 6px;
+  text-align: right;
+}
+
+/* ---------- Posting page ---------- */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin-bottom: 8px;
+  color: var(--text-2);
+}
+.back-link:hover {
+  color: var(--gold);
+}
+.posting-page {
+  display: grid;
+  gap: 14px;
+  max-width: 760px;
+}
+.posting-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+.posting-head h1 {
+  font-size: 34px;
+}
+.site-address {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-2);
+}
+.eligibility {
+  margin-top: 12px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--surface);
+}
+.eligibility h2 {
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+.eligibility h3 {
+  margin: 14px 0 6px;
+  font-size: 16px;
+  color: var(--text-3);
+}
+.eligibility ul {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.elig-row {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+.elig-row span {
+  display: grid;
+}
+.elig-row small {
+  font-size: 14px;
+  color: var(--text-3);
+}
+.elig-row.ok svg,
+.elig-row.ok strong {
+  color: var(--ok);
+}
+.elig-row.pending svg,
+.elig-row.pending strong {
+  color: var(--gold);
+}
+.elig-row.missing svg,
+.elig-row.missing strong {
+  color: var(--danger);
+}
+.elig-row strong {
+  font-size: 15px;
+  font-weight: 500;
+}
+.posting-description {
+  max-width: 68ch;
+  margin-top: 8px;
+  color: var(--text-2);
+}
+.posting-action {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+}
+.apply-form {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+}
+.apply-form .button {
+  justify-self: start;
+}
+.application-block {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+.application-block-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+/* ---------- Work ---------- */
+.page-head-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.page-head-row .page-title {
+  margin: 0;
+}
+.page-head-row .text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.v1-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line);
+}
+.v1-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--text-2);
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.v1-tabs button.active {
+  border-bottom-color: var(--accent);
+  color: var(--text);
+}
+.tab-count {
+  min-width: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  background: var(--raised);
+  font-size: 13px;
+  line-height: 22px;
+  text-align: center;
+}
+.v1-tabs button.active .tab-count {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.work-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.work-row,
+.applicant-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--surface);
+}
+.work-row-main,
+.applicant-main {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+.work-row-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+.work-row-title:hover {
+  color: var(--gold);
+}
+.posting-counts {
+  color: var(--text-2);
+}
+.posting-row-side,
+.applicant-side {
+  display: grid;
+  justify-items: end;
+  gap: 10px;
+}
+.posting-row-side .actions,
+.applicant-side .actions {
+  justify-content: flex-end;
+}
+.closed-list {
+  margin-top: 16px;
+}
+.posting-select {
+  max-width: 480px;
+  margin-bottom: 16px;
+}
+.applicant-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+}
+.applicant-main > p:not(.wallet-meta):not(.match-line) {
+  color: var(--text-2);
+}
+.applicant-note {
+  padding-left: 12px;
+  border-left: 3px solid var(--line-strong);
+  font-style: italic;
+}
+.offer-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid color-mix(in oklab, var(--yellow) 55%, transparent);
+  border-radius: var(--r-panel);
+  background: var(--surface);
+}
+.offer-terms {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+.offer-terms dt {
+  font-size: 14px;
+  color: var(--text-3);
+}
+.offer-terms dd {
+  margin: 2px 0 0;
+  font-weight: 500;
+}
+
+/* ---------- Posting form ---------- */
+.field-row.three {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.segmented-field {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.segmented-field legend {
+  width: 100%;
+}
+.req-field small {
+  display: block;
+  margin-bottom: 8px;
+}
+.req-list {
+  display: grid;
+  gap: 4px;
+  max-height: 280px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: var(--r-control);
+}
+.req {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+  padding: 6px 10px;
+}
+.req.on {
+  background: var(--accent-soft);
+}
+.req.nice {
+  background: var(--raised);
+}
+.req-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.req-buttons button {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 18px;
+  background: transparent;
+  font-size: 14px;
+}
+.req-buttons button[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.mini-check {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+}
+.mini-check input {
+  min-height: 0 !important;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--yellow);
+}
+
+@media (max-width: 767px) {
+  .work-row,
+  .applicant-row,
+  .talent-row {
+    flex-direction: column;
+  }
+  .posting-row-side,
+  .applicant-side,
+  .talent-side {
+    justify-items: start;
+    text-align: left;
+  }
+  .posting-row-side .actions,
+  .applicant-side .actions {
+    justify-content: flex-start;
+  }
+  .field-row.three {
+    grid-template-columns: 1fr 1fr;
+  }
+  .filters {
+    padding: 12px;
+  }
+  .filters label:not(.filter-search):not(.toggle) {
+    flex: 1 1 140px;
+  }
+  .filters select,
+  .filters input[type='date'] {
+    min-width: 0;
+    width: 100%;
+  }
+  .posting-head h1 {
+    font-size: 28px;
+  }
+}
+
 @media (max-width: 767px) {
   .v1-shell {
     grid-template-columns: 1fr;

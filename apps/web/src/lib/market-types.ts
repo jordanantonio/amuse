@@ -117,6 +117,149 @@ export type Notification = {
 };
 export type Notifications = { unread: number; work_badge: number; items: Notification[] };
 
+export type MatchItem = {
+  credential_type_id: string;
+  name: string;
+  required: boolean;
+  must_be_verified: boolean;
+  state: 'ok' | 'pending' | 'missing';
+};
+
+export type PostingCard = {
+  id: string;
+  title: string;
+  trade: string;
+  posting_type: 'individual' | 'agency';
+  org: { id: string; name: string; kind: string; verified: boolean };
+  city: string;
+  start_date: string;
+  end_date: string;
+  schedule_pattern: string;
+  is_exclusive: boolean;
+  pay_rate_cents: number;
+  pay_unit: 'hour' | 'day' | 'fixed';
+  headcount: number;
+  status: 'draft' | 'open' | 'filled' | 'closed';
+  created_at: string;
+  match: { required_total: number; required_held: number; items: MatchItem[] };
+  eligible: boolean;
+  reasons: string[];
+  distance_km?: number | null;
+  score?: number | null;
+  score_breakdown?: { label: string; points: number }[];
+  is_new?: boolean;
+  site_address?: string | null;
+  description?: string | null;
+  applicants?: number | null;
+  new_applicants?: number | null;
+  offers_out?: number | null;
+  hired?: number | null;
+};
+
+export type Feed = { items: PostingCard[]; new_count: number };
+
+export type ApplicantSummary = {
+  kind: 'worker' | 'agency';
+  id: string;
+  name: string;
+  headline: string;
+  city: string;
+  distance_km?: number | null;
+  verified?: boolean | null;
+};
+
+export type EngagementSummary = {
+  id: string;
+  start_date: string;
+  end_date: string;
+  is_exclusive: boolean;
+  schedule_pattern: string;
+  status: 'active' | 'completed' | 'cancelled';
+  calendar_synced: boolean;
+};
+
+export type ApplicationStatus =
+  | 'applied'
+  | 'invited'
+  | 'shortlisted'
+  | 'offered'
+  | 'accepted'
+  | 'declined'
+  | 'withdrawn'
+  | 'completed';
+
+export type ApplicationView = {
+  id: string;
+  status: ApplicationStatus;
+  note: string;
+  proposed_rate_cents: number | null;
+  crew_size: number | null;
+  initiated_by: string;
+  created_at: string;
+  updated_at: string;
+  applicant: ApplicantSummary;
+  posting: PostingCard;
+  engagement: EngagementSummary | null;
+};
+
+export type PostingDetail = {
+  posting: PostingCard;
+  description: string;
+  is_owner: boolean;
+  my_application: ApplicationView | null;
+};
+
+export type WorkView = {
+  applied: ApplicationView[];
+  offers: ApplicationView[];
+  active: ApplicationView[];
+  past: ApplicationView[];
+};
+
+export type OrgEngagement = {
+  engagement: EngagementSummary;
+  application_id: string;
+  posting_id: string;
+  posting_title: string;
+  applicant: ApplicantSummary;
+};
+
+export type OrgWork = { postings: PostingCard[]; active: OrgEngagement[]; past: OrgEngagement[] };
+
+export type HomeView = {
+  next_shift: {
+    application_id: string;
+    posting_title: string;
+    org_name: string;
+    start_date: string;
+    end_date: string;
+    city: string;
+  } | null;
+  offers: ApplicationView[];
+  expiring: Credential[];
+  new_applicants: {
+    application_id: string;
+    posting_id: string;
+    posting_title: string;
+    name: string;
+    created_at: string;
+  }[];
+  offers_awaiting: number;
+  open_postings: number;
+  active_contracts: number;
+};
+
+export type TalentCard = {
+  id: string;
+  name: string;
+  headline: string;
+  trades: string[];
+  city: string;
+  distance_km: number | null;
+  verified_tickets: number;
+  tickets: number;
+};
+
 export type DemoAccount = {
   id: string;
   full_name: string;

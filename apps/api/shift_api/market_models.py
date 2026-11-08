@@ -15,6 +15,7 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
+    UniqueConstraint,
     false,
 )
 from sqlalchemy.orm import Mapped, mapped_column
@@ -140,6 +141,120 @@ class Notification(Base):
     payload: Mapped[dict] = mapped_column(JSON, default=dict)
     read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class Posting(Base):
+    """A contract a business posts: hire a person (individual) or a crew (agency)."""
+
+    __tablename__ = "postings"
+    __table_args__ = (
+        CheckConstraint("end_date >= start_date"),
+        CheckConstraint("posting_type IN ('individual','agency')"),
+        CheckConstraint("status IN ('draft','open','filled','closed')"),
+        CheckConstraint("pay_unit IN ('hour','day','fixed')"),
+        CheckConstraint("pay_rate_cents > 0 AND headcount > 0"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    org_id: Mapped[str] = mapped_column(ForeignKey("organizations.id"), index=True)
+    title: Mapped[str] = mapped_column(String(160))
+    trade: Mapped[str] = mapped_column(String(60))
+    description: Mapped[str] = mapped_column(String(3000), default="")
+    posting_type: Mapped[str] = mapped_column(String(20), default="individual")
+    city: Mapped[str] = mapped_column(String(100))
+    lat: Mapped[float | None] = mapped_column(Float, nullable=True)
+    lng: Mapped[float | None] = mapped_column(Float, nullable=True)
+    # Hidden from applicants until they receive an offer.
+    site_address: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    start_date: Mapped[date] = mapped_column(Date)
+    end_date: Mapped[date] = mapped_column(Date)
+    schedule_pattern: Mapped[str] = mapped_column(String(30), default="mon_fri")
+    is_exclusive: Mapped[bool] = mapped_column(Boolean, default=True)
+    pay_rate_cents: Mapped[int] = mapped_column(Integer)
+    pay_unit: Mapped[str] = mapped_column(String(10), default="hour")
+    headcount: Mapped[int] = mapped_column(Integer, default=1)
+    status: Mapped[str] = mapped_column(String(10), default="open", index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class PostingRequirement(Base):
+    __tablename__ = "posting_requirements"
+    posting_id: Mapped[str] = mapped_column(ForeignKey("postings.id"), primary_key=True)
+    credential_type_id: Mapped[str] = mapped_column(
+        ForeignKey("credential_types.id"), primary_key=True
+    )
+    # required=False means nice-to-have: improves ranking, never gates eligibility.
+    required: Mapped[bool] = mapped_column(Boolean, default=True)
+    must_be_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class ContractApplication(Base):
+    __tablename__ = "contract_applications"
+    __table_args__ = (
+        CheckConstraint("(applicant_user_id IS NULL) != (applicant_org_id IS NULL)"),
+        CheckConstraint(
+            "status IN ('applied','invited','shortlisted','offered','accepted',"
+            "'declined','withdrawn','completed')"
+        ),
+        UniqueConstraint("posting_id", "applicant_user_id"),
+        UniqueConstraint("posting_id", "applicant_org_id"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    posting_id: Mapped[str] = mapped_column(ForeignKey("postings.id"), index=True)
+    applicant_user_id: Mapped[str | None] = mapped_column(
+        ForeignKey("users.id"), nullable=True, index=True
+    )
+    applicant_org_id: Mapped[str | None] = mapped_column(
+        ForeignKey("organizations.id"), nullable=True, index=True
+    )
+    # 'applicant' | 'business'
+    initiated_by: Mapped[str] = mapped_column(String(20), default="applicant")
+    status: Mapped[str] = mapped_column(String(20), default="applied")
+    note: Mapped[str] = mapped_column(String(1000), default="")
+    proposed_rate_cents: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    crew_size: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class Engagement(Base):
+    """An accepted contract. Its availability blocks are the source of truth (FLOW-4)."""
+
+    __tablename__ = "engagements"
+    __table_args__ = (CheckConstraint("status IN ('active','completed','cancelled')"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    application_id: Mapped[str] = mapped_column(
+        ForeignKey("contract_applications.id"), unique=True
+    )
+    start_date: Mapped[date] = mapped_column(Date)
+    end_date: Mapped[date] = mapped_column(Date)
+    is_exclusive: Mapped[bool] = mapped_column(Boolean)
+    schedule_pattern: Mapped[str] = mapped_column(String(30))
+    status: Mapped[str] = mapped_column(String(20), default="active")
+    google_event_ids: Mapped[list] = mapped_column(JSON, default=list)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class AvailabilityBlock(Base):
+    """Dates someone is unavailable: booked by an engagement or added by hand."""
+
+    __tablename__ = "availability_blocks"
+    __table_args__ = (
+        CheckConstraint("end_date >= start_date"),
+        CheckConstraint("source IN ('engagement','manual')"),
+        CheckConstraint("(user_id IS NULL) != (org_id IS NULL)"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    org_id: Mapped[str | None] = mapped_column(
+        ForeignKey("organizations.id"), nullable=True, index=True
+    )
+    start_date: Mapped[date] = mapped_column(Date)
+    end_date: Mapped[date] = mapped_column(Date)
+    source: Mapped[str] = mapped_column(String(20))
+    engagement_id: Mapped[str | None] = mapped_column(
+        ForeignKey("engagements.id"), nullable=True, index=True
+    )
+    note: Mapped[str] = mapped_column(String(200), default="")
 
 
 class OrgMember(Base):

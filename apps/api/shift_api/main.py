@@ -151,11 +151,14 @@ from .adaptive_routes import router as adaptive_router
 from .auth_routes import router as auth_router
 from .market_routes import router as market_router
 from .profile_routes import router as profile_router
+from .posting_routes import dev as dev_router, router as posting_router
 
 app.include_router(adaptive_router)
 app.include_router(auth_router)
 app.include_router(market_router)
 app.include_router(profile_router)
+app.include_router(posting_router)
+app.include_router(dev_router)
 
 
 @app.exception_handler(IntegrityError)

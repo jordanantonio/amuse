@@ -53,6 +53,33 @@ SCHEDULE_PATTERNS = {
 }
 
 
+# Plain-language starting points for a posting description, by trade (POST-1).
+TEMPLATES = {
+    "Electrical": "We need a journeyperson electrician for rough-in, wiring and device "
+    "finishing. You'll read prints, work to the CEC and coordinate with other trades on site.",
+    "Carpentry": "We need a carpenter for framing, trim and finishing work. Bring your own "
+    "hand tools; power tools and materials are on site.",
+    "Framing": "We need framers for walls, floors and roof systems on production homes. "
+    "Crews work from plans with a lead hand on site.",
+    "Plumbing": "We need a plumber for rough-in and finishing, including DWV, water lines "
+    "and fixture setting.",
+    "Welding": "We need a welder for structural and pipe work in our shop. Work is to "
+    "drawing with QC sign-off on every joint.",
+    "Pipefitting": "We need a pipefitter to fabricate and install process piping from "
+    "isometric drawings.",
+    "Millwright": "We need a millwright for equipment installation, alignment and "
+    "maintenance during the work window.",
+    "Heavy equipment": "We need an equipment operator for site work. Machines are "
+    "maintained and fuelled by us.",
+    "Forklift & warehouse": "We need forklift operators to load, unload and move "
+    "product safely through the warehouse.",
+    "Food processing": "We need production workers for our processing lines. "
+    "Food-safety training is provided on day one.",
+    "Concrete": "We need concrete workers for forming, placing and finishing.",
+    "General labour": "We need general labourers for site clean-up, material handling "
+    "and helping the trades.",
+}
+
 ACSA = "Alberta Construction Safety Association"
 # (id, name, category, default issuer, applies_to, has_expiry) — seeded into
 # credential_types; the catalog is data and can grow without code changes.

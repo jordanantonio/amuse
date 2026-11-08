@@ -22,6 +22,207 @@
         "title": "AbsenceInput",
         "type": "object"
       },
+      "ActionInput": {
+        "properties": {
+          "action": {
+            "enum": [
+              "shortlist",
+              "offer",
+              "decline",
+              "withdraw_offer",
+              "decline_offer",
+              "withdraw"
+            ],
+            "title": "Action",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "title": "ActionInput",
+        "type": "object"
+      },
+      "ApplicantSummary": {
+        "properties": {
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "distance_km": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Km"
+          },
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "worker",
+              "agency"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "verified": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "name",
+          "headline",
+          "city"
+        ],
+        "title": "ApplicantSummary",
+        "type": "object"
+      },
+      "ApplicationView": {
+        "properties": {
+          "applicant": {
+            "$ref": "#/components/schemas/ApplicantSummary"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "crew_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Crew Size"
+          },
+          "engagement": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EngagementSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "initiated_by": {
+            "title": "Initiated By",
+            "type": "string"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "posting": {
+            "$ref": "#/components/schemas/PostingCard"
+          },
+          "proposed_rate_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proposed Rate Cents"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "note",
+          "proposed_rate_cents",
+          "crew_size",
+          "initiated_by",
+          "created_at",
+          "updated_at",
+          "applicant",
+          "posting",
+          "engagement"
+        ],
+        "title": "ApplicationView",
+        "type": "object"
+      },
+      "ApplyInput": {
+        "properties": {
+          "crew_size": {
+            "anyOf": [
+              {
+                "maximum": 500.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Crew Size"
+          },
+          "note": {
+            "default": "",
+            "maxLength": 1000,
+            "title": "Note",
+            "type": "string"
+          },
+          "proposed_rate_cents": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 10000000.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proposed Rate Cents"
+          }
+        },
+        "title": "ApplyInput",
+        "type": "object"
+      },
       "ApprovalView": {
         "properties": {
           "actor": {
@@ -867,6 +1068,72 @@
         "title": "DraftView",
         "type": "object"
       },
+      "EngagementSummary": {
+        "properties": {
+          "calendar_synced": {
+            "title": "Calendar Synced",
+            "type": "boolean"
+          },
+          "end_date": {
+            "format": "date",
+            "title": "End Date",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "is_exclusive": {
+            "title": "Is Exclusive",
+            "type": "boolean"
+          },
+          "schedule_pattern": {
+            "title": "Schedule Pattern",
+            "type": "string"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "start_date",
+          "end_date",
+          "is_exclusive",
+          "schedule_pattern",
+          "status",
+          "calendar_synced"
+        ],
+        "title": "EngagementSummary",
+        "type": "object"
+      },
+      "FeedView": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PostingCard"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "new_count": {
+            "title": "New Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "new_count"
+        ],
+        "title": "FeedView",
+        "type": "object"
+      },
       "ForecastInput": {
         "additionalProperties": false,
         "properties": {
@@ -951,6 +1218,61 @@
           }
         },
         "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HomeView": {
+        "properties": {
+          "active_contracts": {
+            "default": 0,
+            "title": "Active Contracts",
+            "type": "integer"
+          },
+          "expiring": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/CredentialView"
+            },
+            "title": "Expiring",
+            "type": "array"
+          },
+          "new_applicants": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/NewApplicant"
+            },
+            "title": "New Applicants",
+            "type": "array"
+          },
+          "next_shift": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NextShift"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "offers": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ApplicationView"
+            },
+            "title": "Offers",
+            "type": "array"
+          },
+          "offers_awaiting": {
+            "default": 0,
+            "title": "Offers Awaiting",
+            "type": "integer"
+          },
+          "open_postings": {
+            "default": 0,
+            "title": "Open Postings",
+            "type": "integer"
+          }
+        },
+        "title": "HomeView",
         "type": "object"
       },
       "InviteInput": {
@@ -1102,6 +1424,70 @@
         "title": "JobView",
         "type": "object"
       },
+      "Match": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MatchItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "required_held": {
+            "title": "Required Held",
+            "type": "integer"
+          },
+          "required_total": {
+            "title": "Required Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "required_total",
+          "required_held",
+          "items"
+        ],
+        "title": "Match",
+        "type": "object"
+      },
+      "MatchItem": {
+        "properties": {
+          "credential_type_id": {
+            "title": "Credential Type Id",
+            "type": "string"
+          },
+          "must_be_verified": {
+            "title": "Must Be Verified",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "required": {
+            "title": "Required",
+            "type": "boolean"
+          },
+          "state": {
+            "enum": [
+              "ok",
+              "pending",
+              "missing"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "credential_type_id",
+          "name",
+          "required",
+          "must_be_verified",
+          "state"
+        ],
+        "title": "MatchItem",
+        "type": "object"
+      },
       "MeView": {
         "properties": {
           "calendar_connected": {
@@ -1213,6 +1599,80 @@
           "schedule_patterns"
         ],
         "title": "Meta",
+        "type": "object"
+      },
+      "NewApplicant": {
+        "properties": {
+          "application_id": {
+            "title": "Application Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "posting_id": {
+            "title": "Posting Id",
+            "type": "string"
+          },
+          "posting_title": {
+            "title": "Posting Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "posting_id",
+          "posting_title",
+          "name",
+          "created_at"
+        ],
+        "title": "NewApplicant",
+        "type": "object"
+      },
+      "NextShift": {
+        "properties": {
+          "application_id": {
+            "title": "Application Id",
+            "type": "string"
+          },
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "end_date": {
+            "format": "date",
+            "title": "End Date",
+            "type": "string"
+          },
+          "org_name": {
+            "title": "Org Name",
+            "type": "string"
+          },
+          "posting_title": {
+            "title": "Posting Title",
+            "type": "string"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "posting_title",
+          "org_name",
+          "start_date",
+          "end_date",
+          "city"
+        ],
+        "title": "NextShift",
         "type": "object"
       },
       "NextStep": {
@@ -1428,6 +1888,37 @@
         "title": "OnboardingInput",
         "type": "object"
       },
+      "OrgEngagementItem": {
+        "properties": {
+          "applicant": {
+            "$ref": "#/components/schemas/ApplicantSummary"
+          },
+          "application_id": {
+            "title": "Application Id",
+            "type": "string"
+          },
+          "engagement": {
+            "$ref": "#/components/schemas/EngagementSummary"
+          },
+          "posting_id": {
+            "title": "Posting Id",
+            "type": "string"
+          },
+          "posting_title": {
+            "title": "Posting Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "engagement",
+          "application_id",
+          "posting_id",
+          "posting_title",
+          "applicant"
+        ],
+        "title": "OrgEngagementItem",
+        "type": "object"
+      },
       "OrgInput": {
         "properties": {
           "about": {
@@ -1512,6 +2003,34 @@
           "credentials"
         ],
         "title": "OrgProfileView",
+        "type": "object"
+      },
+      "OrgRef": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "verified": {
+            "title": "Verified",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "verified"
+        ],
+        "title": "OrgRef",
         "type": "object"
       },
       "OrgView": {
@@ -1600,6 +2119,38 @@
           "verification_status"
         ],
         "title": "OrgView",
+        "type": "object"
+      },
+      "OrgWorkView": {
+        "properties": {
+          "active": {
+            "items": {
+              "$ref": "#/components/schemas/OrgEngagementItem"
+            },
+            "title": "Active",
+            "type": "array"
+          },
+          "past": {
+            "items": {
+              "$ref": "#/components/schemas/OrgEngagementItem"
+            },
+            "title": "Past",
+            "type": "array"
+          },
+          "postings": {
+            "items": {
+              "$ref": "#/components/schemas/PostingCard"
+            },
+            "title": "Postings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "postings",
+          "active",
+          "past"
+        ],
+        "title": "OrgWorkView",
         "type": "object"
       },
       "Persona": {
@@ -1708,6 +2259,372 @@
           }
         },
         "title": "PolicyInput",
+        "type": "object"
+      },
+      "PostingCard": {
+        "properties": {
+          "applicants": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applicants"
+          },
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "distance_km": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Km"
+          },
+          "eligible": {
+            "title": "Eligible",
+            "type": "boolean"
+          },
+          "end_date": {
+            "format": "date",
+            "title": "End Date",
+            "type": "string"
+          },
+          "headcount": {
+            "title": "Headcount",
+            "type": "integer"
+          },
+          "hired": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hired"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "is_exclusive": {
+            "title": "Is Exclusive",
+            "type": "boolean"
+          },
+          "is_new": {
+            "default": false,
+            "title": "Is New",
+            "type": "boolean"
+          },
+          "match": {
+            "$ref": "#/components/schemas/Match"
+          },
+          "new_applicants": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Applicants"
+          },
+          "offers_out": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offers Out"
+          },
+          "org": {
+            "$ref": "#/components/schemas/OrgRef"
+          },
+          "pay_rate_cents": {
+            "title": "Pay Rate Cents",
+            "type": "integer"
+          },
+          "pay_unit": {
+            "enum": [
+              "hour",
+              "day",
+              "fixed"
+            ],
+            "title": "Pay Unit",
+            "type": "string"
+          },
+          "posting_type": {
+            "enum": [
+              "individual",
+              "agency"
+            ],
+            "title": "Posting Type",
+            "type": "string"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "schedule_pattern": {
+            "title": "Schedule Pattern",
+            "type": "string"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "score_breakdown": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ScorePart"
+            },
+            "title": "Score Breakdown",
+            "type": "array"
+          },
+          "site_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site Address"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "trade": {
+            "title": "Trade",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "trade",
+          "posting_type",
+          "org",
+          "city",
+          "start_date",
+          "end_date",
+          "schedule_pattern",
+          "is_exclusive",
+          "pay_rate_cents",
+          "pay_unit",
+          "headcount",
+          "status",
+          "created_at",
+          "match",
+          "eligible",
+          "reasons"
+        ],
+        "title": "PostingCard",
+        "type": "object"
+      },
+      "PostingDetail": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "is_owner": {
+            "title": "Is Owner",
+            "type": "boolean"
+          },
+          "my_application": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ApplicationView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "posting": {
+            "$ref": "#/components/schemas/PostingCard"
+          }
+        },
+        "required": [
+          "posting",
+          "description",
+          "is_owner",
+          "my_application"
+        ],
+        "title": "PostingDetail",
+        "type": "object"
+      },
+      "PostingInput": {
+        "properties": {
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "maxLength": 3000,
+            "title": "Description",
+            "type": "string"
+          },
+          "end_date": {
+            "format": "date",
+            "title": "End Date",
+            "type": "string"
+          },
+          "headcount": {
+            "default": 1,
+            "maximum": 200.0,
+            "minimum": 1.0,
+            "title": "Headcount",
+            "type": "integer"
+          },
+          "is_exclusive": {
+            "default": true,
+            "title": "Is Exclusive",
+            "type": "boolean"
+          },
+          "pay_rate_cents": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 10000000.0,
+            "title": "Pay Rate Cents",
+            "type": "integer"
+          },
+          "pay_unit": {
+            "default": "hour",
+            "enum": [
+              "hour",
+              "day",
+              "fixed"
+            ],
+            "title": "Pay Unit",
+            "type": "string"
+          },
+          "posting_type": {
+            "default": "individual",
+            "enum": [
+              "individual",
+              "agency"
+            ],
+            "title": "Posting Type",
+            "type": "string"
+          },
+          "requirements": {
+            "items": {
+              "$ref": "#/components/schemas/RequirementInput"
+            },
+            "maxItems": 20,
+            "title": "Requirements",
+            "type": "array"
+          },
+          "schedule_pattern": {
+            "default": "mon_fri",
+            "enum": [
+              "mon_fri",
+              "nights",
+              "four_on_four_off",
+              "weekends"
+            ],
+            "title": "Schedule Pattern",
+            "type": "string"
+          },
+          "site_address": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site Address"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          },
+          "status": {
+            "default": "open",
+            "enum": [
+              "draft",
+              "open"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 160,
+            "minLength": 3,
+            "title": "Title",
+            "type": "string"
+          },
+          "trade": {
+            "title": "Trade",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "trade",
+          "city",
+          "start_date",
+          "end_date",
+          "pay_rate_cents"
+        ],
+        "title": "PostingInput",
         "type": "object"
       },
       "ProfileView": {
@@ -2083,6 +3000,29 @@
         "title": "RecoveryView",
         "type": "object"
       },
+      "RequirementInput": {
+        "properties": {
+          "credential_type_id": {
+            "title": "Credential Type Id",
+            "type": "string"
+          },
+          "must_be_verified": {
+            "default": false,
+            "title": "Must Be Verified",
+            "type": "boolean"
+          },
+          "required": {
+            "default": true,
+            "title": "Required",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "credential_type_id"
+        ],
+        "title": "RequirementInput",
+        "type": "object"
+      },
       "ScheduleSlot": {
         "properties": {
           "cost_cents": {
@@ -2148,6 +3088,82 @@
           "cost_cents"
         ],
         "title": "ScheduleSlot",
+        "type": "object"
+      },
+      "ScorePart": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "points": {
+            "title": "Points",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "label",
+          "points"
+        ],
+        "title": "ScorePart",
+        "type": "object"
+      },
+      "TalentCard": {
+        "properties": {
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "distance_km": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Km"
+          },
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "tickets": {
+            "title": "Tickets",
+            "type": "integer"
+          },
+          "trades": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Trades",
+            "type": "array"
+          },
+          "verified_tickets": {
+            "title": "Verified Tickets",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "headline",
+          "trades",
+          "city",
+          "distance_km",
+          "verified_tickets",
+          "tickets"
+        ],
+        "title": "TalentCard",
         "type": "object"
       },
       "TaskInput": {
@@ -2567,6 +3583,46 @@
           "engagement_id"
         ],
         "title": "WorkHistoryView",
+        "type": "object"
+      },
+      "WorkView": {
+        "properties": {
+          "active": {
+            "items": {
+              "$ref": "#/components/schemas/ApplicationView"
+            },
+            "title": "Active",
+            "type": "array"
+          },
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/ApplicationView"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "offers": {
+            "items": {
+              "$ref": "#/components/schemas/ApplicationView"
+            },
+            "title": "Offers",
+            "type": "array"
+          },
+          "past": {
+            "items": {
+              "$ref": "#/components/schemas/ApplicationView"
+            },
+            "title": "Past",
+            "type": "array"
+          }
+        },
+        "required": [
+          "applied",
+          "offers",
+          "active",
+          "past"
+        ],
+        "title": "WorkView",
         "type": "object"
       },
       "WorkerProfileView": {
@@ -3620,6 +4676,26 @@
         "summary": "Demo Reset"
       }
     },
+    "/api/v1/dev/reset": {
+      "post": {
+        "description": "SEED-5: restore the fictional demo. Disabled outside demo mode.",
+        "operationId": "dev_reset_api_v1_dev_reset_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Dev Reset",
+        "tags": [
+          "dev"
+        ]
+      }
+    },
     "/api/v1/drafts": {
       "get": {
         "operationId": "get_drafts_api_v1_drafts_get",
@@ -3980,6 +5056,134 @@
         "summary": "Apply"
       }
     },
+    "/api/v1/market/agency-feed": {
+      "get": {
+        "description": "Crew contracts for contracting companies, checked against the company wallet.",
+        "operationId": "agency_feed_api_v1_market_agency_feed_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "qualified_only",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Qualified Only",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Agency Feed",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/applications/{application_id}/action": {
+      "post": {
+        "operationId": "application_action_api_v1_market_applications__application_id__action_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "application_id",
+            "required": true,
+            "schema": {
+              "title": "Application Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActionInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Application Action",
+        "tags": [
+          "market"
+        ]
+      }
+    },
     "/api/v1/market/credential-types": {
       "get": {
         "operationId": "credential_types_api_v1_market_credential_types_get",
@@ -4310,6 +5514,144 @@
         ]
       }
     },
+    "/api/v1/market/feed": {
+      "get": {
+        "operationId": "for_you_api_v1_market_feed_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 100,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "trade",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Trade"
+            }
+          },
+          {
+            "in": "query",
+            "name": "max_km",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 2000,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Max Km"
+            }
+          },
+          {
+            "in": "query",
+            "name": "starts_before",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Starts Before"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_pay_cents",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Min Pay Cents"
+            }
+          },
+          {
+            "in": "query",
+            "name": "qualified_only",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Qualified Only",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "For You",
+        "tags": [
+          "market"
+        ]
+      }
+    },
     "/api/v1/market/files/{token}": {
       "get": {
         "operationId": "serve_file_api_v1_market_files__token__get",
@@ -4345,6 +5687,55 @@
           }
         },
         "summary": "Serve File",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/home": {
+      "get": {
+        "operationId": "home_api_v1_market_home_get",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HomeView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Home",
         "tags": [
           "market"
         ]
@@ -4783,6 +6174,574 @@
           }
         },
         "summary": "Update Org",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/org/work": {
+      "get": {
+        "operationId": "org_work_api_v1_market_org_work_get",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgWorkView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Org Work",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/posting-templates": {
+      "get": {
+        "operationId": "posting_templates_api_v1_market_posting_templates_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Posting Templates",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/postings": {
+      "post": {
+        "operationId": "create_posting_api_v1_market_postings_post",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostingInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostingCard"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Posting",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/postings/{posting_id}": {
+      "get": {
+        "operationId": "posting_detail_api_v1_market_postings__posting_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "posting_id",
+            "required": true,
+            "schema": {
+              "title": "Posting Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostingDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Posting Detail",
+        "tags": [
+          "market"
+        ]
+      },
+      "put": {
+        "operationId": "edit_posting_api_v1_market_postings__posting_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "posting_id",
+            "required": true,
+            "schema": {
+              "title": "Posting Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostingInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostingCard"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edit Posting",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/postings/{posting_id}/applicants": {
+      "get": {
+        "operationId": "posting_applicants_api_v1_market_postings__posting_id__applicants_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "posting_id",
+            "required": true,
+            "schema": {
+              "title": "Posting Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationView"
+                  },
+                  "title": "Response Posting Applicants Api V1 Market Postings  Posting Id  Applicants Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Posting Applicants",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/postings/{posting_id}/apply": {
+      "post": {
+        "operationId": "apply_to_posting_api_v1_market_postings__posting_id__apply_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "posting_id",
+            "required": true,
+            "schema": {
+              "title": "Posting Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Apply To Posting",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/postings/{posting_id}/close": {
+      "post": {
+        "operationId": "close_posting_api_v1_market_postings__posting_id__close_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "posting_id",
+            "required": true,
+            "schema": {
+              "title": "Posting Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostingCard"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Close Posting",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/talent": {
+      "get": {
+        "operationId": "talent_api_v1_market_talent_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 100,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "trade",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Trade"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TalentCard"
+                  },
+                  "title": "Response Talent Api V1 Market Talent Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Talent",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/api/v1/market/work": {
+      "get": {
+        "operationId": "my_work_api_v1_market_work_get",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "shift_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shift Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Work",
         "tags": [
           "market"
         ]
