@@ -1,7 +1,9 @@
-<img width="1800" height="600" alt="output-onlinetools-ezgif com-resize" src="https://github.com/user-attachments/assets/379797a8-951e-453d-a6ec-6c5f569c37fe"/>
+<img width="1800" height="600" alt="SHIFT: Workforce, in sync" src="https://github.com/user-attachments/assets/379797a8-951e-453d-a6ec-6c5f569c37fe"/>
+
+# SHIFT
 
 **Workforce, in sync.** A hybrid-first workforce operating system for construction,
-manufacturing and project work, built for natHacks 2026.
+manufacturing and project work, built at natHacks 2026 (Construction & Manufacturing theme).
 
 SHIFT connects professional profiles, published availability, cross-project
 calendars, job postings/applications, and **SHIFT Adaptive**: weather-aware CP-SAT
@@ -14,14 +16,14 @@ replaces a confirmed schedule. No LLM determines feasibility or invents metrics.
 
 🔐 Sign-In, Onboarding & Demo Personas
 
-- Google OAuth2 & Supabase Auth: One-click sign-in via Google (Continue with Google) backed by Supabase Auth with server-side asymmetric RS256 JWT signature verification.
+- Continue with Google: Google OAuth sign-in with server-side RS256 token verification is built in and switches on once `SHIFT_GOOGLE_CLIENT_ID` and `SHIFT_GOOGLE_CLIENT_SECRET` are set. Until then, the local demo opens a picker of fictional demo accounts instead. Hosted deployments can also use Supabase Auth (see below).
 - Guided Role Onboarding: New users choose what they are here for—finding work, hiring a crew, or running a contracting company—and reach their home screen in under a minute.
 
 🪪 Profile & Credential Wallet
 
 - A person, not a record. Worker profiles are essentially a LinkedIn page for the trades with a photo, a headline, a clear availability badge (e.g. "Open to work from Jan 6"), an experience timeline with job photos, tools, trades, languages and past employer reviews.
 - Structured Ticket & Certification Tracking: WHMIS, Fall Protection, Forklift, First Aid and trade licenses all tracked with issuer details, expiry dates and uploaded proof documents. All proof documents are served via private 5 minute signed URLs.
-- Proactive Expiry Warnings: works out the current status of the credentials (self reported, pending review, verified or expired / expiring in the next 30 days) and will alert the worker a month before a ticket expires so they never just quietly lose the job.
+- Proactive Expiry Warnings: works out the current status of the credentials (self reported, pending review, verified or expired / expiring in the next 30 days) and warns the worker on their Home screen 30 days before a ticket expires so they never just quietly lose the job.
 
 🏠 Home & Gated "For You" Feed (/)
 
@@ -38,14 +40,21 @@ replaces a confirmed schedule. No LLM determines feasibility or invents metrics.
 
 - Saying Yes Books it: an offer is checked for conflicts straight away and the booking is then stamped into the Schedule tab.
 - Exclusive vs Part Time blocking: Exclusive (e.g. a 6 month full time role) will block the entire date range and allow one click withdraw from any overlapping applications. Part time roles will only block the specific shift days so the worker can still book work around them.
-- Database level double booking prevention: published availability blocks are the single source of truth and are enforced in production via PostgreSQL btree_gist range exclusion constraints. These are then synced to Google Calendar in one tap (with .ics file export as a backup).
+- Database level double booking prevention: published availability blocks are the single source of truth and are enforced in production via PostgreSQL btree_gist range exclusion constraints. Every booking offers a Google Calendar link and an .ics download; one-tap Google Calendar sync works once Google OAuth is configured.
 
-⚡ Crew Planner & CP-SAT Disruption Recovery (/planner)
+⚡ Crew Planner (/crew)
 
 - Visual Slot Scheduling & Fatigue Guardrails: The week is displayed as shift slots (e.g. "Packaging line, 8 AM-12 PM, needs 2, forklift preferred"). Clicking on a slot will then rank the available workers by fit, with side by side availability bars and a warning to the manager prior to assigning someone who has worked yesterday, is on their 3rd consecutive day, has no rest between shifts or would be over 40 hours.
-- Weather aware risk monitoring: tracks the weather forecast against task specific safety and operational limits (e.g. outdoor electrical wiring or framing against heavy rain).
-- Mathematical Schedule Recovery (Google OR-Tools CP-SAT): Tapping Auto-fill runs the CP-SAT constraint solver to generate multi-objective recovery plans (lowest cost, earliest completion, minimum schedule changes) under strict non-negotiable invariants:
-- Enforces worker skills, valid non-expired certifications, published availability, existing commitments, task dependency DAGs, site capacity limits, labor budgets, and deadlines.
+- Auto-fill week (Google OR-Tools CP-SAT): fills as many open spots as possible, preferring workers who hold the slot's preferred cert. Hard rules: required certifications, published weekly hours, no overlap with any existing booking, slot headcount, minimum rest, maximum consecutive days and maximum weekly hours. Proposals appear as ghost assignments for the manager to accept.
+
+🌧️ SHIFT Adaptive: Weather & Absence Recovery (/dev/legacy-planner)
+
+- Weather-aware risk monitoring: checks the (simulated) forecast against task-specific safety and operational limits (e.g. outdoor electrical wiring or framing against heavy rain).
+- Multi-objective recovery (CP-SAT): generates separately optimized plans for lowest cost, earliest completion and fewest schedule changes, under non-negotiable rules:
+  - worker skills, published availability and existing commitments;
+  - task dependency DAGs, site capacity, labour budgets and deadlines;
+  - rest, daily-hour limits and task/setup/contingency buffers.
+- Manager approval, worker acceptance and atomic publication: nothing reaches a confirmed calendar until every affected worker accepts and SHIFT revalidates the plan.
 
 ## Run locally
 
@@ -69,9 +78,10 @@ Terminal 2:
 npm run dev
 ```
 
-Open **http://127.0.0.1:3000** for the Shift V1 marketplace (sign in with a
-fictional demo account; see `docs/V1.md`) or **/planner** for the SHIFT Adaptive crew
-planner. Reset the V1 demo at **/dev/reset**. API documentation: http://127.0.0.1:8000/docs.
+Open **http://127.0.0.1:3000** and click **Continue with Google** to pick a fictional
+demo account (see `docs/V2.md`). The crew planner is at **/crew** (**/planner** redirects
+there), and SHIFT Adaptive weather recovery is at **/dev/legacy-planner**. Reset the
+marketplace demo at **/dev/reset**. API documentation: http://127.0.0.1:8000/docs.
 Both launchers bind to loopback. Stop with Ctrl+C. SQLite persists to ignored
 `shift.sqlite`; startup applies Alembic migrations and idempotently upgrades the
 fictional Northline fixture. It does not reset existing work.
@@ -80,9 +90,20 @@ The demo week is **November 9–13, 2026, America/Edmonton**, with 12 workers, t
 projects, indoor/outdoor tasks, private busy windows and simulated weather. The
 persona selector is a local demo harness, not production authentication.
 
-## Try the complete recovery
+## Try the marketplace and crew planner
 
-1. As Alex Morgan, open **SHIFT Adaptive** and select Eastside facility fit-out.
+1. On **/**, click **Continue with Google** and choose **Ilya** (worker). Open _Why am I
+   seeing this?_ on a job card, then **Apply** through the 4-step sheet.
+2. Switch to **Rahul** (Prairie Harvest Foods). Under **Work → Applicants**, review
+   fit-sorted applicants. Open **Work → Crew planner**, click **Auto-fill week**, then
+   **Find a replacement** on the Sunday gap.
+3. Switch to **Jordan** (Timberline Framing Crew) for the contracting-company view.
+4. Reset everything at **/dev/reset**.
+
+## Try the complete weather recovery
+
+1. Open **/dev/legacy-planner**. As Alex Morgan, open **SHIFT Adaptive** and select
+   Eastside facility fit-out.
 2. Click **Simulate heavy rain**, then review the task-specific weather risks.
 3. Record Maya Brooks's absence. Enter an explicit end of November 13 at 17:00.
    Confirmed assignments remain in place.
@@ -192,3 +213,7 @@ Run one persisted rolling review with `uv run python scripts/review_schedules.py
 Use separate `codex/<task>` / `claude/<task>` branches and worktrees. Coordinate
 shared contracts, test changes, and obtain authorization before pushing/merging.
 The original MIT license is retained.
+
+## Team
+
+Built at natHacks 2026 by [Name], [Name], [Name] and [Name].
