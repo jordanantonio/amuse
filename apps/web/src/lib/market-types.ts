@@ -20,6 +20,8 @@ export type WorkerProfileView = {
   bio: string;
   linkedin_url: string | null;
   is_public: boolean;
+  tools?: string[];
+  languages?: string[];
 };
 
 export type OrgView = {
@@ -76,6 +78,7 @@ export type Credential = {
   days_to_expiry: number | null;
   has_document: boolean;
   document_name: string | null;
+  document_type?: string | null;
   rejection_reason: string | null;
 };
 
@@ -90,6 +93,8 @@ export type WorkHistory = {
   reference_name: string | null;
   reference_contact: string | null;
   engagement_id: string | null;
+  photo_paths?: string[];
+  rating?: number | null;
 };
 
 export type Completeness = {
@@ -104,6 +109,15 @@ export type Profile = {
   credentials: Credential[];
   history: WorkHistory[];
   completeness: Completeness;
+  reviews: {
+    id: string;
+    org_name: string;
+    org_industry: string | null;
+    author_name: string;
+    rating: number;
+    quote: string;
+  }[];
+  availability: { status: 'open' | 'booked'; label: string } | null;
 };
 
 export type OrgProfile = { organization: OrgView; credentials: Credential[] };
@@ -123,6 +137,7 @@ export type MatchItem = {
   required: boolean;
   must_be_verified: boolean;
   state: 'ok' | 'pending' | 'missing';
+  weight?: string | null;
 };
 
 export type PostingCard = {
@@ -130,7 +145,7 @@ export type PostingCard = {
   title: string;
   trade: string;
   posting_type: 'individual' | 'agency';
-  org: { id: string; name: string; kind: string; verified: boolean };
+  org: { id: string; name: string; kind: string; verified: boolean; industry?: string | null };
   city: string;
   start_date: string;
   end_date: string;
@@ -166,6 +181,7 @@ export type ApplicantSummary = {
   city: string;
   distance_km?: number | null;
   verified?: boolean | null;
+  industry?: string | null;
 };
 
 export type EngagementSummary = {
@@ -202,11 +218,20 @@ export type ApplicationView = {
   engagement: EngagementSummary | null;
 };
 
+export type Question = { id: string; prompt: string; kind: 'yes_no' | 'date' | 'text' };
+
 export type PostingDetail = {
   posting: PostingCard;
   description: string;
   is_owner: boolean;
   my_application: ApplicationView | null;
+  shift_hours?: string | null;
+  ppe_provided?: string[];
+  ppe_required?: string[];
+  typical_day?: string | null;
+  questions?: Question[];
+  org_about?: string | null;
+  calendar?: { status: 'clear' | 'conflict' | 'warning'; message: string } | null;
 };
 
 export type WorkView = {
@@ -285,12 +310,39 @@ export type ScheduleItem = {
   posting_id?: string | null;
   engagement_id?: string | null;
   status?: string | null;
+  person_id?: string | null;
+  industry?: string | null;
+  location?: string | null;
 };
 
 export type ScheduleView = {
   items: ScheduleItem[];
   calendar_enabled: boolean;
   calendar_connected: boolean;
+};
+
+export type RankedApplicant = ApplicationView & {
+  score: number;
+  breakdown: { kind: string; label: string; points: number; strength: number }[];
+  bonus: { name: string; weight: string; held: boolean }[];
+  fills_gap: string[];
+  signals: string[];
+  answers: { prompt: string; answer: string }[];
+  pile_reasons: string[];
+};
+
+export type Ranking = {
+  coverage: {
+    credential_type_id: string;
+    name: string;
+    needed: number;
+    hired: number;
+    covered: boolean;
+    label: string;
+  }[];
+  applicants: RankedApplicant[];
+  pile: RankedApplicant[];
+  auto_decline: boolean;
 };
 
 export type DemoAccount = {

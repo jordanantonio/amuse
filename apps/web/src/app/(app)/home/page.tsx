@@ -15,7 +15,9 @@ import type { Feed, HomeView, Meta, PostingCard, TalentCard } from '@/lib/market
 import { day, dollars, range } from '@/lib/format';
 import { useSession } from '@/components/v1/session';
 import { ContractCard } from '@/components/v1/contract';
+import { ApplySheet } from '@/components/v1/apply-sheet';
 import { EmptyState, ErrorNote, Modal, Skeleton } from '@/components/v1/ui';
+import { CompanyBadge, PersonAvatar } from '@/components/v1/avatar';
 
 export default function HomePage() {
   const { me } = useSession();
@@ -71,6 +73,7 @@ function WorkerHome() {
   const [error, setError] = useState('');
   const [applied, setApplied] = useState<Record<string, 'sending' | 'done'>>({});
   const [applyError, setApplyError] = useState('');
+  const [applying, setApplying] = useState<PostingCard | null>(null);
   useEffect(() => {
     market<Meta>('/meta').then(setMeta, () => undefined);
   }, []);
@@ -106,28 +109,11 @@ function WorkerHome() {
   const set = (patch: Partial<Filters>) => setFilters((f) => ({ ...f, ...patch }));
   const filtered = JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS);
 
-  // Optimistic one-tap apply (FLOW-1): the button flips immediately, reverts on error.
-  const apply = async (card: PostingCard) => {
-    setApplyError('');
-    setApplied((a) => ({ ...a, [card.id]: 'sending' }));
-    try {
-      await market(`/postings/${card.id}/apply`, { method: 'POST', body: {} });
-      setApplied((a) => ({ ...a, [card.id]: 'done' }));
-    } catch (e) {
-      setApplied((a) => {
-        const next = { ...a };
-        delete next[card.id];
-        return next;
-      });
-      setApplyError(`${card.title}: ${(e as Error).message}`);
-    }
-  };
   const newest = feed?.items.filter((c) => c.is_new && c.eligible).slice(0, 3) || [];
 
   return (
     <>
       <Greeting />
-      <TodayStrip home={home} />
       {feed && !filtered && feed.new_count > 0 && (
         <section className="new-since" aria-labelledby="new-title">
           <h2 id="new-title">
@@ -148,6 +134,7 @@ function WorkerHome() {
           </ul>
         </section>
       )}
+      <TodayStrip home={home} />
       <section className="v1-section" aria-labelledby="foryou-title">
         <div className="v1-section-head">
           <h2 id="foryou-title">For you</h2>
@@ -236,14 +223,14 @@ function WorkerHome() {
                 </button>
               ) : (
                 <Link className="button button-outline" href="/profile">
-                  Add tickets to your wallet
+                  Add certifications to your wallet
                 </Link>
               )
             }
           >
             {filtered
               ? 'Try a wider distance or turn off “Only show ones I qualify for”.'
-              : 'New contracts are posted every day. Adding tickets opens up more of them.'}
+              : 'New contracts are posted every day. Adding certifications opens up more of them.'}
           </EmptyState>
         )}
         <div className="feed-list">
@@ -251,6 +238,7 @@ function WorkerHome() {
             <ContractCard
               key={c.id}
               card={c}
+              onApply={c.eligible && !applied[c.id] ? () => setApplying(c) : undefined}
               action={
                 c.eligible ? (
                   applied[c.id] ? (
@@ -258,7 +246,7 @@ function WorkerHome() {
                       {applied[c.id] === 'sending' ? 'Applying…' : 'Applied, see Work'}
                     </Link>
                   ) : (
-                    <button className="button button-primary" onClick={() => void apply(c)}>
+                    <button className="button button-primary" onClick={() => setApplying(c)}>
                       Apply
                     </button>
                   )
@@ -272,6 +260,13 @@ function WorkerHome() {
           ))}
         </div>
       </section>
+      {applying && (
+        <ApplySheet
+          postingId={applying.id}
+          onClose={() => setApplying(null)}
+          onApplied={() => setApplied((a) => ({ ...a, [applying.id]: 'done' }))}
+        />
+      )}
     </>
   );
 }
@@ -418,19 +413,22 @@ function BusinessHome() {
         <ul className="talent-list">
           {talent?.map((t) => (
             <li key={t.id} className="talent-row">
-              <div>
-                <strong>{t.name}</strong>
-                <p>{t.headline}</p>
-                <p className="wallet-meta">
-                  <MapPin size={15} aria-hidden="true" />
-                  {t.city}
-                  {t.distance_km != null ? `, ${t.distance_km} km away` : ''}
-                </p>
+              <div className="with-face">
+                <PersonAvatar id={t.id} name={t.name} size={52} />
+                <div>
+                  <strong>{t.name}</strong>
+                  <p>{t.headline}</p>
+                  <p className="wallet-meta">
+                    <MapPin size={15} aria-hidden="true" />
+                    {t.city}
+                    {t.distance_km != null ? `, ${t.distance_km} km away` : ''}
+                  </p>
+                </div>
               </div>
               <div className="talent-side">
                 <span className="status-chip ok">
                   <BadgeCheck size={15} aria-hidden="true" />
-                  {t.verified_tickets} verified {t.verified_tickets === 1 ? 'ticket' : 'tickets'}
+                  {t.verified_tickets} verified {t.verified_tickets === 1 ? 'cert' : 'certs'}
                 </span>
                 <span className="wallet-meta">{t.trades.join(', ')}</span>
               </div>

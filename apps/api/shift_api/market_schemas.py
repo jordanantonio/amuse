@@ -53,6 +53,8 @@ class WorkerProfileView(BaseModel):
     bio: str
     linkedin_url: str | None
     is_public: bool
+    tools: list[str] = []
+    languages: list[str] = []
 
 
 class OrgView(BaseModel):
@@ -135,6 +137,7 @@ class CredentialView(BaseModel):
     days_to_expiry: int | None
     has_document: bool
     document_name: str | None
+    document_type: str | None = None
     rejection_reason: str | None
 
 
@@ -175,6 +178,8 @@ class WorkHistoryView(BaseModel):
     reference_name: str | None
     reference_contact: str | None
     engagement_id: str | None
+    photo_paths: list[str] = []
+    rating: int | None = None
 
 
 class WorkHistoryInput(BaseModel):
@@ -205,6 +210,8 @@ class ProfileInput(BaseModel):
     bio: str | None = Field(None, max_length=1000)
     linkedin_url: str | None = Field(None, max_length=300, pattern=r"^(https://[^\s]+)?$")
     is_public: bool | None = None
+    tools: list[str] | None = Field(None, max_length=20)
+    languages: list[str] | None = Field(None, max_length=12)
 
     _trades = field_validator("trades")(classmethod(lambda cls, v: check_trades(v)))
     _city = field_validator("city")(classmethod(lambda cls, v: check_city(v)))
@@ -249,12 +256,28 @@ class Completeness(BaseModel):
     next_step: NextStep | None
 
 
+class ReviewView(BaseModel):
+    id: str
+    org_name: str
+    org_industry: str | None
+    author_name: str
+    rating: int
+    quote: str
+
+
+class Availability(BaseModel):
+    status: Literal["open", "booked"]
+    label: str
+
+
 class ProfileView(BaseModel):
     user: UserView
     profile: WorkerProfileView
     credentials: list[CredentialView]
     history: list[WorkHistoryView]
     completeness: Completeness
+    reviews: list[ReviewView] = []
+    availability: Availability | None = None
 
 
 class OrgProfileView(BaseModel):
@@ -286,6 +309,7 @@ class RequirementInput(BaseModel):
     credential_type_id: str
     required: bool = True
     must_be_verified: bool = False
+    weight: Literal["nice", "valuable", "very_valuable"] | None = None
 
 
 class PostingInput(BaseModel):
@@ -323,6 +347,7 @@ class OrgRef(BaseModel):
     name: str
     kind: str
     verified: bool
+    industry: str | None = None
 
 
 class MatchItem(BaseModel):
@@ -331,6 +356,7 @@ class MatchItem(BaseModel):
     required: bool
     must_be_verified: bool
     state: Literal["ok", "pending", "missing"]
+    weight: str | None = None
 
 
 class Match(BaseModel):
@@ -388,6 +414,7 @@ class ApplicantSummary(BaseModel):
     city: str
     distance_km: int | None = None
     verified: bool | None = None
+    industry: str | None = None
 
 
 class EngagementSummary(BaseModel):
@@ -414,14 +441,33 @@ class ApplicationView(BaseModel):
     engagement: EngagementSummary | None
 
 
+class Question(BaseModel):
+    id: str
+    prompt: str
+    kind: Literal["yes_no", "date", "text"]
+
+
+class CalendarCheck(BaseModel):
+    status: Literal["clear", "conflict", "warning"]
+    message: str
+
+
 class PostingDetail(BaseModel):
     posting: PostingCard
     description: str
     is_owner: bool
     my_application: ApplicationView | None
+    shift_hours: str | None = None
+    ppe_provided: list[str] = []
+    ppe_required: list[str] = []
+    typical_day: str | None = None
+    questions: list[Question] = []
+    org_about: str | None = None
+    calendar: CalendarCheck | None = None
 
 
 class ApplyInput(BaseModel):
+    answers: dict[str, str] = Field(default_factory=dict, max_length=20)
     note: str = Field("", max_length=1000)
     proposed_rate_cents: int | None = Field(None, gt=0, le=10_000_000)
     crew_size: int | None = Field(None, ge=1, le=500)
@@ -490,6 +536,54 @@ class TalentCard(BaseModel):
     tickets: int
 
 
+class CoverageRow(BaseModel):
+    credential_type_id: str
+    name: str
+    needed: int
+    hired: int
+    covered: bool
+    label: str
+
+
+class FitRow(BaseModel):
+    kind: str
+    label: str
+    points: int
+    strength: float
+
+
+class BonusChip(BaseModel):
+    name: str
+    weight: str
+    held: bool
+
+
+class AnswerRow(BaseModel):
+    prompt: str
+    answer: str
+
+
+class RankedApplicant(ApplicationView):
+    score: int
+    breakdown: list[FitRow]
+    bonus: list[BonusChip]
+    fills_gap: list[str]
+    signals: list[str]
+    answers: list[AnswerRow]
+    pile_reasons: list[str]
+
+
+class RankingView(BaseModel):
+    coverage: list[CoverageRow]
+    applicants: list[RankedApplicant]
+    pile: list[RankedApplicant]
+    auto_decline: bool
+
+
+class ScreeningInput(BaseModel):
+    auto_decline: bool
+
+
 class AcceptInput(BaseModel):
     withdraw_ids: list[str] = Field(default_factory=list, max_length=50)
 
@@ -532,6 +626,9 @@ class ScheduleItem(BaseModel):
     posting_id: str | None = None
     engagement_id: str | None = None
     status: str | None = None
+    person_id: str | None = None
+    industry: str | None = None
+    location: str | None = None
 
 
 class ScheduleView(BaseModel):

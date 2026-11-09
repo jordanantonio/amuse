@@ -6,7 +6,12 @@ import { todayIso } from '@/lib/format';
 import { Modal } from './ui';
 import { PATTERNS } from './contract';
 
-type Req = { credential_type_id: string; required: boolean; must_be_verified: boolean };
+type Req = {
+  credential_type_id: string;
+  required: boolean;
+  must_be_verified: boolean;
+  weight?: string | null;
+};
 const plusDays = (iso: string, n: number) => {
   const d = new Date(iso + 'T12:00:00');
   d.setDate(d.getDate() + n);
@@ -47,6 +52,7 @@ export function PostingForm({
       credential_type_id: i.credential_type_id,
       required: i.required,
       must_be_verified: i.must_be_verified,
+      weight: i.weight || (i.required ? null : 'nice'),
     })) || [],
   );
   const [busy, setBusy] = useState(false);
@@ -64,8 +70,21 @@ export function PostingForm({
       const existing = rs.find((r) => r.credential_type_id === id);
       if (existing && existing.required === required)
         return rs.filter((r) => r.credential_type_id !== id);
-      if (existing) return rs.map((r) => (r.credential_type_id === id ? { ...r, required } : r));
-      return [...rs, { credential_type_id: id, required, must_be_verified: false }];
+      if (existing)
+        return rs.map((r) =>
+          r.credential_type_id === id
+            ? { ...r, required, weight: required ? null : r.weight || 'nice' }
+            : r,
+        );
+      return [
+        ...rs,
+        {
+          credential_type_id: id,
+          required,
+          must_be_verified: false,
+          weight: required ? null : 'nice',
+        },
+      ];
     });
 
   const submit = async (status: 'open' | 'draft') => {
@@ -92,7 +111,7 @@ export function PostingForm({
   return (
     <Modal
       title={posting ? 'Edit posting' : 'New posting'}
-      description="Workers see contracts that match their tickets. The site address stays hidden until you send an offer."
+      description="Workers see contracts that match their certifications. The site address stays hidden until you send an offer."
       onClose={onClose}
       busy={busy}
     >
@@ -255,9 +274,12 @@ export function PostingForm({
             </label>
           </div>
           <fieldset className="req-field">
-            <legend>{form.posting_type === 'agency' ? 'Company credentials' : 'Tickets'}</legend>
+            <legend>
+              {form.posting_type === 'agency' ? 'Company credentials' : 'Certifications'}
+            </legend>
             <small>
-              Required tickets decide who can apply. Nice-to-haves only improve ranking.
+              Required certifications decide who can apply. Bonus certifications only improve
+              ranking.
             </small>
             <ul className="req-list">
               {options.map((t) => {
@@ -278,8 +300,29 @@ export function PostingForm({
                         aria-pressed={r?.required === false}
                         onClick={() => toggle(t.id, false)}
                       >
-                        Nice to have
+                        Bonus
                       </button>
+                      {r && !r.required && (
+                        <label className="mini-check">
+                          <span className="sr-only">Bonus weight for {t.name}</span>
+                          <select
+                            value={r.weight || 'nice'}
+                            onChange={(e) =>
+                              setReqs((rs) =>
+                                rs.map((x) =>
+                                  x.credential_type_id === t.id
+                                    ? { ...x, weight: e.target.value }
+                                    : x,
+                                ),
+                              )
+                            }
+                          >
+                            <option value="nice">Nice</option>
+                            <option value="valuable">Valuable</option>
+                            <option value="very_valuable">Very valuable</option>
+                          </select>
+                        </label>
+                      )}
                       {r?.required && (
                         <label className="mini-check">
                           <input

@@ -14,8 +14,8 @@ import {
 } from 'lucide-react';
 import { market } from '@/lib/market';
 import type { Notifications, Notification } from '@/lib/market-types';
-import { initials } from '@/lib/format';
 import { useSession } from './session';
+import { CompanyBadge, PersonAvatar } from './avatar';
 
 const TABS = [
   { href: '/home', label: 'Home', icon: House },
@@ -66,12 +66,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return () => clearInterval(id);
   }, [load, pathname]);
   const name = me.organization?.name || me.user.full_name;
-  const openPlanner = () => {
-    // The crew planner uses its own demo persona; hand it this business's manager.
-    try {
-      if (me.planner_persona) localStorage.setItem('shift-persona', me.planner_persona);
-    } catch {}
-  };
   return (
     <div className="v1-shell">
       <a className="skip-link" href="#main">
@@ -124,7 +118,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     {notes.items.map((n) => (
                       <li key={n.id} className={n.read_at ? '' : 'unread'}>
                         <Link href="/work" onClick={() => setBellOpen(false)}>
-                          {describe(n)}
+                          <NoteFace n={n} />
+                          <span>{describe(n)}</span>
                         </Link>
                       </li>
                     ))}
@@ -145,9 +140,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               buttonClass="account-button"
               button={
                 <>
-                  <span className="account-avatar" aria-hidden="true">
-                    {initials(name)}
-                  </span>
+                  {me.organization ? (
+                    <CompanyBadge
+                      name={me.organization.name}
+                      industry={me.organization.industry}
+                      size={34}
+                    />
+                  ) : (
+                    <PersonAvatar id={me.user.id} name={me.user.full_name} size={34} />
+                  )}
                   <span className="account-name">{name}</span>
                   <ChevronDown size={16} aria-hidden="true" />
                 </>
@@ -158,8 +159,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   {me.user.full_name}
                   <small>{me.user.email}</small>
                 </p>
-                {me.planner_persona && (
-                  <Link href="/planner" onClick={openPlanner} className="menu-item">
+                {me.mode === 'business' && (
+                  <Link href="/crew" className="menu-item" onClick={() => setMenuOpen(false)}>
                     <Workflow size={18} aria-hidden="true" />
                     Crew planner
                   </Link>
@@ -188,6 +189,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </nav>
     </div>
   );
+}
+
+/** Who a notification is about: the applicant for businesses, the company for workers. */
+function NoteFace({ n }: { n: Notification }) {
+  const p = n.payload;
+  const aboutApplicant = [
+    'application.received',
+    'offer.accepted',
+    'offer.declined',
+    'application.withdrawn',
+  ].includes(n.type);
+  if (aboutApplicant && p.applicant) return <PersonAvatar name={String(p.applicant)} size={32} />;
+  return <CompanyBadge name={String(p.org || 'Shift')} size={32} />;
 }
 
 function NavLink({

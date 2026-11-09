@@ -39,6 +39,8 @@ from .market_schemas import (
     PostingCard,
     PostingDetail,
     PostingInput,
+    RankingView,
+    ScreeningInput,
     TalentCard,
     WorkView,
 )
@@ -129,7 +131,12 @@ def save_requirements(db, posting: Posting, payload: PostingInput, org: Organiza
         db.delete(old)
     db.flush()
     for r in payload.requirements:
-        db.add(PostingRequirement(posting_id=posting.id, **r.model_dump()))
+        data = r.model_dump()
+        if data["required"]:
+            data["weight"] = None
+        elif not data.get("weight"):
+            data["weight"] = "nice"
+        db.add(PostingRequirement(posting_id=posting.id, **data))
 
 
 def apply_posting(posting: Posting, payload: PostingInput) -> None:
@@ -237,7 +244,40 @@ def posting_detail(posting_id: str, db: Database, user: CurrentUser):
         description=p.description,
         is_owner=is_owner,
         my_application=application_view(db, mine, user) if mine else None,
+        shift_hours=p.shift_hours,
+        ppe_provided=p.ppe_provided or [],
+        ppe_required=p.ppe_required or [],
+        typical_day=p.typical_day,
+        questions=p.questions or [],
+        org_about=org.about,
+        calendar=calendar_check(db, user, p) if user.default_mode == "worker" else None,
     )
+
+
+def calendar_check(db, user, p: Posting) -> dict:
+    """APPLY-1 step 2: the contract dates against the worker's schedule."""
+    from .feed import booked_ranges, booking_conflict, posting_ranges
+    from .market_models import AvailabilityBlock
+    from .schedule import overlap
+
+    conflict = booking_conflict(booked_ranges(db, user.id), p)
+    if conflict:
+        return {"status": "conflict", "message": conflict}
+    manual = [
+        b
+        for b in db.scalars(
+            select(AvailabilityBlock).where(
+                AvailabilityBlock.user_id == user.id, AvailabilityBlock.source == "manual"
+            )
+        )
+        if overlap(posting_ranges(p), [(b.start_date, b.end_date)])
+    ]
+    if manual:
+        return {
+            "status": "warning",
+            "message": f"You marked yourself unavailable {manual[0].start_date:%b} {manual[0].start_date.day}. Check with the business.",
+        }
+    return {"status": "clear", "message": "No conflicts with your schedule"}
 
 
 @router.post("/postings/{posting_id}/apply", response_model=ApplicationView, status_code=201)
@@ -245,7 +285,12 @@ def apply_to_posting(posting_id: str, payload: ApplyInput, db: Database, user: C
     p = db.get(Posting, posting_id)
     if not p or p.status == "draft":
         raise HTTPException(404, "Posting not found")
+    valid = {q["id"] for q in (p.questions or [])}
+    if any(k not in valid for k in payload.answers):
+        raise HTTPException(422, "Answer only this contract’s questions")
     a = apply(db, user, p, payload.note.strip(), payload.proposed_rate_cents, payload.crew_size)
+    a.answers = {k: v.strip()[:200] for k, v in payload.answers.items() if v.strip()}
+    db.commit()
     return application_view(db, a, user)
 
 
@@ -357,6 +402,37 @@ def talent(
         )
     results.sort(key=lambda t: (t.distance_km if t.distance_km is not None else 9999, t.name))
     return results
+
+
+@router.get("/postings/{posting_id}/ranking", response_model=RankingView)
+def posting_ranking(posting_id: str, db: Database, user: CurrentUser):
+    from .applicant_ranking import ranking
+
+    p = db.get(Posting, posting_id)
+    if not p:
+        raise HTTPException(404, "Posting not found")
+    return ranking(db, user, p)
+
+
+@router.post("/postings/{posting_id}/decline-unqualified")
+def decline_unqualified(posting_id: str, db: Database, user: CurrentUser):
+    from .applicant_ranking import decline_pile
+
+    p = owned_posting(db, user, posting_id)
+    return {"declined": decline_pile(db, user, p)}
+
+
+@router.put("/postings/{posting_id}/screening", response_model=RankingView)
+def screening_settings(posting_id: str, payload: ScreeningInput, db: Database, user: CurrentUser):
+    from .applicant_ranking import decline_pile, ranking
+
+    p = owned_posting(db, user, posting_id)
+    p.auto_decline = payload.auto_decline
+    audit(db, user, "posting.auto_decline", "postings", p.id, enabled=payload.auto_decline)
+    db.commit()
+    if payload.auto_decline:
+        decline_pile(db, user, p, missing_only=True)
+    return ranking(db, user, p)
 
 
 dev = APIRouter(prefix="/api/v1/dev", tags=["dev"])

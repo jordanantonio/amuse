@@ -10,7 +10,7 @@ test('accept an offer: withdraw overlaps, block dates, calendar, schedule', asyn
   page,
   browser,
 }) => {
-  await signInAs(page, /Maya Brooks/);
+  await signInAs(page, 'u-maya');
   await page.goto('/work?tab=offers');
   const offer = page
     .locator('.offer-card')
@@ -28,8 +28,12 @@ test('accept an offer: withdraw overlaps, block dates, calendar, schedule', asyn
   await expect(done).toContainText(
     'Maintenance electrician, night shift with Prairie Harvest Foods',
   );
-  await done.getByRole('button', { name: 'Add to Google Calendar' }).click();
-  await expect(done).toContainText('Google Calendar isn’t set up on this server');
+  await expect(done.locator('.booked-stamp')).toHaveText('BOOKED');
+  await expect(done.locator('.mini-cal-day.booked').first()).toBeVisible();
+  await expect(done.getByRole('link', { name: 'Add to Google Calendar' })).toHaveAttribute(
+    'href',
+    /calendar\.google\.com\/calendar\/render\?action=TEMPLATE&text=Shift.*&dates=\d{8}%2F\d{8}/,
+  );
   const [download] = await Promise.all([
     page.waitForEvent('download'),
     done.getByRole('link', { name: 'Download .ics' }).click(),
@@ -60,7 +64,7 @@ test('accept an offer: withdraw overlaps, block dates, calendar, schedule', asyn
 
   // The business sees its new crew member on its schedule.
   const priya = await (await browser.newContext()).newPage();
-  await signInAs(priya, /Priya Desai/);
+  await signInAs(priya, 'u-priya');
   await priya.goto('/schedule');
   await expect(priya.locator('.agenda')).toContainText('Maya Brooks');
 });

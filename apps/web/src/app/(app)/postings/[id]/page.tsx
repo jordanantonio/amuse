@@ -6,18 +6,21 @@ import { ArrowLeft, Lock, MapPinned } from 'lucide-react';
 import { market } from '@/lib/market';
 import type { PostingDetail } from '@/lib/market-types';
 import { useSession } from '@/components/v1/session';
-import { ContractFacts, EligibilityBox, OrgLine, Pay, WhyPopover } from '@/components/v1/contract';
+import { ContractFacts, EligibilityBox, OrgLine, Pay } from '@/components/v1/contract';
+import { ApplySheet } from '@/components/v1/apply-sheet';
+import { WhySheet } from '@/components/v1/why-sheet';
 import { ApplicationStatusBlock } from '@/components/v1/applications';
 import { AcceptOffer, EngagementActions } from '@/components/v1/accept';
 import { ErrorNote, Skeleton, StatusChip } from '@/components/v1/ui';
+import { CompanyBadge } from '@/components/v1/avatar';
 
 export default function PostingPage() {
   const { id } = useParams<{ id: string }>();
   const { me } = useSession();
   const [data, setData] = useState<PostingDetail | null>(null);
   const [error, setError] = useState('');
-  const [note, setNote] = useState('');
-  const [busy, setBusy] = useState(false);
+  const [whyOpen, setWhyOpen] = useState(false);
+  const [applyOpen, setApplyOpen] = useState(false);
   const load = useCallback(async () => {
     try {
       setData(await market<PostingDetail>(`/postings/${id}`));
@@ -47,7 +50,8 @@ export default function PostingPage() {
         {data.is_owner ? 'Back to Work' : 'Back to Home'}
       </Link>
       <header className="posting-head">
-        <div>
+        <CompanyBadge name={p.org.name} industry={p.org.industry} size={56} />
+        <div className="posting-head-main">
           <h1>{p.title}</h1>
           <div className="contract-card-head">
             <OrgLine card={p} />
@@ -78,7 +82,30 @@ export default function PostingPage() {
 
       {!data.is_owner && <EligibilityBox items={p.match.items} reasons={p.reasons} />}
       {!data.is_owner && p.score_breakdown && p.score_breakdown.length > 0 && (
-        <WhyPopover card={p} />
+        <button className="text-button why-link" onClick={() => setWhyOpen(true)}>
+          Why am I seeing this?
+        </button>
+      )}
+      {whyOpen && (
+        <WhySheet
+          card={p}
+          onClose={() => setWhyOpen(false)}
+          onApply={
+            canApply
+              ? () => {
+                  setWhyOpen(false);
+                  setApplyOpen(true);
+                }
+              : undefined
+          }
+        />
+      )}
+      {applyOpen && (
+        <ApplySheet
+          postingId={p.id}
+          onClose={() => setApplyOpen(false)}
+          onApplied={() => void load()}
+        />
       )}
 
       {data.description && (
@@ -106,42 +133,13 @@ export default function PostingPage() {
           <EngagementActions application={mine} onChange={load} />
         )}
         {canApply && (
-          <form
-            className="apply-form"
-            onSubmit={async (e) => {
-              e.preventDefault();
-              setBusy(true);
-              setError('');
-              try {
-                await market(`/postings/${p.id}/apply`, { method: 'POST', body: { note } });
-                await load();
-              } catch (err) {
-                setError((err as Error).message);
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            <label>
-              Note to the business <small>(optional)</small>
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                maxLength={1000}
-                placeholder="When you can start, or anything they should know"
-              />
-            </label>
-            <p className="wallet-meta">
-              Your profile and ticket wallet are included automatically.
-            </p>
-            <button className="button button-primary" disabled={busy}>
-              {busy ? 'Applying…' : 'Apply'}
-            </button>
-          </form>
+          <button className="button button-primary" onClick={() => setApplyOpen(true)}>
+            Apply
+          </button>
         )}
         {!data.is_owner && !p.eligible && !mine && (
           <Link className="button button-outline" href="/profile">
-            Add the missing tickets
+            Add the missing certifications
           </Link>
         )}
       </section>

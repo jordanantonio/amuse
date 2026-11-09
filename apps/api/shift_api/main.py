@@ -153,6 +153,7 @@ from .market_routes import router as market_router
 from .profile_routes import router as profile_router
 from .posting_routes import dev as dev_router, router as posting_router
 from .calendar_routes import auth_router as calendar_auth_router, router as calendar_router
+from .crew_routes import router as crew_router
 
 app.include_router(adaptive_router)
 app.include_router(auth_router)
@@ -162,6 +163,7 @@ app.include_router(posting_router)
 app.include_router(dev_router)
 app.include_router(calendar_router)
 app.include_router(calendar_auth_router)
+app.include_router(crew_router)
 
 
 @app.exception_handler(IntegrityError)

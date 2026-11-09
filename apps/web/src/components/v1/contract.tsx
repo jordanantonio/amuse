@@ -11,6 +11,8 @@ import {
   TriangleAlert,
   Users,
 } from 'lucide-react';
+import { CompanyBadge } from './avatar';
+import { WhySheet } from './why-sheet';
 import type { MatchItem, PostingCard } from '@/lib/market-types';
 import { dollars, duration, payUnit, range } from '@/lib/format';
 
@@ -40,8 +42,8 @@ export function MatchLine({ card }: { card: PostingCard }) {
         <CircleCheck size={18} aria-hidden="true" />
       )}
       {required_total
-        ? `You have ${required_held} of ${required_total} required tickets${pending ? ', some pending review' : ''}`
-        : 'No tickets required'}
+        ? `You have ${required_held} of ${required_total} required certs${pending ? ', some pending review' : ''}`
+        : 'No certifications required'}
     </p>
   );
 }
@@ -103,13 +105,19 @@ export function ContractCard({
   card,
   action,
   footer,
+  onApply,
 }: {
   card: PostingCard;
   action?: React.ReactNode;
   footer?: React.ReactNode;
+  onApply?: () => void;
 }) {
+  const [why, setWhy] = useState(false);
   return (
     <article className={`contract-card ${card.eligible ? '' : 'ineligible'}`}>
+      <span className="contract-card-badge">
+        <CompanyBadge name={card.org.name} industry={card.org.industry} size={48} />
+      </span>
       <div className="contract-card-head">
         <h3>
           <Link href={`/postings/${card.id}`}>{card.title}</Link>
@@ -124,9 +132,27 @@ export function ContractCard({
       <MatchLine card={card} />
       <div className="contract-card-actions">
         {action}
-        {card.score_breakdown && card.score_breakdown.length > 0 && <WhyPopover card={card} />}
+        {card.score_breakdown && card.score_breakdown.length > 0 && (
+          <button className="text-button" onClick={() => setWhy(true)}>
+            Why am I seeing this?
+          </button>
+        )}
       </div>
       {footer}
+      {why && (
+        <WhySheet
+          card={card}
+          onClose={() => setWhy(false)}
+          onApply={
+            onApply
+              ? () => {
+                  setWhy(false);
+                  onApply();
+                }
+              : undefined
+          }
+        />
+      )}
     </article>
   );
 }
@@ -157,7 +183,7 @@ export function WhyPopover({ card }: { card: PostingCard }) {
       </button>
       {open && (
         <div className="popover-panel why-panel" role="dialog" aria-label="Why you’re seeing this">
-          <p className="popover-title">You qualify for every required ticket. Then:</p>
+          <p className="popover-title">You qualify for every required certification. Then:</p>
           <ul>
             {card.score_breakdown!.map((b) => (
               <li key={b.label}>
@@ -185,8 +211,10 @@ export function EligibilityBox({ items, reasons }: { items: MatchItem[]; reasons
   const booked = reasons.filter((r) => r.startsWith('You’re booked'));
   return (
     <section className="eligibility" aria-labelledby="eligibility-title">
-      <h2 id="eligibility-title">Your tickets for this contract</h2>
-      {!required.length && <p className="v1-lede">This contract doesn’t require any tickets.</p>}
+      <h2 id="eligibility-title">Your certifications for this contract</h2>
+      {!required.length && (
+        <p className="v1-lede">This contract doesn’t require any certifications.</p>
+      )}
       <ul>
         {required.map((i) => (
           <EligibilityRow key={i.credential_type_id} item={i} />

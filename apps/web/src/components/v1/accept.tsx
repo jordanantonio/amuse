@@ -1,9 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { CalendarCheck, CalendarPlus, Download, TriangleAlert, CircleCheck } from 'lucide-react';
+import { CalendarPlus, Download, TriangleAlert, CircleCheck } from 'lucide-react';
 import { market } from '@/lib/market';
-import type { AcceptPreview, ApplicationView, CalendarResult } from '@/lib/market-types';
+import type { AcceptPreview, ApplicationView } from '@/lib/market-types';
+import { googleEventUrl } from '@/lib/gcal';
 import { range } from '@/lib/format';
 import { ErrorNote, Modal, Skeleton } from './ui';
 
@@ -84,6 +85,10 @@ function AcceptDialog({
     return (
       <Modal title="You’re booked" onClose={() => onClose(true)}>
         <div className="editor-fields accept-done">
+          <div className="booked-stamp" aria-hidden="true">
+            BOOKED
+          </div>
+          <MiniCalendar start={accepted.engagement.start_date} end={accepted.engagement.end_date} />
           <p className="match-line ok">
             <CircleCheck size={20} aria-hidden="true" />
             {p.title} with {p.org.name},{' '}
@@ -93,10 +98,7 @@ function AcceptDialog({
             Shift has blocked {p.is_exclusive ? 'these dates' : 'the scheduled days'} so you can’t
             be double-booked. Add them to your phone’s calendar too.
           </p>
-          <CalendarButtons
-            engagementId={accepted.engagement.id}
-            synced={accepted.engagement.calendar_synced}
-          />
+          <CalendarButtons engagementId={accepted.engagement.id} event={eventFor(accepted)} />
         </div>
         <div className="editor-actions">
           <button className="text-button" onClick={() => onClose(true)}>
@@ -123,7 +125,9 @@ function AcceptDialog({
         {preview?.ticket_problems.length ? (
           <p className="conflict-note" role="alert">
             <TriangleAlert size={20} aria-hidden="true" />
-            Your tickets changed since you applied: {preview.ticket_problems.join('; ')}.{' '}
+            Your certifications changed since you applied: {preview.ticket_problems.join(
+              '; ',
+            )}.{' '}
             <Link className="inline-link" href="/profile">
               Update your wallet
             </Link>
@@ -185,54 +189,25 @@ function AcceptDialog({
   );
 }
 
-/** CAL-1 / CAL-3: Google Calendar when available, and the .ics file always. */
+/** SCHED-2 / CAL-3: Google's event template link (no OAuth) and the .ics file. */
 export function CalendarButtons({
   engagementId,
-  synced,
+  event,
 }: {
   engagementId: string;
-  synced: boolean;
+  event: { title: string; start: string; end: string; details?: string; location?: string };
 }) {
-  const [state, setState] = useState<'idle' | 'busy' | 'added'>(synced ? 'added' : 'idle');
-  const [message, setMessage] = useState('');
-  const add = async () => {
-    setState('busy');
-    setMessage('');
-    try {
-      const r = await market<CalendarResult>(`/engagements/${engagementId}/google`, {
-        method: 'POST',
-      });
-      if (r.status === 'needs_auth' && r.url) {
-        window.location.assign(r.url);
-        return;
-      }
-      if (r.status === 'added') setState('added');
-      else {
-        setState('idle');
-        setMessage(r.message || 'Google Calendar isn’t available right now.');
-      }
-    } catch (e) {
-      setState('idle');
-      setMessage((e as Error).message);
-    }
-  };
   return (
     <div className="calendar-buttons">
-      {state === 'added' ? (
-        <span className="status-chip ok">
-          <CalendarCheck size={16} aria-hidden="true" />
-          In your Google Calendar
-        </span>
-      ) : (
-        <button
-          className="button button-primary"
-          disabled={state === 'busy'}
-          onClick={() => void add()}
-        >
-          <CalendarPlus size={18} aria-hidden="true" />
-          {state === 'busy' ? 'Adding…' : 'Add to Google Calendar'}
-        </button>
-      )}
+      <a
+        className="button button-primary"
+        href={googleEventUrl(event)}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <CalendarPlus size={18} aria-hidden="true" />
+        Add to Google Calendar
+      </a>
       <a
         className="button button-outline"
         href={`/api/v1/market/engagements/${engagementId}/calendar.ics`}
@@ -241,9 +216,19 @@ export function CalendarButtons({
         <Download size={18} aria-hidden="true" />
         Download .ics
       </a>
-      {message && <p className="wallet-meta calendar-message">{message}</p>}
     </div>
   );
+}
+
+export function eventFor(a: ApplicationView) {
+  const p = a.posting;
+  return {
+    title: `Shift: ${p.title} @ ${p.org.name}`,
+    start: a.engagement?.start_date || p.start_date,
+    end: a.engagement?.end_date || p.end_date,
+    details: `${p.trade} contract with ${p.org.name}, booked through Shift.`,
+    location: p.site_address || p.city,
+  };
 }
 
 /** Active contracts: calendar, schedule and cancel. */
@@ -259,7 +244,7 @@ export function EngagementActions({
   if (!a.engagement) return null;
   return (
     <div className="engagement-actions">
-      <CalendarButtons engagementId={a.engagement.id} synced={a.engagement.calendar_synced} />
+      <CalendarButtons engagementId={a.engagement.id} event={eventFor(a)} />
       <div className="actions">
         <Link className="text-button" href="/schedule">
           See on Schedule
@@ -291,5 +276,45 @@ export function EngagementActions({
       </div>
       {error && <ErrorNote message={error} />}
     </div>
+  );
+}
+
+/** WOW-2: the booked dates fill into a small month calendar, one by one. */
+function MiniCalendar({ start, end }: { start: string; end: string }) {
+  const first = new Date(start.slice(0, 7) + '-01T00:00:00Z');
+  const year = first.getUTCFullYear();
+  const month = first.getUTCMonth();
+  const days = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+  const lead = (first.getUTCDay() + 6) % 7;
+  const label = first.toLocaleString('en-CA', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  let n = 0;
+  return (
+    <figure className="mini-cal" aria-label={`Booked days in ${label}`}>
+      <figcaption>{label}</figcaption>
+      <div className="mini-cal-grid">
+        {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
+          <span key={`h${i}`} className="mini-cal-head">
+            {d}
+          </span>
+        ))}
+        {Array.from({ length: lead }, (_, i) => (
+          <span key={`l${i}`} />
+        ))}
+        {Array.from({ length: days }, (_, i) => {
+          const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(i + 1).padStart(2, '0')}`;
+          const booked = iso >= start.slice(0, 10) && iso <= end.slice(0, 10);
+          const delay = booked ? 600 + 30 * n++ : 0;
+          return (
+            <span
+              key={iso}
+              className={`mini-cal-day ${booked ? 'booked' : ''}`}
+              style={booked ? { animationDelay: `${delay}ms` } : undefined}
+            >
+              {i + 1}
+            </span>
+          );
+        })}
+      </div>
+    </figure>
   );
 }

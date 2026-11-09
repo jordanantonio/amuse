@@ -84,6 +84,7 @@ def evaluate(
                 "required": r.required,
                 "must_be_verified": r.must_be_verified,
                 "state": state,
+                "weight": r.weight,
             }
         )
         if r.required:
@@ -155,7 +156,7 @@ def score(p: Posting, profile: WorkerProfile, ev: Evaluation, today: date, now: 
     if now - as_utc(p.created_at) <= timedelta(hours=NEW_POSTING_HOURS):
         breakdown.append({"label": "Posted in the last 2 days", "points": WEIGHTS["new_posting"]})
     if ev.nice_total and ev.nice_held == ev.nice_total:
-        breakdown.append({"label": "You hold every nice-to-have ticket", "points": WEIGHTS["nice_to_haves"]})
+        breakdown.append({"label": "You hold every nice-to-have certification", "points": WEIGHTS["nice_to_haves"]})
     return sum(b["points"] for b in breakdown), breakdown, dist
 
 
@@ -170,6 +171,7 @@ def card(db, p: Posting, org: Organization, ev: Evaluation, **extra) -> dict:
             "name": org.name,
             "kind": org.kind,
             "verified": org.verification_status == "verified",
+            "industry": org.industry,
         },
         "city": p.city,
         "start_date": p.start_date,
@@ -292,6 +294,11 @@ def unlock_counts(db: Session, user: User) -> dict[str, int]:
             )
         )
     )
+    # Only suggest certifications for work in the worker's own trades.
+    profile = db.get(WorkerProfile, user.id)
+    trades = set(profile.trades or []) if profile else set()
+    if trades:
+        postings = [p for p in postings if p.trade in trades]
     reqs = requirements_for(db, [p.id for p in postings])
     counts: dict[str, int] = {}
     for p in postings:

@@ -2,12 +2,23 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { CalendarCheck, ChevronLeft, ChevronRight, Plus, Workflow } from 'lucide-react';
+import {
+  CalendarCheck,
+  CalendarPlus,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  ExternalLink,
+  Plus,
+  Workflow,
+} from 'lucide-react';
+import { googleEventUrl, googleWeekUrl } from '@/lib/gcal';
 import { market } from '@/lib/market';
 import type { ScheduleItem, ScheduleView } from '@/lib/market-types';
 import { day, range, todayIso } from '@/lib/format';
 import { useSession } from '@/components/v1/session';
 import { EmptyState, ErrorNote, Modal, Skeleton } from '@/components/v1/ui';
+import { CompanyBadge, PersonAvatar } from '@/components/v1/avatar';
 
 const DAY = 86400000;
 const toUtc = (iso: string) => Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10));
@@ -103,16 +114,17 @@ export default function SchedulePage() {
       <div className="page-head-row">
         <h1 className="page-title">Schedule</h1>
         <div className="actions">
-          {me.mode === 'business' && me.planner_persona && (
-            <Link
-              className="text-button"
-              href="/planner"
-              onClick={() => {
-                try {
-                  localStorage.setItem('shift-persona', me.planner_persona!);
-                } catch {}
-              }}
-            >
+          <a
+            className="button button-outline"
+            href={googleWeekUrl(mode === 'week' ? start : addDays(anchor, -weekday(anchor)))}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ExternalLink size={18} aria-hidden="true" />
+            Open in Google Calendar
+          </a>
+          {me.mode === 'business' && (
+            <Link className="text-button" href="/crew">
               <Workflow size={18} aria-hidden="true" /> Crew planner
             </Link>
           )}
@@ -213,7 +225,8 @@ export default function SchedulePage() {
                         onClick={() => open(i)}
                         title={`${i.title}${i.subtitle ? ` · ${i.subtitle}` : ''}`}
                       >
-                        {i.title}
+                        <ItemFace item={i} size={18} />
+                        <span>{i.title}</span>
                       </button>
                     ))}
                     {items.length > shown.length && (
@@ -251,18 +264,47 @@ export default function SchedulePage() {
         )}
         <ul className="agenda">
           {upcoming.map((i) => (
-            <li key={i.id}>
+            <li key={i.id} className="agenda-row">
               <button className={`agenda-item ${i.kind}`} onClick={() => open(i)}>
-                <i
-                  className={`swatch ${i.kind === 'manual' ? 'unavailable' : 'booked'}`}
-                  aria-hidden="true"
-                />
+                {i.kind === 'manual' ? (
+                  <i className="swatch unavailable" aria-hidden="true" />
+                ) : (
+                  <ItemFace item={i} size={36} />
+                )}
                 <span>
                   <strong>{i.title}</strong>
                   {range(i.start_date, i.end_date)}
                   {i.subtitle ? ` · ${i.subtitle}` : ''}
                 </span>
               </button>
+              {i.kind === 'engagement' && i.engagement_id && (
+                <div className="agenda-links">
+                  <a
+                    className="text-button"
+                    href={googleEventUrl({
+                      title: `Shift: ${i.title} @ ${me.mode === 'business' ? me.organization?.name : i.subtitle}`,
+                      start: i.start_date,
+                      end: i.end_date,
+                      details:
+                        me.mode === 'business'
+                          ? `${i.subtitle} booked through Shift.`
+                          : 'Booked through Shift.',
+                      location: i.location || '',
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <CalendarPlus size={16} aria-hidden="true" /> Add to Google Calendar
+                  </a>
+                  <a
+                    className="text-button"
+                    href={`/api/v1/market/engagements/${i.engagement_id}/calendar.ics`}
+                    download
+                  >
+                    <Download size={16} aria-hidden="true" /> .ics
+                  </a>
+                </div>
+              )}
             </li>
           ))}
         </ul>
@@ -302,6 +344,13 @@ export default function SchedulePage() {
       )}
     </>
   );
+}
+
+/** Business view shows the booked worker; worker view shows the company. */
+function ItemFace({ item, size }: { item: ScheduleItem; size: number }) {
+  if (item.kind === 'manual') return null;
+  if (item.person_id) return <PersonAvatar id={item.person_id} name={item.subtitle} size={size} />;
+  return <CompanyBadge name={item.subtitle} industry={item.industry} size={size} />;
 }
 
 function BlockDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () => Promise<void> }) {

@@ -13,7 +13,7 @@ test('weather and absence recovery → manager approval → worker acceptance �
 }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto('/planner');
+  await page.goto('/dev/legacy-planner');
   await expect(page.getByRole('heading', { name: 'Week of November 9' })).toBeVisible();
   await page.screenshot({ path: 'test-results/shift-adaptive-overview.png', fullPage: true });
   await page.getByRole('link', { name: 'SHIFT Adaptive', exact: true }).click();
@@ -45,7 +45,7 @@ test('weather and absence recovery → manager approval → worker acceptance �
   );
   for (const c of proposal.confirmations) {
     await page.getByLabel('Demo persona').selectOption('demo-' + c.worker_id);
-    await page.goto(`/planner?view=inbox&project=eastside&proposal=${proposalId}`);
+    await page.goto(`/dev/legacy-planner?view=inbox&project=eastside&proposal=${proposalId}`);
     await expect(
       page.getByRole('button', { name: 'Accept assignments', exact: true }),
     ).toBeVisible();
@@ -55,7 +55,7 @@ test('weather and absence recovery → manager approval → worker acceptance �
     );
   }
   await page.getByLabel('Demo persona').selectOption('demo-manager');
-  await page.goto(`/planner?view=inbox&project=eastside&proposal=${proposalId}`);
+  await page.goto(`/dev/legacy-planner?view=inbox&project=eastside&proposal=${proposalId}`);
   await page.getByRole('button', { name: 'Revalidate & publish schedule' }).click();
   await expect(page.locator('#proposal-comparison > .section-heading')).toContainText('Published');
   dashboard = await (await request.get('http://127.0.0.1:8000/api/v1/dashboard')).json();
@@ -77,7 +77,7 @@ test('worker mobile profile, availability, application and calendar date navigat
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/planner');
+  await page.goto('/dev/legacy-planner');
   await expect(page.getByRole('heading', { name: 'Week of November 9' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   await page.screenshot({ path: 'test-results/shift-adaptive-mobile.png', fullPage: true });
@@ -111,7 +111,7 @@ test('worker mobile profile, availability, application and calendar date navigat
 });
 
 test('project and task editors persist new scope and URLs survive reload', async ({ page }) => {
-  await page.goto('/planner?view=projects&project=eastside');
+  await page.goto('/dev/legacy-planner?view=projects&project=eastside');
   await expect(page.getByRole('heading', { name: 'Turn scope into a shared plan.' })).toBeVisible();
   await page.getByRole('button', { name: 'New project', exact: true }).click();
   await page.getByLabel('Project name', { exact: true }).fill('Browser-verified fabrication');

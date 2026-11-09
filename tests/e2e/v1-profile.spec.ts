@@ -5,8 +5,10 @@ test.beforeEach(async ({ request }) => {
   expect((await request.post('/api/v1/dev/reset')).ok()).toBeTruthy();
 });
 
-test('worker wallet: expiring warning, add a ticket with proof, four-tab nav', async ({ page }) => {
-  await signInAs(page, /Maya Brooks/);
+test('worker wallet: expiring warning, add a certification with proof, four-tab nav', async ({
+  page,
+}) => {
+  await signInAs(page, 'u-maya');
   await expect(page.getByRole('link', { name: /WHMIS expires/ })).toBeVisible();
   const nav = page.locator('.v1-nav').getByRole('link');
   await expect(nav).toHaveText([/^Home/, /^Work/, /^Schedule/, /^Profile/]);
@@ -17,8 +19,8 @@ test('worker wallet: expiring warning, add a ticket with proof, four-tab nav', a
   await expect(whmis).toContainText('Verified');
   await page.screenshot({ path: 'test-results/v1-profile-desktop.png', fullPage: true });
 
-  await page.getByRole('button', { name: 'Add ticket' }).click();
-  const dialog = page.getByRole('dialog', { name: 'Add a ticket' });
+  await page.getByRole('button', { name: 'Upload certification' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Add a certification' });
   await dialog.getByLabel('Type').selectOption('fall-protection');
   await dialog.getByLabel('Expires on').fill('2029-03-31');
   await dialog.locator('input[type=file]').setInputFiles({
@@ -41,7 +43,7 @@ test('worker wallet: expiring warning, add a ticket with proof, four-tab nav', a
 });
 
 test('business sees its company profile and credentials', async ({ page }) => {
-  await signInAs(page, /Alex Morgan/);
+  await signInAs(page, 'u-alex');
   await navLink(page, 'Profile').click();
   await expect(page.getByRole('heading', { name: 'Northline Homes' })).toBeVisible();
   await expect(page.locator('.wallet-card').filter({ hasText: 'COR' })).toContainText('Verified');

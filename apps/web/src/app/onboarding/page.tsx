@@ -10,7 +10,7 @@ const roles: { mode: Mode; title: string; detail: string; icon: typeof HardHat }
   {
     mode: 'worker',
     title: 'I’m looking for work',
-    detail: 'Find contracts that fit your tickets and schedule.',
+    detail: 'Find contracts that fit your certifications and schedule.',
     icon: HardHat,
   },
   {

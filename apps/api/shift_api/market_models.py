@@ -12,6 +12,7 @@ from sqlalchemy import (
     Date,
     DateTime,
     Float,
+    Index,
     ForeignKey,
     Integer,
     String,
@@ -55,6 +56,9 @@ class WorkerProfile(Base):
     bio: Mapped[str] = mapped_column(String(1000), default="")
     linkedin_url: Mapped[str | None] = mapped_column(String(300), nullable=True)
     is_public: Mapped[bool] = mapped_column(Boolean, default=True)
+    # PROFILE-5
+    tools: Mapped[list] = mapped_column(JSON, default=list)
+    languages: Mapped[list] = mapped_column(JSON, default=list)
 
 
 class AuditLog(Base):
@@ -131,6 +135,23 @@ class WorkHistory(Base):
     reference_contact: Mapped[str | None] = mapped_column(String(160), nullable=True)
     # Set when the entry was created from a completed Shift contract.
     engagement_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    # PROFILE-3: public paths of work photos, and the employer's rating for Shift contracts.
+    photo_paths: Mapped[list] = mapped_column(JSON, default=list)
+    rating: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+
+class Review(Base):
+    """A short review from a past employer on Shift (PROFILE-5)."""
+
+    __tablename__ = "reviews"
+    __table_args__ = (CheckConstraint("rating BETWEEN 1 AND 5"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    worker_user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    org_id: Mapped[str] = mapped_column(ForeignKey("organizations.id"))
+    author_name: Mapped[str] = mapped_column(String(160))
+    rating: Mapped[int] = mapped_column(Integer)
+    quote: Mapped[str] = mapped_column(String(600))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
 class Notification(Base):
@@ -174,6 +195,17 @@ class Posting(Base):
     headcount: Mapped[int] = mapped_column(Integer, default=1)
     status: Mapped[str] = mapped_column(String(10), default="open", index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    # V2 apply flow content (APPLY-1); all optional.
+    shift_hours: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    ppe_provided: Mapped[list] = mapped_column(JSON, default=list)
+    ppe_required: Mapped[list] = mapped_column(JSON, default=list)
+    typical_day: Mapped[str | None] = mapped_column(String(1500), nullable=True)
+    # [{id, prompt, kind: 'yes_no' | 'date' | 'text'}]
+    questions: Mapped[list] = mapped_column(JSON, default=list)
+    # RANK-3: crew needs, e.g. [{"credential_type_id": "forklift", "needed": 2}]
+    coverage: Mapped[list] = mapped_column(JSON, default=list)
+    # RANK-4: off by default; when on, applicants missing required certs are declined politely.
+    auto_decline: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
 
 
 class PostingRequirement(Base):
@@ -185,6 +217,8 @@ class PostingRequirement(Base):
     # required=False means nice-to-have: improves ranking, never gates eligibility.
     required: Mapped[bool] = mapped_column(Boolean, default=True)
     must_be_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    # RANK-1: bonus (required=False) weight: 'nice' | 'valuable' | 'very_valuable'
+    weight: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
 
 class ContractApplication(Base):
@@ -214,6 +248,8 @@ class ContractApplication(Base):
     crew_size: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    # Screening answers keyed by question id (APPLY-1 step 3).
+    answers: Mapped[dict] = mapped_column(JSON, default=dict)
 
 
 class Engagement(Base):
@@ -269,6 +305,74 @@ class ConnectedAccount(Base):
     scopes: Mapped[str] = mapped_column(String(500), default="")
     refresh_token_encrypted: Mapped[str] = mapped_column(String(2000))
     connected_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class CrewMember(Base):
+    """A worker on a business's regular crew roster (crew planner pool)."""
+
+    __tablename__ = "crew_members"
+    org_id: Mapped[str] = mapped_column(ForeignKey("organizations.id"), primary_key=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), primary_key=True)
+
+
+class WorkerHours(Base):
+    """Weekly availability: minutes from midnight on `weekday` (0 = Monday).
+
+    `end_minute` may pass 1440 for windows that run past midnight (nights).
+    """
+
+    __tablename__ = "worker_hours"
+    __table_args__ = (CheckConstraint("end_minute > start_minute AND weekday BETWEEN 0 AND 6"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    weekday: Mapped[int] = mapped_column(Integer)
+    start_minute: Mapped[int] = mapped_column(Integer)
+    end_minute: Mapped[int] = mapped_column(Integer)
+
+
+class CrewSlot(Base):
+    """A shift the business needs filled, e.g. Packaging line 8 AM–12 PM, needs 2."""
+
+    __tablename__ = "crew_slots"
+    __table_args__ = (
+        CheckConstraint("end_minute > start_minute AND needed > 0"),
+        Index("ix_crew_slots_org_day", "org_id", "day"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    org_id: Mapped[str] = mapped_column(ForeignKey("organizations.id"))
+    day: Mapped[date] = mapped_column(Date)
+    start_minute: Mapped[int] = mapped_column(Integer)
+    end_minute: Mapped[int] = mapped_column(Integer)
+    label: Mapped[str] = mapped_column(String(120))
+    needed: Mapped[int] = mapped_column(Integer, default=1)
+    preferred_cert: Mapped[str | None] = mapped_column(
+        ForeignKey("credential_types.id"), nullable=True
+    )
+    required_certs: Mapped[list] = mapped_column(JSON, default=list)
+
+
+class CrewAssignment(Base):
+    __tablename__ = "crew_assignments"
+    __table_args__ = (
+        UniqueConstraint("slot_id", "user_id"),
+        CheckConstraint("status IN ('assigned','proposed')"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    slot_id: Mapped[str] = mapped_column(ForeignKey("crew_slots.id"), index=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    # 'proposed' = Auto-fill ghost avatar until the manager accepts it.
+    status: Mapped[str] = mapped_column(String(20), default="assigned")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class CrewRules(Base):
+    """Fatigue and fairness advice settings (CREW-3). Advice only; never blocks."""
+
+    __tablename__ = "crew_rules"
+    org_id: Mapped[str] = mapped_column(ForeignKey("organizations.id"), primary_key=True)
+    max_consecutive_days: Mapped[int] = mapped_column(Integer, default=5)
+    min_rest_hours: Mapped[int] = mapped_column(Integer, default=10)
+    max_weekly_hours: Mapped[int] = mapped_column(Integer, default=40)
 
 
 class OrgMember(Base):

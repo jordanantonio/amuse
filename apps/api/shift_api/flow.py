@@ -270,6 +270,7 @@ def applicant_summary(db, a: ContractApplication, p: Posting) -> dict:
         "city": o.city or "",
         "distance_km": None,
         "verified": o.verification_status == "verified",
+        "industry": o.industry,
     }
 
 

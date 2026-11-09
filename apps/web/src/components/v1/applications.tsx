@@ -2,6 +2,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
+  Award,
+  Flag,
+  Puzzle,
   CircleCheck,
   CircleMinus,
   Clock3,
@@ -13,9 +16,11 @@ import {
   MapPin,
 } from 'lucide-react';
 import { market } from '@/lib/market';
-import type { ApplicationStatus, ApplicationView } from '@/lib/market-types';
-import { dollars, range } from '@/lib/format';
+import type { ApplicationStatus, ApplicationView, RankedApplicant } from '@/lib/market-types';
+import { FitBreakdown, ScoreBar } from './crew';
+import { day, dollars, range } from '@/lib/format';
 import { StatusChip, type Tone } from './ui';
+import { CompanyBadge, PersonAvatar } from './avatar';
 
 const STATUS: Record<ApplicationStatus, { tone: Tone; label: string; icon: typeof Clock3 }> = {
   applied: { tone: 'muted', label: 'Applied', icon: Clock3 },
@@ -77,7 +82,7 @@ export function ApplicationStatusBlock({
               : a.status === 'shortlisted'
                 ? 'You’re on the shortlist.'
                 : a.status === 'applied'
-                  ? 'The business can see your profile and tickets.'
+                  ? 'The business can see your profile and certifications.'
                   : ''}
         </span>
       </div>
@@ -122,6 +127,7 @@ export function MyApplicationRow({
   const p = a.posting;
   return (
     <li className="work-row">
+      <CompanyBadge name={p.org.name} industry={p.org.industry} size={44} />
       <div className="work-row-main">
         <Link href={`/postings/${p.id}`} className="work-row-title">
           {p.title}
@@ -141,11 +147,14 @@ export function MyApplicationRow({
 export function ApplicantRow({
   application,
   onChanged,
+  rank,
 }: {
   application: ApplicationView;
   onChanged: () => void;
+  rank?: RankedApplicant;
 }) {
   const [a, setA] = useState(application);
+  const [why, setWhy] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const m = a.posting.match;
@@ -169,6 +178,11 @@ export function ApplicantRow({
   };
   return (
     <li className="applicant-row">
+      {a.applicant.kind === 'worker' ? (
+        <PersonAvatar id={a.applicant.id} name={a.applicant.name} size={52} />
+      ) : (
+        <CompanyBadge name={a.applicant.name} industry={a.applicant.industry} size={52} />
+      )}
       <div className="applicant-main">
         <div className="applicant-name">
           <strong>{a.applicant.name}</strong>
@@ -203,10 +217,74 @@ export function ApplicantRow({
           ) : (
             <CircleCheck size={18} aria-hidden="true" />
           )}
-          {m.required_held} of {m.required_total} required tickets
+          {m.required_held} of {m.required_total} required certs
           {pending.length ? `, ${pending.length} not yet verified` : ''}
           {missing.length ? `, missing ${missing.map((i) => i.name).join(', ')}` : ''}
         </p>
+        {rank && (
+          <div className="rank-extras">
+            <button
+              className="score-button"
+              aria-expanded={why}
+              aria-label={`Fit score ${rank.score}. Show breakdown`}
+              onClick={() => setWhy(!why)}
+            >
+              <ScoreBar score={rank.score} />
+            </button>
+            {rank.fills_gap.length > 0 && (
+              <span className="gap-tag">
+                <Puzzle size={14} aria-hidden="true" /> Fills a gap: {rank.fills_gap.join(', ')}
+              </span>
+            )}
+            {rank.signals.length > 0 && (
+              <span className="auto-apply-flag" title={rank.signals.join('. ')}>
+                <Flag size={14} aria-hidden="true" /> Possible auto-apply
+              </span>
+            )}
+          </div>
+        )}
+        {rank && rank.bonus.some((b) => b.held) && (
+          <ul className="cert-chips" aria-label="Bonus certifications held">
+            {rank.bonus
+              .filter((b) => b.held)
+              .map((b) => (
+                <li key={b.name} className="cert-chip verified">
+                  <Award size={14} aria-hidden="true" /> {b.name} · {b.weight}
+                </li>
+              ))}
+          </ul>
+        )}
+        {rank && why && (
+          <>
+            <FitBreakdown rows={rank.breakdown} />
+            {rank.signals.length > 0 && (
+              <ul className="warn-chips" aria-label="Low-effort signals">
+                {rank.signals.map((s) => (
+                  <li key={s}>{s}</li>
+                ))}
+              </ul>
+            )}
+            {rank.answers.length > 0 && (
+              <dl className="answer-list">
+                {rank.answers.map((q) => (
+                  <div key={q.prompt}>
+                    <dt>{q.prompt}</dt>
+                    <dd>
+                      {q.answer
+                        ? /^\d{4}-\d{2}-\d{2}$/.test(q.answer)
+                          ? day(q.answer, true)
+                          : q.answer
+                        : 'Skipped'}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+          </>
+        )}
+        {rank?.pile_reasons.length ? (
+          <p className="blocker">{rank.pile_reasons.join('; ')}</p>
+        ) : null}
         {a.note && <p className="applicant-note">“{a.note}”</p>}
         {error && (
           <p className="v1-inline-error" role="alert">

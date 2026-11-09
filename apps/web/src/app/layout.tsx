@@ -17,7 +17,7 @@ const display = Barlow_Semi_Condensed({
 export const metadata: Metadata = {
   title: 'Shift — contract work in the trades',
   description:
-    'Find and fill construction and manufacturing contracts, matched to verified tickets and real availability.',
+    'Find and fill construction and manufacturing contracts, matched to verified certifications and real availability.',
 };
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
