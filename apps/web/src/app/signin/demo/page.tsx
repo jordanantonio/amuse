@@ -36,7 +36,11 @@ export default function DemoSignIn() {
     setBusy(key);
     setError('');
     try {
-      const { next } = await api<{ next: string }>('/auth/demo', { method: 'POST', body });
+      const destination = new URLSearchParams(window.location.search).get('next');
+      const path = destination
+        ? `/auth/demo?next=${encodeURIComponent(destination)}`
+        : '/auth/demo';
+      const { next } = await api<{ next: string }>(path, { method: 'POST', body });
       router.push(next);
     } catch (e) {
       setError((e as Error).message);

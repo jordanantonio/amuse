@@ -1,6 +1,7 @@
 """Shift V1 sign-in: Google OAuth when configured, otherwise the local demo sign-in."""
 
 import secrets
+from urllib.parse import urlencode
 from typing import Annotated
 from fastapi import APIRouter, Cookie, HTTPException, Response
 from fastapi.responses import RedirectResponse
@@ -52,7 +53,9 @@ def google_start(next: str | None = None):
     if not google.enabled():
         if settings.demo_mode:
             # Honest fallback: no Google client is configured on this server.
-            return RedirectResponse("/signin/demo", status_code=303)
+            target = safe_next(next)
+            path = "/signin/demo" if target == "/home" else "/signin/demo?" + urlencode({"next": target})
+            return RedirectResponse(path, status_code=303)
         return RedirectResponse("/?error=google-not-configured", status_code=303)
     return oauth_redirect("signin", google.SIGN_IN_SCOPES, safe_next(next))
 
@@ -131,7 +134,7 @@ def demo_accounts(db: Database):
 
 
 @router.post("/demo")
-def demo_sign_in(payload: DemoSignIn, db: Database, response: Response):
+def demo_sign_in(payload: DemoSignIn, db: Database, response: Response, next: str | None = None):
     require_demo()
     if payload.user_id:
         user = db.get(User, payload.user_id)
@@ -149,7 +152,7 @@ def demo_sign_in(payload: DemoSignIn, db: Database, response: Response):
         db.add(user)
         db.commit()
     start_session(response, user)
-    return {"next": "/home" if user.onboarded else "/onboarding"}
+    return {"next": safe_next(next) if user.onboarded else "/onboarding"}
 
 
 @router.post("/signout")

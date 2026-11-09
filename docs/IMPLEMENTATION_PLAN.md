@@ -117,3 +117,20 @@ Shift_v1_Requirements.md shipped: Google/demo sign-in + onboarding; four-tab she
 profiles and credential wallets; postings, For You feed and applications; accept with
 conflict check, availability blocks, Google Calendar and .ics, Schedule tab. Status per
 requirement and open P1/P2 items: docs/V1.md. The crew planner moved to /planner.
+
+## Public home — 2026-11-08
+
+Owner: Codex, `codex/public-home`, sequential work. Reference: user-supplied
+Public home (open style) HTML export. Owns public landing component/styles,
+public discovery route/response models, frontend public contract types, API/browser
+tests and canonical docs. Contract: GET /api/v1/public/contracts?q=&trade= returns
+{demo, contracts}; only open/unexpired listings and explicitly public fields.
+Root stays public without redirects or required sessions; protected actions retain
+existing sign-in/authorization. No database schema changes.
+
+Public home delivered: responsive reference-based layout, anonymous API-backed
+search/filter/preview, device-local saves, preserved sign-in destinations, explicit
+private-field projection, local SVG artwork and public browser/API tests. Typecheck,
+build, schema/OpenAPI checks and 113 API tests passed; the 19 existing browser
+scenarios and 4 new public-home scenarios were verified. See TESTING.md for the
+cold-compilation assertion retry and skipped PostgreSQL/live integration checks.

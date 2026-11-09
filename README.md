@@ -32,9 +32,11 @@ Terminal 2:
 npm run dev
 ```
 
-Open **http://127.0.0.1:3000** for the Shift V1 marketplace (sign in with a
-fictional demo account; see `docs/V1.md`) or **/planner** for the SHIFT Adaptive crew
-planner. Reset the V1 demo at **/dev/reset**. API documentation: http://127.0.0.1:8000/docs.
+Open **http://127.0.0.1:3000** for the public home screen. Search and preview
+open contracts without logging in. Select **Sign in** for your account workspace
+(the local demo opens the Ilya/Rahul/Jordan picker). The current crew planner is
+at **/crew**, and **/planner** redirects there. The legacy recovery planner remains
+at **/dev/legacy-planner**. Reset the V1 demo at **/dev/reset**. API documentation: http://127.0.0.1:8000/docs.
 Both launchers bind to loopback. Stop with Ctrl+C. SQLite persists to ignored
 `shift.sqlite`; startup applies Alembic migrations and idempotently upgrades the
 fictional Northline fixture. It does not reset existing work.
@@ -136,7 +138,8 @@ npm run test:e2e
 
 Playwright requires `npx playwright install chromium`, or set
 `PLAYWRIGHT_CHROME_PATH` to an installed Chrome executable. It starts isolated
-servers and `.tmp/e2e.sqlite`; ports 3000/8000 must be free. PostgreSQL integration
+servers with a fresh `.tmp/e2e-<run>.sqlite` database/upload directory per run;
+ports 3000/8000 must be free. Normal demo data is not reset. PostgreSQL integration
 requires an explicitly disposable database; CI provides one. See
 [TESTING.md](docs/TESTING.md) for actual results, skipped checks and limits.
 

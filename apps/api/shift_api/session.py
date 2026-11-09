@@ -82,6 +82,12 @@ CurrentUser = Annotated[User, Depends(current_user)]
 
 def safe_next(path: str | None, default: str = "/home") -> str:
     """Only allow same-site relative redirects (no open redirects)."""
-    if path and path.startswith("/") and not path.startswith("//") and "\\" not in path:
+    if (
+        path
+        and path.startswith("/")
+        and not path.startswith("//")
+        and "\\" not in path
+        and not any(ord(char) < 32 or ord(char) == 127 for char in path)
+    ):
         return path
     return default

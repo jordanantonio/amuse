@@ -103,3 +103,22 @@ preemptive/split tasks and resilience benchmarking remain outside this release.
 - [Supabase JWT verification](https://supabase.com/docs/guides/auth/jwts)
 - [PostgreSQL range exclusions](https://www.postgresql.org/docs/current/rangetypes.html)
 - [OR-Tools scheduling](https://developers.google.com/optimization/scheduling/employee_scheduling)
+
+## Public entry point
+
+`/` renders the server landing shell and client PublicHome without a session
+guard or automatic account redirect. Its scoped Inter/navy/yellow styles do not
+replace signed-in workspace styles. Local SVG illustrations fill the export's
+photo placeholders; its bundled React/runtime files are not imported.
+
+GET `/api/v1/public/contracts?q=&trade=` returns `{demo, contracts}` through a
+dedicated Pydantic allowlist, selecting only open postings whose end date has not
+passed. Search is literal, bounded and parameterized; responses are limited to
+40 entries ordered by start date/id. Frontend types mirror this contract and
+are re-exported from lib/types.ts. No database schema or direct-client grant changes.
+
+Public previews contain no private addresses or personalized eligibility claims.
+Application links enter the existing authentication flow; the demo fallback
+preserves validated local `next` paths for existing onboarded accounts. Incomplete
+accounts still go through onboarding. Anonymous saved IDs live only in browser
+storage. Signed-in posting/profile/schedule routes retain their server checks.

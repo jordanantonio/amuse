@@ -3,12 +3,14 @@ import { expect, test } from '@playwright/test';
 test('signed-out visitors are sent from Home to the landing page', async ({ page }) => {
   await page.goto('/home');
   await expect(page).toHaveURL(/\/\?next=%2Fhome$/);
-  await expect(page.getByRole('link', { name: 'Continue with Google' })).toBeVisible();
+  await expect(
+    page.locator('.public-nav').getByRole('link', { name: 'Sign in', exact: true }),
+  ).toBeVisible();
 });
 
 test('new worker signs in, onboards in three steps and lands on Home', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('link', { name: 'Continue with Google' }).click();
+  await page.locator('.public-nav').getByRole('link', { name: 'Sign in', exact: true }).click();
   // No Google client is configured in tests, so the honest demo fallback appears.
   await expect(page.getByRole('heading', { name: 'How do you want to use Shift?' })).toBeVisible();
   await page.waitForLoadState('networkidle');
@@ -33,11 +35,15 @@ test('new worker signs in, onboards in three steps and lands on Home', async ({ 
 
 test('the demo picker shows three personas and signs Ilya in', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Contract work, made easy.' })).toBeVisible();
-  await expect(page.locator('.testimonial')).toHaveCount(3);
+  await expect(
+    page.getByRole('heading', { name: 'Find skilled trades work across Alberta' }),
+  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Open contracts', exact: true })).toBeVisible();
   await page.screenshot({ path: 'test-results/v2-landing.png' });
-  await expect(page.getByText('Illustrative feedback from our prototype')).toBeVisible();
-  await page.getByRole('link', { name: 'Continue with Google' }).click();
+  await expect(
+    page.getByText('Fictional demo. All companies, people and contracts shown are made up.'),
+  ).toBeVisible();
+  await page.locator('.public-nav').getByRole('link', { name: 'Sign in', exact: true }).click();
   const cards = page.locator('.persona-card');
   await expect(cards).toHaveCount(3);
   await expect(cards.nth(1)).toContainText('Prairie Harvest Foods');

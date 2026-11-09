@@ -83,3 +83,43 @@ incorrectly expected a worker-scoped response to contain other workers' confirma
 the corrected test obtains the authorized manager view before completing acceptance.
 No privacy restriction was relaxed. Hosted Supabase credentials/sign-in remain a
 separate, unverified deployment setup step.
+
+## Public home verification — 2026-11-08
+
+Implemented on `codex/public-home` using the user's Public home (open style) HTML
+export as the visual reference. The export's bundled React/runtime is not shipped;
+existing local illustrations were reused and electrical/welding/equipment SVGs added.
+
+Executed results:
+
+- `uv run pytest -q`: **113 passed, 3 PostgreSQL tests skipped** (no disposable
+  PostgreSQL URL configured for this change).
+- `uv run pytest -q apps/api/tests/test_public.py`: **5 passed**, including public
+  allowlisted fields, hidden addresses, publication/expiry filters, bounded literal
+  search, hosted-mode access and safe post-sign-in destinations. External URLs,
+  protocol-relative paths, backslashes and control characters fall back to /home.
+- `npm run typecheck` and `npm run build`: passed, including the new Inter font.
+- `uv run alembic check` and OpenAPI export `--check`: passed; no schema changes.
+- Full Playwright run: all **19 existing regression scenarios passed**, plus three
+  new public-home scenarios. The fourth new scenario initially exceeded its
+  five-second navigation assertion during the first cold compilation of a contract
+  route; its assertion was changed to wait up to 15 seconds for that navigation.
+- Focused `npm run test:e2e -- public-home.spec.ts` with installed Chrome:
+  **all 4 public-home scenarios passed**, including the selected-contract sign-in
+  return path. The existing regression scenarios were unchanged by that test-only fix.
+- Live anonymous desktop (1280px) and mobile (390px) checks passed without browser
+  runtime errors or document overflow. Screenshots are in ignored `.tmp/`.
+
+Public browser scenarios cover search/trade filters, real carousel scrolling,
+contract preview/escape dismissal, local saved IDs surviving reload, no root redirect
+for existing sessions, empty/error/retry states, mobile layout, and authentication
+before applying. Demo sign-in retains the selected contract for onboarded accounts;
+incomplete accounts still go through onboarding. Public access does not expose site
+addresses, private schedules, applicant records or credentials.
+
+The browser harness now creates an isolated database/upload directory per run so
+old branch migration histories cannot interfere. The preserved V2 local demo DB was
+not reset. Development servers are left running on 127.0.0.1:3000 and :8000.
+Existing upstream migration/Starlette warnings remain visible; live Google/Supabase
+integration and PostgreSQL checks were not repeated for this change. No commits,
+pushes or deployment were performed.

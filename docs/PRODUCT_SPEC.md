@@ -83,3 +83,15 @@ There is no fake production login or claimed live weather connection. Full Adapt
 semantics and operational limits are in ADAPTIVE.md. Legal overtime compliance,
 equipment/material resource models, split shifts and resilience benchmarks remain
 future extensions. See TESTING.md for executed evidence, not inferred readiness.
+
+## Public home and discovery
+
+The root route is a public home screen based on the supplied open-style design:
+navy search hero, open-contract carousel, trade browsing and worker/employer
+sections. Visitors need no account to search or preview open, unexpired contracts.
+The public API returns only title, company, trade, city, dates, pay and posting
+type. It never returns site addresses, coordinates, applicant details, screening
+answers, credentials or private schedules. Personal qualification checks, account
+workspaces and application mutations remain authenticated. Hearts save locally
+on the current device with explicit wording; they do not imply an account save.
+The root stays public even when a visitor already has a session.

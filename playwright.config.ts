@@ -1,4 +1,7 @@
 import { defineConfig } from '@playwright/test';
+
+// Migration histories can differ between branches; keep each run isolated.
+const fixture = `.tmp/e2e-${Date.now()}-${process.pid}`;
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: false,
@@ -17,7 +20,11 @@ export default defineConfig({
       command: 'uv run python scripts/dev_api.py',
       url: 'http://127.0.0.1:8000/api/v1/health',
       reuseExistingServer: false,
-      env: { SHIFT_DATABASE_URL: 'sqlite:///./.tmp/e2e.sqlite', SHIFT_DEMO_MODE: 'true' },
+      env: {
+        SHIFT_DATABASE_URL: `sqlite:///./${fixture}.sqlite`,
+        SHIFT_UPLOAD_DIR: `${fixture}-uploads`,
+        SHIFT_DEMO_MODE: 'true',
+      },
       timeout: 30000,
     },
     {

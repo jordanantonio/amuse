@@ -3636,6 +3636,96 @@
         "title": "ProposalInput",
         "type": "object"
       },
+      "PublicContract": {
+        "properties": {
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "company": {
+            "title": "Company",
+            "type": "string"
+          },
+          "end_date": {
+            "format": "date",
+            "title": "End Date",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "pay_rate_cents": {
+            "title": "Pay Rate Cents",
+            "type": "integer"
+          },
+          "pay_unit": {
+            "enum": [
+              "hour",
+              "day",
+              "fixed"
+            ],
+            "title": "Pay Unit",
+            "type": "string"
+          },
+          "posting_type": {
+            "enum": [
+              "individual",
+              "agency"
+            ],
+            "title": "Posting Type",
+            "type": "string"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "trade": {
+            "title": "Trade",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "company",
+          "trade",
+          "city",
+          "start_date",
+          "end_date",
+          "pay_rate_cents",
+          "pay_unit",
+          "posting_type"
+        ],
+        "title": "PublicContract",
+        "type": "object"
+      },
+      "PublicContracts": {
+        "properties": {
+          "contracts": {
+            "items": {
+              "$ref": "#/components/schemas/PublicContract"
+            },
+            "title": "Contracts",
+            "type": "array"
+          },
+          "demo": {
+            "title": "Demo",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "demo",
+          "contracts"
+        ],
+        "title": "PublicContracts",
+        "type": "object"
+      },
       "Question": {
         "properties": {
           "id": {
@@ -5776,6 +5866,24 @@
     "/api/v1/auth/demo": {
       "post": {
         "operationId": "demo_sign_in_api_v1_auth_demo_post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "next",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Next"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -11167,6 +11275,61 @@
           }
         },
         "summary": "Proposal Publish"
+      }
+    },
+    "/api/v1/public/contracts": {
+      "get": {
+        "operationId": "contracts_api_v1_public_contracts_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 100,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "trade",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 60,
+              "title": "Trade",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicContracts"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Contracts",
+        "tags": [
+          "public"
+        ]
       }
     }
   }
