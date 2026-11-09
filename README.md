@@ -1,4 +1,4 @@
-# SHIFT
+<img width="1800" height="600" alt="output-onlinetools-ezgif com-resize" src="https://github.com/user-attachments/assets/379797a8-951e-453d-a6ec-6c5f569c37fe"/>
 
 **Workforce, in sync.** A hybrid-first workforce operating system for construction,
 manufacturing and project work, built for natHacks 2026.
@@ -9,6 +9,43 @@ recovery with manager approval, worker acceptance and atomic publication.
 
 **SHIFT recommends. Authorized humans approve.** Proposed work never silently
 replaces a confirmed schedule. No LLM determines feasibility or invents metrics.
+
+# Features
+
+🔐 Sign-In, Onboarding & Demo Personas
+
+- Google OAuth2 & Supabase Auth: One-click sign-in via Google (Continue with Google) backed by Supabase Auth with server-side asymmetric RS256 JWT signature verification.
+- Guided Role Onboarding: New users choose what they are here for—finding work, hiring a crew, or running a contracting company—and reach their home screen in under a minute.
+
+🪪 Profile & Credential Wallet
+
+- A person, not a record. Worker profiles are essentially a LinkedIn page for the trades with a photo, a headline, a clear availability badge (e.g. "Open to work from Jan 6"), an experience timeline with job photos, tools, trades, languages and past employer reviews.
+- Structured Ticket & Certification Tracking: WHMIS, Fall Protection, Forklift, First Aid and trade licenses all tracked with issuer details, expiry dates and uploaded proof documents. All proof documents are served via private 5 minute signed URLs.
+- Proactive Expiry Warnings: works out the current status of the credentials (self reported, pending review, verified or expired / expiring in the next 30 days) and will alert the worker a month before a ticket expires so they never just quietly lose the job.
+
+🏠 Home & Gated "For You" Feed (/)
+
+- Daily At-a-Glance Summary: Starts with a summary card of new matching contracts since yesterday, then a Today Strip with the next booked shift, any pending offers requiring a reply and any certifications that need looking at.
+- Qualified & Free Matching Engine: The For You feed will only surface contracts that the worker has every required ticket for and has open calendar blocks to take.
+- "Why Am I Seeing This?" Transparency. Every job card will explain the match in plain English (distance in km, start date window, required and bonus cert matches, pay rate versus minimum preference, calendar fit) and will show which further certification would unlock more work.
+
+🏢 Contracting Companies & Crew Proposals
+
+- Crew Rosters & Pooled Credentials: Subs and agencies (e.g. Timberline Framing Crew) will show their full crew roster, each individual's verified trades and tickets and their company wide safety credentials.
+- Side by side crew bidding: when a business puts out a crew contract the various contracting companies will submit their proposals in a structured format (crew size, rate, earliest start date and cover note) which the hiring manager can then compare side by side and book just as they would with an individual worker.
+
+📅 Conflict-Free Booking & Calendar Sync
+
+- Saying Yes Books it: an offer is checked for conflicts straight away and the booking is then stamped into the Schedule tab.
+- Exclusive vs Part Time blocking: Exclusive (e.g. a 6 month full time role) will block the entire date range and allow one click withdraw from any overlapping applications. Part time roles will only block the specific shift days so the worker can still book work around them.
+- Database level double booking prevention: published availability blocks are the single source of truth and are enforced in production via PostgreSQL btree_gist range exclusion constraints. These are then synced to Google Calendar in one tap (with .ics file export as a backup).
+
+⚡ Crew Planner & CP-SAT Disruption Recovery (/planner)
+
+- Visual Slot Scheduling & Fatigue Guardrails: The week is displayed as shift slots (e.g. "Packaging line, 8 AM-12 PM, needs 2, forklift preferred"). Clicking on a slot will then rank the available workers by fit, with side by side availability bars and a warning to the manager prior to assigning someone who has worked yesterday, is on their 3rd consecutive day, has no rest between shifts or would be over 40 hours.
+- Weather aware risk monitoring: tracks the weather forecast against task specific safety and operational limits (e.g. outdoor electrical wiring or framing against heavy rain).
+- Mathematical Schedule Recovery (Google OR-Tools CP-SAT): Tapping Auto-fill runs the CP-SAT constraint solver to generate multi-objective recovery plans (lowest cost, earliest completion, minimum schedule changes) under strict non-negotiable invariants:
+- Enforces worker skills, valid non-expired certifications, published availability, existing commitments, task dependency DAGs, site capacity limits, labor budgets, and deadlines.
 
 ## Run locally
 
